@@ -1,0 +1,35 @@
+{
+  "jurrejan": {
+    "username": "jurrejan",
+    "avatarUrl": "https://avatars.githubusercontent.com/u/60948661?v=4",
+    "name": null,
+    "bio": null,
+    "repos": []
+  },
+  "doublej": {
+    "username": "doublej",
+    "avatarUrl": "https://avatars.githubusercontent.com/u/548350?v=4",
+    "name": "Jurre-Jan Smit",
+    "bio": null,
+    "repos": [
+      {
+        "name": "spinner-verbs-generator",
+        "description": null,
+        "stars": 0,
+        "url": "https://github.com/doublej/spinner-verbs-generator"
+      },
+      {
+        "name": "pixi-paper",
+        "description": "Real-time comparison of HTML to Canvas/Image screenshot libraries",
+        "stars": 0,
+        "url": "https://github.com/doublej/pixi-paper"
+      },
+      {
+        "name": "sheet-cms",
+        "description": "Bidirectional sync between Google Sheets and local JSON files",
+        "stars": 0,
+        "url": "https://github.com/doublej/sheet-cms"
+      }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "template": "typescript/sveltekit",
+  "rendered_at": "2026-02-11T07:36:24.653948+00:00",
+  "context": {
+    "project_name": "Claude Verbs Website",
+    "project_slug": "claude-verbs-website",
+    "description": "Platform to exchange claude verb sets",
+    "author": "Jurre-Jan Smit",
+    "include_tracking": "y",
+    "mcp_servers": "none",
+    "mcp_scope": "project"
+  }
+}

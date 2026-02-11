@@ -5,8 +5,10 @@ import AuthorPopup from './AuthorPopup.svelte'
 const { set, author }: { set: VerbSet; author: Author | undefined } = $props()
 
 const normalizedVerbs = $derived(set.verbs.map((v) => v.replace(/^\s*I(?:[\u2019']m| am)\s+/i, '')))
+const installCmd = $derived(`bunx github:doublej/claude-verbs-cli install ${set.name}`)
 
 let expanded = $state(false)
+let copied = $state(false)
 
 function toggle() {
   expanded = !expanded
@@ -16,6 +18,15 @@ function onKeydown(e: KeyboardEvent) {
   if (e.key !== 'Enter' && e.key !== ' ') return
   e.preventDefault()
   toggle()
+}
+
+function copyInstallCmd(e: MouseEvent) {
+  e.stopPropagation()
+  navigator.clipboard.writeText(installCmd)
+  copied = true
+  setTimeout(() => {
+    copied = false
+  }, 1500)
 }
 </script>
 
@@ -28,6 +39,19 @@ function onKeydown(e: KeyboardEvent) {
   onclick={toggle}
   onkeydown={onKeydown}
 >
+  <button
+    class="card__copy"
+    class:card__copy--copied={copied}
+    title="Copy install command"
+    aria-label="Copy install command: {installCmd}"
+    onclick={copyInstallCmd}
+  >
+    {#if copied}
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+    {:else}
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="0"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+    {/if}
+  </button>
   <span class="card__expand-hint" aria-hidden="true">&#9654;</span>
   <div class="card__name">{set.name}</div>
   <div class="card__desc">{set.description}</div>
@@ -133,6 +157,30 @@ function onKeydown(e: KeyboardEvent) {
 
   .card__author-link:hover {
     color: var(--accent);
+  }
+
+  .card__copy {
+    position: absolute;
+    top: 1.25rem;
+    right: 3rem;
+    background: none;
+    border: 1px solid transparent;
+    padding: 0.2rem;
+    cursor: pointer;
+    color: var(--text-faint);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .card__copy:hover {
+    color: var(--accent);
+    border-color: var(--border);
+  }
+
+  .card__copy--copied {
+    color: var(--green, #4ec990);
   }
 
   .card__expand-hint {

@@ -80,11 +80,16 @@ interface AppOptions {
   onMarketplace?: () => void
 }
 
+export interface AppHandle {
+  cleanup: () => void
+  disableScrollZoom: () => void
+}
+
 export async function createApp(
   wrap: HTMLDivElement,
   sets: VerbSets,
   options?: AppOptions,
-): Promise<() => void> {
+): Promise<AppHandle> {
   const params = createParams()
 
   const app = new Application()
@@ -115,11 +120,18 @@ export async function createApp(
   const scrollItems: (Text | Container)[] = []
   const bootAnim: BootAnim = createBootAnim()
 
+  const onMarketplace = options?.onMarketplace
+    ? () => {
+        scrollZoomCtrl.cleanup()
+        options.onMarketplace?.()
+      }
+    : undefined
+
   const doDispatch = (event: DispatchEvent) =>
     dispatch(event, machine, localeSets, idiotSet, {
       enterState,
       updateSuggestion,
-      onMarketplace: options?.onMarketplace,
+      onMarketplace,
     })
 
   const updateCamera = () =>
@@ -360,19 +372,22 @@ export async function createApp(
 
   if (location.hostname === 'localhost') toggleDevtools()
 
-  return () => {
-    destroyed = true
-    destroyBootAnim(bootAnim)
-    scrollZoomCtrl.cleanup()
-    window.removeEventListener('resize', onResize)
-    window.removeEventListener('mousemove', onMouseMove)
-    document.removeEventListener('keydown', onKeyDown)
-    if (machine.demoTimer) clearTimeout(machine.demoTimer)
-    pool.flush()
-    app.destroy(true, { children: true })
-    // biome-ignore lint/suspicious/noExplicitAny: cleanup window globals
-    ;(window as any).__spinnerAPI = undefined
-    // biome-ignore lint/suspicious/noExplicitAny: cleanup window globals
-    ;(window as any).__PIXI_DEVTOOLS__ = undefined
+  return {
+    cleanup: () => {
+      destroyed = true
+      destroyBootAnim(bootAnim)
+      scrollZoomCtrl.cleanup()
+      window.removeEventListener('resize', onResize)
+      window.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('keydown', onKeyDown)
+      if (machine.demoTimer) clearTimeout(machine.demoTimer)
+      pool.flush()
+      app.destroy(true, { children: true })
+      // biome-ignore lint/suspicious/noExplicitAny: cleanup window globals
+      ;(window as any).__spinnerAPI = undefined
+      // biome-ignore lint/suspicious/noExplicitAny: cleanup window globals
+      ;(window as any).__PIXI_DEVTOOLS__ = undefined
+    },
+    disableScrollZoom: () => scrollZoomCtrl.cleanup(),
   }
 }

@@ -78,11 +78,13 @@ function dispatchIdle(
   } else if (event === 'ARROW_DOWN') {
     m.tabCompleted = false
     m.browseIndex = (m.browseIndex + 1) % localeSets.length
-    cb.updateSuggestion()
+    m.skipCount = 0
+    cb.enterState(State.BROWSING)
   } else if (event === 'ARROW_UP') {
     m.tabCompleted = false
     m.browseIndex = (m.browseIndex - 1 + localeSets.length) % localeSets.length
-    cb.updateSuggestion()
+    m.skipCount = 0
+    cb.enterState(State.BROWSING)
   } else if (event === 'SHIFT_TAB') cb.enterState(State.BUGGED)
 }
 

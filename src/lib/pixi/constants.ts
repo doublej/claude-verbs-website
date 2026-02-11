@@ -28,6 +28,9 @@ export const PALETTE = {
   suggestion: isLight ? 0x8b8b8b : 0x555555,
   active: isLight ? 0x000000 : 0xffffff,
   deadPixel: isLight ? '#d0d0d0' : '#0a0c10',
+  deadPixelRed: isLight ? '#e8a0a0' : '#3a0808',
+  deadPixelBlue: isLight ? '#a0a0e8' : '#08083a',
+  deadPixelGreen: isLight ? '#a0e8a0' : '#083a08',
 }
 
 export const LAYOUT = {
@@ -56,7 +59,7 @@ export const MOUSE_DEFAULTS = {
 }
 
 export const EFFECT_DEFAULTS = {
-  deadPixelCount: 2,
+  deadPixelCount: 12,
   deadPixelSize: 3,
   deadPixelSeed: 42,
   glareWidth: 0.6,

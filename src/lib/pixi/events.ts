@@ -224,7 +224,7 @@ export function mkStateDiagram(): Event {
       { t: '', c: PALETTE.dim },
       { t: 'Notes:', c: PALETTE.accent },
       {
-        t: '  \u2022 BROWSING state exists but is not actively used in main flow',
+        t: '  \u2022 Arrow navigation enters BROWSING before demo selection',
         c: PALETTE.dim,
         col: 1,
       },

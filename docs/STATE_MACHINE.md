@@ -18,7 +18,7 @@ The interactive CRT terminal animation on the home page (`src/routes/+page.svelt
 | State | ID | Purpose |
 |-------|----|---------|
 | **IDLE** | 0 | Initial state, waiting for ENTER to start demo |
-| **BROWSING** | 1 | Navigating verb sets (defined, not actively used in current flow) |
+| **BROWSING** | 1 | Navigating verb sets after first arrow-key interaction |
 | **DEMO** | 2 | Playing verb set animation with scrolling CLI output |
 | **POST_DEMO** | 3 | After demo completion, showing action suggestions |
 | **BUGGED** | 4 | Easter egg glitch effect (accessed via SHIFT_TAB) |
@@ -71,7 +71,7 @@ demoTimeoutMs: 60000 // Auto-exit demo after 60 seconds
      previous
 
 Notes:
-  • BROWSING state exists but is not actively used in main flow
+  • Arrow navigation enters BROWSING before demo selection
   • All interactive states can transition to BUGGED via SHIFT_TAB
   • BUGGED uses double-line box to indicate special/easter egg status
 ```
@@ -140,8 +140,8 @@ Displays 2 action suggestions:
 | Current State | Event | Next State | Side Effects |
 |---------------|-------|-----------|--------------|
 | **IDLE** | ENTER | DEMO | Set `activeSet`, `hasSubmitted=true` |
-| | ARROW_DOWN | IDLE | Increment `browseIndex`, update suggestion |
-| | ARROW_UP | IDLE | Decrement `browseIndex`, update suggestion |
+| | ARROW_DOWN | BROWSING | Increment `browseIndex`, reset `skipCount`, start browse mode |
+| | ARROW_UP | BROWSING | Decrement `browseIndex`, reset `skipCount`, start browse mode |
 | | SHIFT_TAB | BUGGED | Enable flicker effect, store previous state |
 | **BROWSING** | ENTER | DEMO | Check `skipCount ≥4` → use idiotSet, else selected set |
 | | ARROW_DOWN | BROWSING | Increment `skipCount`, cycle sets (unless idiot triggered) |
@@ -420,7 +420,7 @@ console.log(machine.demoTimer !== null)  // Should be true in DEMO state
 ## Future Enhancements
 
 **Potential improvements:**
-- Activate BROWSING state for richer navigation
+- Refine BROWSING transitions for alternate input devices
 - Add DEMO pause/resume (space bar)
 - Multi-language voice hints
 - More easter eggs (konami code?)

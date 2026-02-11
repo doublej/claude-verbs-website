@@ -7,6 +7,13 @@ function seededRand(): number {
   return seed / 2147483647
 }
 
+const COLORED_PIXELS: Record<number, string> = {
+  3: PALETTE.deadPixelRed,
+  7: PALETTE.deadPixelBlue,
+  10: PALETTE.deadPixelGreen,
+  11: PALETTE.deadPixelRed,
+}
+
 export function buildDeadPixelLayer(w: number, h: number, enabled: boolean): HTMLCanvasElement {
   const c = document.createElement('canvas')
   const dpr = window.devicePixelRatio || 1
@@ -16,9 +23,9 @@ export function buildDeadPixelLayer(w: number, h: number, enabled: boolean): HTM
 
   const ctx = c.getContext('2d')!
   const px = Math.round(EFFECT_DEFAULTS.deadPixelSize * dpr)
-  ctx.fillStyle = PALETTE.deadPixel
   seed = EFFECT_DEFAULTS.deadPixelSeed
   for (let i = 0; i < EFFECT_DEFAULTS.deadPixelCount; i++) {
+    ctx.fillStyle = COLORED_PIXELS[i] ?? PALETTE.deadPixel
     const x = Math.round((0.15 + seededRand() * 0.7) * c.width)
     const y = Math.round((0.1 + seededRand() * 0.6) * c.height)
     ctx.fillRect(x, y, px, px)

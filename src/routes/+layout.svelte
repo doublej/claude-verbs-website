@@ -51,16 +51,12 @@ import ThemeToggle from '$lib/components/ThemeToggle.svelte'
   }
 
   .disclaimer-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    width: 100%;
     background: var(--disclaimer-bg);
     color: var(--disclaimer-text);
     text-align: center;
     font-size: 0.75rem;
     padding: 12px 12px;
-    z-index: 9999;
     font-family: system-ui, sans-serif;
     transition: background-color 0.2s, color 0.2s;
   }

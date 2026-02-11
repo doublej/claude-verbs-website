@@ -1,6 +1,9 @@
 <script lang="ts">
 import type { Author, VerbSet } from '$lib/data/types'
+import { onMount } from 'svelte'
 import AuthorPopup from './AuthorPopup.svelte'
+
+const SPINNER_CHARS = ['|', '/', '-', '\\']
 
 const { set, author }: { set: VerbSet; author: Author | undefined } = $props()
 
@@ -9,6 +12,14 @@ const installCmd = $derived(`bunx github:doublej/claude-verbs-cli install ${set.
 
 let expanded = $state(false)
 let copied = $state(false)
+let hovered = $state(false)
+let currentVerb = $state('')
+let spinnerChar = $state('|')
+let verbTimer: ReturnType<typeof setInterval> | undefined
+let charTimer: ReturnType<typeof setInterval> | undefined
+let shuffled: string[] = []
+let verbIdx = 0
+let charIdx = 0
 
 function toggle() {
   expanded = !expanded
@@ -28,6 +39,45 @@ function copyInstallCmd(e: MouseEvent) {
     copied = false
   }, 1500)
 }
+
+function startTimers() {
+  verbTimer = setInterval(() => {
+    verbIdx = (verbIdx + 1) % shuffled.length
+    currentVerb = shuffled[verbIdx]
+  }, 2200)
+  charTimer = setInterval(() => {
+    charIdx = (charIdx + 1) % SPINNER_CHARS.length
+    spinnerChar = SPINNER_CHARS[charIdx]
+  }, 200)
+}
+
+function stopTimers() {
+  clearInterval(verbTimer)
+  clearInterval(charTimer)
+  verbTimer = undefined
+  charTimer = undefined
+}
+
+function onMouseEnter() {
+  hovered = true
+  startTimers()
+}
+
+function onMouseLeave() {
+  hovered = false
+  stopTimers()
+}
+
+onMount(() => {
+  shuffled = [...normalizedVerbs]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  currentVerb = shuffled[0] ?? 'Thinking...'
+
+  return () => stopTimers()
+})
 </script>
 
 <div
@@ -38,6 +88,8 @@ function copyInstallCmd(e: MouseEvent) {
   aria-expanded={expanded}
   onclick={toggle}
   onkeydown={onKeydown}
+  onmouseenter={onMouseEnter}
+  onmouseleave={onMouseLeave}
 >
   <button
     class="card__copy"
@@ -55,6 +107,13 @@ function copyInstallCmd(e: MouseEvent) {
   <span class="card__expand-hint" aria-hidden="true">&#9654;</span>
   <div class="card__name">{set.name}</div>
   <div class="card__desc">{set.description}</div>
+  <div class="card__preview" class:card__preview--active={hovered} aria-live="polite" aria-label="Verb preview">
+    <span class="card__preview-icon" aria-hidden="true">{spinnerChar}</span>
+    <span class="card__preview-verb">{currentVerb}</span>
+    {#if hovered}
+      <span class="card__preview-cursor" aria-hidden="true"></span>
+    {/if}
+  </div>
   <div class="card__meta">
     <span class="card__author">
       {#if author?.avatarUrl}
@@ -119,8 +178,63 @@ function copyInstallCmd(e: MouseEvent) {
   .card__desc {
     font-size: 0.78rem;
     color: var(--text-muted);
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.65rem;
     line-height: 1.5;
+  }
+
+  .card__preview {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: color-mix(in srgb, var(--bg) 60%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
+    padding: 0.35rem 0.75rem;
+    margin-bottom: 0.65rem;
+    font-size: 0.72rem;
+    min-height: 1.8rem;
+    opacity: 0.4;
+    transition: opacity 0.2s, border-color 0.2s;
+  }
+
+  .card__preview--active {
+    opacity: 1;
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+
+  .card__preview-icon {
+    color: var(--text-faint);
+    font-weight: 700;
+    width: 1ch;
+    display: inline-block;
+    text-align: center;
+  }
+
+  .card__preview--active .card__preview-icon {
+    color: var(--accent);
+  }
+
+  .card__preview-verb {
+    color: var(--text-faint);
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .card__preview--active .card__preview-verb {
+    color: var(--text);
+  }
+
+  .card__preview-cursor {
+    display: inline-block;
+    width: 0.5ch;
+    height: 1em;
+    background: var(--accent);
+    vertical-align: text-bottom;
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
   }
 
   .card__meta {
@@ -180,7 +294,7 @@ function copyInstallCmd(e: MouseEvent) {
   }
 
   .card__copy--copied {
-    color: var(--green, #4ec990);
+    color: var(--accent);
   }
 
   .card__expand-hint {

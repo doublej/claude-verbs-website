@@ -1,6 +1,5 @@
 <script lang="ts">
 import Gallery from '$lib/components/Gallery.svelte'
-import SpinnerDemo from '$lib/components/SpinnerDemo.svelte'
 import { loadSets } from '$lib/data/sets'
 import { type AppHandle, createApp } from '$lib/pixi/app'
 import { getResolvedTheme } from '$lib/theme.svelte'
@@ -8,12 +7,6 @@ import { onMount } from 'svelte'
 import type { PageData } from './$types'
 
 const { data }: { data: PageData } = $props()
-
-const allVerbs = $derived(
-  Object.values(data.sets)
-    .flat()
-    .flatMap((s) => s.verbs),
-)
 
 let wrap: HTMLDivElement
 let revealed = $state(false)
@@ -34,10 +27,11 @@ $effect(() => {
 })
 
 onMount(() => {
+  window.scrollTo(0, 0)
   const sets = loadSets()
 
   function init() {
-    createApp(wrap, sets, { onMarketplace: unlock }).then((handle) => {
+    createApp(wrap, sets, { onMarketplace: unlock, preferredLang: data.preferredLang }).then((handle) => {
       appHandle = handle
     })
   }
@@ -85,12 +79,6 @@ onMount(() => {
 </div>
 
 <main>
-	<section class="demo" aria-label="Spinner demo">
-		<div class="container">
-			<SpinnerDemo verbs={allVerbs} />
-		</div>
-	</section>
-
 	<section class="gallery" aria-label="Verb set gallery">
 		<div class="container">
 			<h2 class="section-heading">Browse Sets</h2>
@@ -237,8 +225,6 @@ onMount(() => {
 	/* ---- Sections ---- */
 
 	section { padding: 4rem 0; }
-	.demo { text-align: center; padding: 3rem 0; }
-
 	.section-heading {
 		font-size: 1.5rem;
 		font-weight: 700;
@@ -277,9 +263,9 @@ onMount(() => {
 		background: var(--border);
 	}
 
-	.terminal__dot--red { background: #f85149; }
-	.terminal__dot--yellow { background: #d29922; }
-	.terminal__dot--green { background: #3fb950; }
+	.terminal__dot--red { background: var(--text-faint); }
+	.terminal__dot--yellow { background: var(--text-faint); }
+	.terminal__dot--green { background: var(--text-faint); }
 	.terminal__body { padding: 1.25rem; font-size: 0.82rem; line-height: 2; }
 	.terminal__line::before { content: '$ '; color: var(--accent); }
 	.terminal__comment { color: var(--text-faint); }

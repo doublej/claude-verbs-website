@@ -1,15 +1,8 @@
 <script lang="ts">
 import Gallery from '$lib/components/Gallery.svelte'
-import SpinnerDemo from '$lib/components/SpinnerDemo.svelte'
 import type { PageData } from './$types'
 
 const { data }: { data: PageData } = $props()
-
-const allVerbs = $derived(
-  Object.values(data.sets)
-    .flat()
-    .flatMap((s) => s.verbs),
-)
 </script>
 
 <svelte:head>
@@ -30,7 +23,6 @@ const allVerbs = $derived(
   <div class="container">
     <h1 class="hero__title">Claude Verbs</h1>
     <p class="hero__tagline">Themed spinner verb sets for Claude Code</p>
-    <SpinnerDemo verbs={allVerbs} />
     <p class="hero__desc">
       Claude Code shows a spinner while it thinks. By default it cycles through generic verbs like
       &ldquo;Thinking&rdquo; and &ldquo;Analyzing&rdquo;.
@@ -215,15 +207,15 @@ const allVerbs = $derived(
   }
 
   .terminal__dot--red {
-    background: #f85149;
+    background: var(--text-faint);
   }
 
   .terminal__dot--yellow {
-    background: #d29922;
+    background: var(--text-faint);
   }
 
   .terminal__dot--green {
-    background: #3fb950;
+    background: var(--text-faint);
   }
 
   .terminal__body {

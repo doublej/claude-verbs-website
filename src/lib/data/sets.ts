@@ -1,3 +1,4 @@
+import { localeToLang } from '$lib/locale'
 import type { VerbSet, VerbSets } from './types'
 
 interface RawSetJson {
@@ -5,6 +6,7 @@ interface RawSetJson {
   description: string
   author: string
   github: string
+  language: string
   config: { spinnerVerbs: { verbs: string[] } }
 }
 
@@ -12,21 +14,14 @@ function normalizeVerb(line: string): string {
   return line.replace(/^\s*I(?:[\u2019']m| am)\s+/i, '')
 }
 
-function langFromPath(path: string): string {
-  // path like "./sets/nl/jiskefet.json" or "./sets/en/countries/egypt-comedy.json"
-  const parts = path.replace('./sets/', '').split('/')
-  // First segment is language.
-  return parts[0]
-}
-
-function toVerbSet(raw: RawSetJson, lang: string): VerbSet {
+function toVerbSet(raw: RawSetJson): VerbSet {
   const verbs = raw.config.spinnerVerbs.verbs.map(normalizeVerb)
   return {
     name: raw.name,
     description: raw.description,
     author: raw.author,
     github: raw.github,
-    language: lang,
+    language: raw.language,
     verbCount: verbs.length,
     verbs,
   }
@@ -45,8 +40,8 @@ export function loadSets(): VerbSets {
   const sets: VerbSets = {}
   for (const [path, raw] of Object.entries(modules)) {
     if (path.includes('schema.json')) continue
-    const lang = langFromPath(path)
-    const set = toVerbSet(raw, lang)
+    const set = toVerbSet(raw)
+    const lang = localeToLang(raw.language)
     if (!sets[lang]) sets[lang] = []
     sets[lang].push(set)
   }

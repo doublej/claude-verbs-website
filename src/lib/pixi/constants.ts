@@ -9,22 +9,54 @@ function isLight(): boolean {
 
 /** Centralised color palette — reads theme at access time so it stays in sync. */
 export const PALETTE = {
-  get border() { return isLight() ? 0xd0d7de : 0x30363d },
-  get dim() { return isLight() ? 0x6e7781 : 0x6e7681 },
-  get lineNum() { return isLight() ? 0x9ca3af : 0x484f58 },
-  get tool() { return isLight() ? 0x57606a : 0x8b949e },
-  get path() { return isLight() ? 0x24292f : 0xc9d1d9 },
-  get ok() { return isLight() ? 0x22c55e : 0x4ade80 },
-  get warn() { return isLight() ? 0xd97706 : 0xd29922 },
-  get error() { return isLight() ? 0xdc2626 : 0xf85149 },
-  get prompt() { return isLight() ? 0x7c3aed : 0xbc8cff },
-  get accent() { return isLight() ? 0x0969da : 0x79c0ff },
-  get suggestion() { return isLight() ? 0x8b8b8b : 0x555555 },
-  get active() { return isLight() ? 0x000000 : 0xffffff },
-  get deadPixel() { return isLight() ? '#d0d0d0' : '#0a0c10' },
-  get deadPixelRed() { return isLight() ? '#e8a0a0' : '#3a0808' },
-  get deadPixelBlue() { return isLight() ? '#a0a0e8' : '#08083a' },
-  get deadPixelGreen() { return isLight() ? '#a0e8a0' : '#083a08' },
+  get border() {
+    return isLight() ? 0xd0d7de : 0x30363d
+  },
+  get dim() {
+    return isLight() ? 0x6e7781 : 0x6e7681
+  },
+  get lineNum() {
+    return isLight() ? 0x9ca3af : 0x484f58
+  },
+  get tool() {
+    return isLight() ? 0x57606a : 0x8b949e
+  },
+  get path() {
+    return isLight() ? 0x24292f : 0xc9d1d9
+  },
+  get ok() {
+    return isLight() ? 0x22c55e : 0x4ade80
+  },
+  get warn() {
+    return isLight() ? 0xd97706 : 0xd29922
+  },
+  get error() {
+    return isLight() ? 0xdc2626 : 0xf85149
+  },
+  get prompt() {
+    return isLight() ? 0x7c3aed : 0xbc8cff
+  },
+  get accent() {
+    return isLight() ? 0x0969da : 0x79c0ff
+  },
+  get suggestion() {
+    return isLight() ? 0x8b8b8b : 0x555555
+  },
+  get active() {
+    return isLight() ? 0x000000 : 0xffffff
+  },
+  get deadPixel() {
+    return isLight() ? '#d0d0d0' : '#0a0c10'
+  },
+  get deadPixelRed() {
+    return isLight() ? '#e8a0a0' : '#3a0808'
+  },
+  get deadPixelBlue() {
+    return isLight() ? '#a0a0e8' : '#08083a'
+  },
+  get deadPixelGreen() {
+    return isLight() ? '#a0e8a0' : '#083a08'
+  },
 }
 
 export const LAYOUT = {

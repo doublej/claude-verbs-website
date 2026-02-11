@@ -4,6 +4,7 @@
   "description": "Breaking Bad chemistry drama spinner verbs",
   "author": "doublej",
   "github": "doublej",
+  "language": "en_GB",
   "config": {
     "showTurnDuration": false,
     "spinnerVerbs": {

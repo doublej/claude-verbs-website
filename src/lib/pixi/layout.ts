@@ -88,8 +88,7 @@ export function layout(
       ? Math.round(lh * params.absoluteY)
       : Math.round(screenH / 2 - lh + lh * params.offsetY)
 
-  const scrollY =
-    params.absoluteY !== 0 ? Math.round(lh * params.absoluteY) : 0
+  const scrollY = params.absoluteY !== 0 ? Math.round(lh * params.absoluteY) : 0
 
   ui.spinnerLine.x = leftX
   ui.spinnerLine.y = spinnerY

@@ -40,7 +40,8 @@ function updateContainerFontSize(items: (Text | Container)[], fontSize: number):
         if ('style' in child) (child as Text).style.fontSize = fontSize
 }
 
-function detectLocale(sets: VerbSets): string {
+function resolveLocale(sets: VerbSets, preferredLang?: string): string {
+  if (preferredLang && sets[preferredLang]) return preferredLang
   const lang = (navigator.language || 'en').slice(0, 2).toLowerCase()
   if (sets[lang]) return lang
   return sets.en ? 'en' : Object.keys(sets)[0] || 'en'
@@ -79,6 +80,7 @@ const KEY_MAP: Record<string, DispatchEvent> = {
 
 interface AppOptions {
   onMarketplace?: () => void
+  preferredLang?: string
 }
 
 export interface AppHandle {
@@ -112,7 +114,7 @@ export async function createApp(
   const lctx = createLayoutCtx(s.chW, params.fontSize, params.lineHeightOffset)
   const ts = createTickerState()
 
-  const locale = detectLocale(sets)
+  const locale = resolveLocale(sets, options?.preferredLang)
   const idiotSet = findIdiotSet(sets)
   const localeSets = buildLocaleSets(sets, locale, idiotSet)
 

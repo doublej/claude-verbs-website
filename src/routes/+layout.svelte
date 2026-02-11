@@ -1,6 +1,6 @@
 <script lang="ts">
-import ThemeToggle from '$lib/components/ThemeToggle.svelte'
 import { page } from '$app/stores'
+import ThemeToggle from '$lib/components/ThemeToggle.svelte'
 
 $effect(() => {
   const locale = $page.data.locale as string | undefined

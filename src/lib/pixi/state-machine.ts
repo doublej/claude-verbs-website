@@ -155,7 +155,9 @@ function dispatchPostDemo(event: DispatchEvent, m: Machine, cb: Callbacks): void
   } else if (event === 'ENTER') {
     const act = POST_SUGGESTIONS[m.postIndex].action
     if (act === 'copy' && m.activeSet)
-      navigator.clipboard.writeText(`bunx github:doublej/claude-verbs-cli install ${m.activeSet.name}`)
+      navigator.clipboard.writeText(
+        `bunx github:doublej/claude-verbs-cli install ${m.activeSet.name}`,
+      )
     else if (act === 'marketplace') cb.onMarketplace?.()
   } else if (event === 'ARROW_DOWN') {
     m.tabCompleted = false

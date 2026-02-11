@@ -1,5 +1,5 @@
-import { error } from '@sveltejs/kit'
 import { LOCALE_CODES } from '$lib/locale'
+import { error } from '@sveltejs/kit'
 import type { LayoutServerLoad } from './$types'
 
 export const load: LayoutServerLoad = ({ params }) => {

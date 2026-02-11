@@ -58,14 +58,11 @@ const allVerbs = $derived(
           <span class="terminal__dot terminal__dot--green"></span>
         </div>
         <div class="terminal__body">
-          <div class="terminal__comment">install globally</div>
-          <div class="terminal__line">bun install -g spinner-verbs</div>
-          <br />
           <div class="terminal__comment">see available sets</div>
-          <div class="terminal__line">spinner-verbs list</div>
+          <div class="terminal__line">bunx github:doublej/claude-verbs-cli list</div>
           <br />
           <div class="terminal__comment">apply a set</div>
-          <div class="terminal__line">spinner-verbs install &lt;name&gt;</div>
+          <div class="terminal__line">bunx github:doublej/claude-verbs-cli install &lt;name&gt;</div>
         </div>
       </div>
     </div>
@@ -93,7 +90,7 @@ const allVerbs = $derived(
         </div>
       </div>
       <div class="contribute__link">
-        <a href="https://github.com/jurrejan/spinner-verbs/blob/main/CONTRIBUTING.md">
+        <a href="https://github.com/doublej/claude-verbs/blob/main/CONTRIBUTING.md">
           Read the Contributing Guide
         </a>
       </div>
@@ -105,7 +102,7 @@ const allVerbs = $derived(
   <div class="container">
     <span>Made with <span aria-label="cursor">_</span> by JJ</span>
     <span class="footer__sep">|</span>
-    <a href="https://github.com/jurrejan/spinner-verbs">GitHub</a>
+    <a href="https://github.com/doublej/claude-verbs">GitHub</a>
   </div>
 </footer>
 
@@ -122,11 +119,10 @@ const allVerbs = $derived(
 
   :global(body) {
     font-family: var(--mono);
-    background: var(--bg);
+    background: transparent;
     color: var(--text);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-    transition: background-color 0.2s, color 0.2s;
   }
 
   .container {
@@ -144,7 +140,6 @@ const allVerbs = $derived(
   .hero {
     text-align: center;
     padding: 6rem 0 4rem;
-    border-bottom: 1px solid var(--border);
   }
 
   .hero__title {
@@ -193,12 +188,14 @@ const allVerbs = $derived(
   }
 
   .terminal {
-    background: var(--bg-surface);
-    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg-surface) 70%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
     border-radius: 6px;
     overflow: hidden;
     max-width: 560px;
     margin: 0 auto;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   .terminal__bar {
@@ -206,8 +203,8 @@ const allVerbs = $derived(
     align-items: center;
     gap: 6px;
     padding: 0.65rem 1rem;
-    background: var(--bg-raised);
-    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg-raised) 60%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
   }
 
   .terminal__dot {
@@ -251,7 +248,7 @@ const allVerbs = $derived(
   /* ---- Contribute ---- */
 
   .contribute {
-    border-top: 1px solid var(--border);
+    padding-top: 2rem;
   }
 
   .contribute__heading {
@@ -283,11 +280,13 @@ const allVerbs = $derived(
   }
 
   .step {
-    background: var(--bg-raised);
-    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg-raised) 70%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
     border-radius: 6px;
     padding: 1.25rem;
     text-align: center;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   .step__num {
@@ -317,24 +316,25 @@ const allVerbs = $derived(
 
   .contribute__link a {
     display: inline-block;
-    color: var(--bg);
-    background: var(--accent);
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
     text-decoration: none;
     font-size: 0.85rem;
     font-weight: 700;
     padding: 0.7rem 1.8rem;
     border-radius: 6px;
-    transition: opacity 0.2s;
+    transition: background 0.2s, border-color 0.2s;
   }
 
   .contribute__link a:hover {
-    opacity: 0.85;
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
+    border-color: var(--accent);
   }
 
   /* ---- Footer ---- */
 
   footer {
-    border-top: 1px solid var(--border);
     padding: 2rem 0;
     text-align: center;
     font-size: 0.75rem;

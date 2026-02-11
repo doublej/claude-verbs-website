@@ -50,13 +50,15 @@ onMount(() => {
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
-    background: var(--bg-raised);
-    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg-raised) 70%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
     border-radius: 6px;
     padding: 0.85rem 1.5rem;
     margin-bottom: 2rem;
     min-height: 3.2rem;
     font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   .spinner__icon {

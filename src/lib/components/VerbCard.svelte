@@ -67,18 +67,21 @@ function onKeydown(e: KeyboardEvent) {
 
 <style>
   .card {
-    background: var(--bg-raised);
-    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg-raised) 70%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
     border-radius: 6px;
     padding: 1.25rem;
     cursor: pointer;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     position: relative;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   .card:hover,
   .card:focus-visible {
     border-color: var(--accent);
+    background: color-mix(in srgb, var(--bg-raised) 85%, transparent);
     box-shadow: 0 0 0 1px var(--accent), 0 0 20px var(--accent-dim);
     outline: none;
   }
@@ -153,7 +156,7 @@ function onKeydown(e: KeyboardEvent) {
   .card__verbs-panel {
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
   }
 
   .card__verbs-panel-label {

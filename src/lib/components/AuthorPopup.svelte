@@ -52,12 +52,14 @@ const { author }: { author: Author } = $props()
     bottom: calc(100% + 8px);
     left: 0;
     z-index: 100;
-    background: var(--bg-surface);
-    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg-surface) 85%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
     border-radius: 6px;
     padding: 1rem;
     width: 280px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     pointer-events: auto;
   }
 

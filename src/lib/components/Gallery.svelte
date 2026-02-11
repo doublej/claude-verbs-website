@@ -36,7 +36,6 @@ const sortedLangs = $derived(
     color: var(--cyan);
     margin-bottom: 1rem;
     padding-bottom: 0.4rem;
-    border-bottom: 1px solid var(--border);
   }
 
   .lang-group__title::before {
@@ -50,7 +49,7 @@ const sortedLangs = $derived(
     font-style: italic;
     padding: 1.5rem;
     text-align: center;
-    border: 1px dashed var(--border);
+    border: 1px dashed color-mix(in srgb, var(--border) 50%, transparent);
     border-radius: 6px;
   }
 

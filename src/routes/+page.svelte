@@ -2,7 +2,7 @@
 import Gallery from '$lib/components/Gallery.svelte'
 import SpinnerDemo from '$lib/components/SpinnerDemo.svelte'
 import { loadSets } from '$lib/data/sets'
-import { createApp } from '$lib/pixi/app'
+import { type AppHandle, createApp } from '$lib/pixi/app'
 import { getResolvedTheme } from '$lib/theme.svelte'
 import { onMount } from 'svelte'
 import type { PageData } from './$types'
@@ -18,12 +18,14 @@ const allVerbs = $derived(
 let wrap: HTMLDivElement
 let revealed = $state(false)
 let scrollLocked = $state(true)
+let appHandle: AppHandle | undefined
 
 function unlock() {
   if (revealed) return
   revealed = true
   scrollLocked = false
-  window.scrollTo({ top: 120, behavior: 'smooth' })
+  appHandle?.disableScrollZoom()
+  window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })
 }
 
 $effect(() => {
@@ -33,11 +35,10 @@ $effect(() => {
 
 onMount(() => {
   const sets = loadSets()
-  let cleanup: (() => void) | undefined
 
   function init() {
-    createApp(wrap, sets, { onMarketplace: unlock }).then((fn) => {
-      cleanup = fn
+    createApp(wrap, sets, { onMarketplace: unlock }).then((handle) => {
+      appHandle = handle
     })
   }
 
@@ -46,7 +47,8 @@ onMount(() => {
   const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
       if (mutation.attributeName === 'data-theme') {
-        cleanup?.()
+        appHandle?.cleanup()
+        appHandle = undefined
         init()
         break
       }
@@ -56,7 +58,7 @@ onMount(() => {
   observer.observe(document.documentElement, { attributes: true })
 
   return () => {
-    cleanup?.()
+    appHandle?.cleanup()
     observer.disconnect()
   }
 })
@@ -106,14 +108,11 @@ onMount(() => {
 					<span class="terminal__dot terminal__dot--green"></span>
 				</div>
 				<div class="terminal__body">
-					<div class="terminal__comment">install globally</div>
-					<div class="terminal__line">bun install -g spinner-verbs</div>
-					<br />
 					<div class="terminal__comment">see available sets</div>
-					<div class="terminal__line">spinner-verbs list</div>
+					<div class="terminal__line">bunx github:doublej/claude-verbs-cli list</div>
 					<br />
 					<div class="terminal__comment">apply a set</div>
-					<div class="terminal__line">spinner-verbs install &lt;name&gt;</div>
+					<div class="terminal__line">bunx github:doublej/claude-verbs-cli install &lt;name&gt;</div>
 				</div>
 			</div>
 		</div>
@@ -141,7 +140,7 @@ onMount(() => {
 				</div>
 			</div>
 			<div class="contribute__link">
-				<a href="https://github.com/jurrejan/spinner-verbs/blob/main/CONTRIBUTING.md">
+				<a href="https://github.com/doublej/claude-verbs/blob/main/CONTRIBUTING.md">
 					Read the Contributing Guide
 				</a>
 			</div>
@@ -153,7 +152,7 @@ onMount(() => {
 	<div class="container">
 		<span>Made with <span aria-label="cursor">_</span> by JJ</span>
 		<span class="footer__sep">|</span>
-		<a href="https://github.com/jurrejan/spinner-verbs">GitHub</a>
+		<a href="https://github.com/doublej/claude-verbs">GitHub</a>
 	</div>
 </footer>
 
@@ -166,14 +165,13 @@ onMount(() => {
 		box-sizing: border-box;
 	}
 
-	:global(html) { scroll-behavior: smooth; }
+	:global(html) { scroll-behavior: smooth; scrollbar-gutter: stable; }
 	:global(body) {
 		font-family: var(--mono);
-		background: var(--bg);
+		background: transparent;
 		color: var(--text);
 		line-height: 1.6;
 		-webkit-font-smoothing: antialiased;
-		transition: background-color 0.2s, color 0.2s;
 	}
 	:global(body.scroll-locked) { overflow: hidden; }
 
@@ -182,10 +180,9 @@ onMount(() => {
 	/* ---- Canvas ---- */
 
 	#canvas-wrap {
-		position: relative;
-		width: 100%;
-		height: 100vh;
-		height: 100svh;
+		position: fixed;
+		inset: 0;
+		z-index: -1;
 		overflow: hidden;
 		background: var(--bg-home);
 	}
@@ -193,29 +190,28 @@ onMount(() => {
 	#canvas-wrap.revealed::after {
 		content: '';
 		position: absolute;
-		inset: auto 0 0;
-		height: 120px;
-		background: linear-gradient(transparent, var(--bg));
+		inset: 0;
+		background: linear-gradient(transparent 20%, color-mix(in srgb, var(--bg) 85%, transparent));
 		pointer-events: none;
 		z-index: 5;
 	}
 
 	.skip-btn {
 		position: absolute;
-		bottom: 2rem;
-		right: 2rem;
+		bottom: 0;
+		right: 0;
 		z-index: 10;
 		font: 700 0.72rem var(--mono);
-		color: var(--text-faint);
-		background: none;
-		border: 1px solid var(--text-faint);
-		padding: 0.5rem 1rem;
+		color: var(--bg);
+		background: var(--accent);
+		border: none;
+		height: 40px;
+		padding: 0 1.5rem;
 		cursor: pointer;
-		opacity: 0.6;
-		transition: opacity 0.2s;
+		transition: filter 0.2s;
 	}
 
-	.skip-btn:hover { opacity: 1; }
+	.skip-btn:hover { filter: brightness(1.3); }
 
 	#canvas-wrap :global(canvas) {
 		display: block;
@@ -232,10 +228,16 @@ onMount(() => {
 		right: 8px;
 	}
 
+	main {
+		position: relative;
+		margin-top: 100vh;
+		margin-top: 100svh;
+	}
+
 	/* ---- Sections ---- */
 
 	section { padding: 4rem 0; }
-	.demo { text-align: center; padding: 3rem 0; border-bottom: 1px solid var(--border); }
+	.demo { text-align: center; padding: 3rem 0; }
 
 	.section-heading {
 		font-size: 1.5rem;
@@ -249,12 +251,14 @@ onMount(() => {
 	/* ---- Terminal ---- */
 
 	.terminal {
-		background: var(--bg-surface);
-		border: 1px solid var(--border);
+		background: color-mix(in srgb, var(--bg-surface) 70%, transparent);
+		border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
 		border-radius: 6px;
 		overflow: hidden;
 		max-width: 560px;
 		margin: 0 auto;
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
 	}
 
 	.terminal__bar {
@@ -262,8 +266,8 @@ onMount(() => {
 		align-items: center;
 		gap: 6px;
 		padding: 0.65rem 1rem;
-		background: var(--bg-raised);
-		border-bottom: 1px solid var(--border);
+		background: color-mix(in srgb, var(--bg-raised) 60%, transparent);
+		border-bottom: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
 	}
 
 	.terminal__dot {
@@ -283,7 +287,7 @@ onMount(() => {
 
 	/* ---- Contribute ---- */
 
-	.contribute { border-top: 1px solid var(--border); }
+	.contribute { padding-top: 2rem; }
 	.contribute__sub { text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 2rem; }
 
 	.steps {
@@ -295,11 +299,13 @@ onMount(() => {
 	}
 
 	.step {
-		background: var(--bg-raised);
-		border: 1px solid var(--border);
+		background: color-mix(in srgb, var(--bg-raised) 70%, transparent);
+		border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
 		border-radius: 6px;
 		padding: 1.25rem;
 		text-align: center;
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
 	}
 
 	.step__num {
@@ -325,20 +331,24 @@ onMount(() => {
 	.contribute__link { display: block; text-align: center; }
 	.contribute__link a {
 		display: inline-block;
-		color: var(--bg);
-		background: var(--accent);
+		color: var(--accent);
+		background: color-mix(in srgb, var(--accent) 12%, transparent);
+		border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
 		text-decoration: none;
 		font-size: 0.85rem;
 		font-weight: 700;
 		padding: 0.7rem 1.8rem;
 		border-radius: 6px;
-		transition: opacity 0.2s;
+		transition: background 0.2s, border-color 0.2s;
 	}
 
-	.contribute__link a:hover { opacity: 0.85; }
+	.contribute__link a:hover {
+		background: color-mix(in srgb, var(--accent) 20%, transparent);
+		border-color: var(--accent);
+	}
 
 	footer {
-		border-top: 1px solid var(--border);
+		position: relative;
 		padding: 2rem 0 4rem;
 		text-align: center;
 		font-size: 0.75rem;

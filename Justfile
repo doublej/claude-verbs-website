@@ -68,6 +68,12 @@ fetch-authors:
 build:
     bun run build
 
+[group('data')]
+sync-sets:
+    rm -rf src/lib/data/sets/en src/lib/data/sets/nl
+    cp -r ../claude-verbs/en ../claude-verbs/nl src/lib/data/sets/
+    cp ../claude-verbs/schema.json src/lib/data/sets/schema.json
+
 [group('cleanup')]
 clean:
     rm -rf .svelte-kit/ build/ node_modules/.cache/

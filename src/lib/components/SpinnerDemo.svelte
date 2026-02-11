@@ -52,7 +52,7 @@ onMount(() => {
     gap: 0.6rem;
     background: color-mix(in srgb, var(--bg-raised) 70%, transparent);
     border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
-    border-radius: 6px;
+    border-radius: 0;
     padding: 0.85rem 1.5rem;
     margin-bottom: 2rem;
     min-height: 3.2rem;

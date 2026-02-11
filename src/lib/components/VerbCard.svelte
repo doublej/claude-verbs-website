@@ -69,10 +69,10 @@ function onKeydown(e: KeyboardEvent) {
   .card {
     background: color-mix(in srgb, var(--bg-raised) 70%, transparent);
     border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
-    border-radius: 6px;
+    border-radius: 0;
     padding: 1.25rem;
     cursor: pointer;
-    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    transition: border-color 0.2s, background 0.2s;
     position: relative;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -82,7 +82,6 @@ function onKeydown(e: KeyboardEvent) {
   .card:focus-visible {
     border-color: var(--accent);
     background: color-mix(in srgb, var(--bg-raised) 85%, transparent);
-    box-shadow: 0 0 0 1px var(--accent), 0 0 20px var(--accent-dim);
     outline: none;
   }
 
@@ -122,7 +121,7 @@ function onKeydown(e: KeyboardEvent) {
   .card__author-avatar {
     width: 20px;
     height: 20px;
-    border-radius: 50%;
+    border-radius: 0;
     vertical-align: middle;
   }
 
@@ -186,7 +185,7 @@ function onKeydown(e: KeyboardEvent) {
 
   .card__verbs-list::-webkit-scrollbar-thumb {
     background: var(--border);
-    border-radius: 2px;
+    border-radius: 0;
   }
 
   .card__verb-item::before {

@@ -47,7 +47,7 @@ function getLabel(): string {
 		right: 1rem;
 		width: 44px;
 		height: 44px;
-		border-radius: 8px;
+		border-radius: 0;
 		background: var(--bg-raised);
 		border: 1px solid var(--border);
 		color: var(--text);

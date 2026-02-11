@@ -27,7 +27,7 @@ import ThemeToggle from '$lib/components/ThemeToggle.svelte'
     --text-faint: #6e7681;
     --accent: #4ade80;
     --accent-dim: rgba(74, 222, 128, 0.15);
-    --cyan: #67e8f9;
+    --cyan: #fbbf24;
     --bg-home: #0d1117;
     --disclaimer-bg: #000;
     --disclaimer-text: #888;
@@ -42,9 +42,9 @@ import ThemeToggle from '$lib/components/ThemeToggle.svelte'
     --text: #24292f;
     --text-muted: #57606a;
     --text-faint: #6e7781;
-    --accent: #0969da;
-    --accent-dim: rgba(9, 105, 218, 0.15);
-    --cyan: #0550ae;
+    --accent: #16a34a;
+    --accent-dim: rgba(22, 163, 74, 0.15);
+    --cyan: #ca8a04;
     --bg-home: #f5f5f5;
     --disclaimer-bg: #e5e7eb;
     --disclaimer-text: #6b7280;

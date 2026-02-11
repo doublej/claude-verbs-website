@@ -54,10 +54,9 @@ const { author }: { author: Author } = $props()
     z-index: 100;
     background: color-mix(in srgb, var(--bg-surface) 85%, transparent);
     border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
-    border-radius: 6px;
+    border-radius: 0;
     padding: 1rem;
     width: 280px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     pointer-events: auto;
@@ -73,7 +72,7 @@ const { author }: { author: Author } = $props()
   .author-popup__avatar {
     width: 48px;
     height: 48px;
-    border-radius: 50%;
+    border-radius: 0;
     flex-shrink: 0;
   }
 

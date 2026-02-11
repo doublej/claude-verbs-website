@@ -253,7 +253,7 @@ onMount(() => {
 	.terminal {
 		background: color-mix(in srgb, var(--bg-surface) 70%, transparent);
 		border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
-		border-radius: 6px;
+		border-radius: 0;
 		overflow: hidden;
 		max-width: 560px;
 		margin: 0 auto;
@@ -273,7 +273,7 @@ onMount(() => {
 	.terminal__dot {
 		width: 10px;
 		height: 10px;
-		border-radius: 50%;
+		border-radius: 0;
 		background: var(--border);
 	}
 
@@ -301,7 +301,7 @@ onMount(() => {
 	.step {
 		background: color-mix(in srgb, var(--bg-raised) 70%, transparent);
 		border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
-		border-radius: 6px;
+		border-radius: 0;
 		padding: 1.25rem;
 		text-align: center;
 		backdrop-filter: blur(8px);
@@ -338,7 +338,7 @@ onMount(() => {
 		font-size: 0.85rem;
 		font-weight: 700;
 		padding: 0.7rem 1.8rem;
-		border-radius: 6px;
+		border-radius: 0;
 		transition: background 0.2s, border-color 0.2s;
 	}
 

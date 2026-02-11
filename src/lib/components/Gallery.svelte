@@ -50,7 +50,7 @@ const sortedLangs = $derived(
     padding: 1.5rem;
     text-align: center;
     border: 1px dashed color-mix(in srgb, var(--border) 50%, transparent);
-    border-radius: 6px;
+    border-radius: 0;
   }
 
   .cards {

@@ -3,10 +3,18 @@ import { langName } from '$lib/data/lang-names'
 import type { Authors, VerbSets } from '$lib/data/types'
 import VerbCard from './VerbCard.svelte'
 
-const { sets, authors }: { sets: VerbSets; authors: Authors } = $props()
+const {
+  sets,
+  authors,
+  preferredLang = '',
+}: { sets: VerbSets; authors: Authors; preferredLang?: string } = $props()
 
 const sortedLangs = $derived(
-  Object.keys(sets).sort((a, b) => langName(a).localeCompare(langName(b))),
+  Object.keys(sets).sort((a, b) => {
+    if (a === preferredLang) return -1
+    if (b === preferredLang) return 1
+    return langName(a).localeCompare(langName(b))
+  }),
 )
 </script>
 

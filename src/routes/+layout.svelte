@@ -1,5 +1,13 @@
 <script lang="ts">
 import ThemeToggle from '$lib/components/ThemeToggle.svelte'
+import { page } from '$app/stores'
+
+$effect(() => {
+  const locale = $page.data.locale as string | undefined
+  if (locale) {
+    document.documentElement.lang = locale.replace('_', '-')
+  }
+})
 </script>
 
 <ThemeToggle />

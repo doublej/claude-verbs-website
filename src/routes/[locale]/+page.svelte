@@ -94,7 +94,7 @@ onMount(() => {
 	<section class="gallery" aria-label="Verb set gallery">
 		<div class="container">
 			<h2 class="section-heading">Browse Sets</h2>
-			<Gallery sets={data.sets} authors={data.authors} />
+			<Gallery sets={data.sets} authors={data.authors} preferredLang={data.preferredLang} />
 		</div>
 	</section>
 

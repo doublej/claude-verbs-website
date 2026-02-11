@@ -44,7 +44,7 @@ const allVerbs = $derived(
   <section class="gallery" aria-label="Verb set gallery">
     <div class="container">
       <h2 class="gallery__heading">Browse Sets</h2>
-      <Gallery sets={data.sets} authors={data.authors} />
+      <Gallery sets={data.sets} authors={data.authors} preferredLang={data.preferredLang} />
     </div>
   </section>
 

@@ -1,5 +1,5 @@
 {
-  "$schema": "../../schema.json",
+  "$schema": "../schema.json",
   "name": "us-snl",
   "description": "Saturday Night Live-style sketch spinner verbs",
   "author": "Codex",

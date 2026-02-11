@@ -1,5 +1,5 @@
 {
-  "$schema": "../../schema.json",
+  "$schema": "../schema.json",
   "name": "us-portal",
   "description": "Portal puzzle adventure spinner verbs",
   "author": "Codex",

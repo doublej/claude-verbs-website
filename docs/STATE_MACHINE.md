@@ -117,7 +117,7 @@ Notes:
 **After demo, showing suggestions**
 
 Displays 2 action suggestions:
-1. `"copy command to get access to spinner verb cli"` → copies `bunx claude-verbs install [name]` to clipboard
+1. `"copy command to get access to spinner verb cli"` → copies `bunx github:doublej/claude-verbs-cli install [name]` to clipboard
 2. `"show marketplace"` → navigates to `/marketplace` page
 
 - **ARROW_UP/DOWN** → cycles between suggestions
@@ -200,7 +200,7 @@ POST_SUGGESTIONS = [
 ```
 
 **Action handlers:**
-- `copy`: uses `navigator.clipboard.writeText()` to copy `bunx claude-verbs install [name]`
+- `copy`: uses `navigator.clipboard.writeText()` to copy `bunx github:doublej/claude-verbs-cli install [name]`
 - `marketplace`: navigates via `window.location.href = '/marketplace'`
 
 Both actions execute immediately on ENTER but keep state at POST_DEMO (allows multiple copies or retries).

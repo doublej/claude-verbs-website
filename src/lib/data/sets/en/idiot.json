@@ -2,7 +2,7 @@
   "$schema": "../schema.json",
   "name": "idiot",
   "description": "Presidential idiot spinner verbs",
-  "author": "doublej",
+  "author": "Jurre-Jan Smit",
   "github": "doublej",
   "language": "en_GB",
   "config": {

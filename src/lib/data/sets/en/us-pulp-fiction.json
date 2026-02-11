@@ -2,8 +2,8 @@
   "$schema": "../schema.json",
   "name": "us-pulp-fiction",
   "description": "Pulp Fiction crime drama spinner verbs",
-  "author": "doublej",
-  "github": "doublej",
+  "author": "Codex",
+  "github": "jurrejan",
   "language": "en_GB",
   "config": {
     "showTurnDuration": false,

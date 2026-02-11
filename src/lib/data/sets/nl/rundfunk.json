@@ -2,8 +2,8 @@
   "$schema": "../schema.json",
   "name": "rundfunk",
   "description": "Dutch radio/TV studio chaos spinner verbs",
-  "author": "doublej",
-  "github": "doublej",
+  "author": "JJ",
+  "github": "jurrejan",
   "language": "nl_NL",
   "config": {
     "showTurnDuration": false,

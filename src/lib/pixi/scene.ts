@@ -12,8 +12,7 @@ import {
   Texture,
 } from 'pixi.js'
 import { createMeshGeometry } from './camera'
-import { FONT_FAMILY } from './constants'
-import { COLOR_SUGGESTION, C_DIM, C_PERMS, C_PROMPT, C_RULE } from './constants'
+import { FONT_FAMILY, PALETTE } from './constants'
 import { buildDeadPixelLayer } from './effects/dead-pixels'
 import { buildGlareCanvas } from './effects/glare'
 import { createLcdFilter } from './effects/lcd'
@@ -50,6 +49,7 @@ export interface SceneRefs {
   adjustmentFilter: AdjustmentFilter
   deadPixelSprite: Sprite
   glareSprite: Sprite
+  scrollZoomWrap: Container
   cameraMesh: MeshSimple
   cameraMeshBaseVerts: Float32Array
   cameraMeshVerts: Float32Array
@@ -71,7 +71,7 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
   // Text objects
   const styleMain = makeStyle(hexToNum(params.colorVerb), params)
   const styleEllipsis = makeStyle(hexToNum(params.colorEllipsis), params)
-  const styleMeta = makeStyle(hexToNum(params.colorMeta), params)
+  const styleMeta = makeStyle(PALETTE.suggestion, params)
   const styleHighlight = makeStyle(hexToNum(params.colorHighlight), params)
 
   const glyphText = new Text({ text: '\u2733', style: styleMain, label: 'glyph' })
@@ -92,28 +92,32 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
   inputContainer.cursor = 'pointer'
   const caretText = new Text({
     text: '> ',
-    style: makeStyle(COLOR_SUGGESTION, params),
+    style: makeStyle(PALETTE.suggestion, params),
     label: 'caret',
   })
   const inputText = new Text({
     text: '',
-    style: makeStyle(COLOR_SUGGESTION, params),
+    style: makeStyle(PALETTE.suggestion, params),
     label: 'inputText',
   })
   inputText.x = Math.round(caretText.width)
   inputContainer.addChild(caretText, inputText)
 
   // Bottom chrome
-  const ruleTop = new Text({ text: '', style: makeStyle(C_RULE, params), label: 'ruleTop' })
+  const ruleTop = new Text({ text: '', style: makeStyle(PALETTE.border, params), label: 'ruleTop' })
   const promptText = new Text({
     text: '\u276f',
-    style: makeStyle(C_PROMPT, params),
+    style: makeStyle(PALETTE.prompt, params),
     label: 'prompt',
   })
-  const ruleBottom = new Text({ text: '', style: makeStyle(C_RULE, params), label: 'ruleBottom' })
-  const statusText = new Text({ text: '', style: makeStyle(C_DIM, params), label: 'status' })
-  const permsText = new Text({ text: '', style: makeStyle(C_PERMS, params), label: 'perms' })
-  const infoText = new Text({ text: '', style: makeStyle(C_DIM, params), label: 'info' })
+  const ruleBottom = new Text({
+    text: '',
+    style: makeStyle(PALETTE.border, params),
+    label: 'ruleBottom',
+  })
+  const statusText = new Text({ text: '', style: makeStyle(PALETTE.dim, params), label: 'status' })
+  const permsText = new Text({ text: '', style: makeStyle(PALETTE.warn, params), label: 'perms' })
+  const infoText = new Text({ text: '', style: makeStyle(PALETTE.dim, params), label: 'info' })
 
   const bottomChrome = new Container({ label: 'bottomChrome' })
   bottomChrome.addChild(ruleTop, promptText, ruleBottom, statusText, permsText, infoText)
@@ -173,7 +177,10 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
     indices,
     label: 'camera',
   })
-  app.stage.addChild(cameraMesh)
+  // Scroll-zoom wrapper (scale/pivot driven by scroll-zoom controller)
+  const scrollZoomWrap = new Container({ label: 'scrollZoomWrap' })
+  scrollZoomWrap.addChild(cameraMesh)
+  app.stage.addChild(scrollZoomWrap)
 
   // Dead pixels + glare (screen-space overlays)
   const deadPixelCanvas = buildDeadPixelLayer(screenW, screenH, params.deadPixelsEnabled)
@@ -194,7 +201,7 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
 
   const overlayContainer = new Container({ label: 'overlays' })
   overlayContainer.addChild(deadPixelSprite, glareSprite)
-  app.stage.addChild(overlayContainer)
+  scrollZoomWrap.addChild(overlayContainer)
 
   // Measure char width
   const chMetric = new Text({
@@ -234,6 +241,7 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
     adjustmentFilter,
     deadPixelSprite,
     glareSprite,
+    scrollZoomWrap,
     cameraMesh,
     cameraMeshBaseVerts,
     cameraMeshVerts,

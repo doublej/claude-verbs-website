@@ -1,4 +1,5 @@
 import * as TWEEN from '@tweenjs/tween.js'
+import { SEQUENCE } from './config'
 import type { Params } from './params'
 import type { SceneRefs } from './scene'
 import { State } from './state-machine'
@@ -13,13 +14,13 @@ export interface ZoomController {
   applyJumpcut: (state: State) => void
 }
 
-export const ZOOM_TARGETS: Record<State, ZoomTarget> = {
-  [State.BOOT]: { zoom: 1.6, focusY: 'center', duration: 200 },
-  [State.IDLE]: { zoom: 1.0, focusY: 'prompt', duration: 300 },
-  [State.BROWSING]: { zoom: 1.35, focusY: 'prompt', duration: 180 },
-  [State.DEMO]: { zoom: 0.8, focusY: 'spinner', duration: 250 },
-  [State.POST_DEMO]: { zoom: 1.15, focusY: 'prompt', duration: 200 },
-  [State.BUGGED]: { zoom: 0.65, focusY: 'center', duration: 100 },
+const STATE_KEY: Record<State, keyof typeof SEQUENCE.zoom.states> = {
+  [State.BOOT]: 'BOOT',
+  [State.IDLE]: 'IDLE',
+  [State.BROWSING]: 'BROWSING',
+  [State.DEMO]: 'DEMO',
+  [State.POST_DEMO]: 'POST_DEMO',
+  [State.BUGGED]: 'BUGGED',
 }
 
 function resolveYPosition(focusY: number | string, s: SceneRefs, screenH: number): number {
@@ -65,7 +66,7 @@ function createFocusTween(
   onComplete: () => void,
 ): TWEEN.Tween<{ strength: number }> {
   return new TWEEN.Tween({ strength: params.focusStrength })
-    .to({ strength: 0.6 }, duration)
+    .to({ strength: SEQUENCE.zoom.focusStrength }, duration)
     .easing(TWEEN.Easing.Cubic.InOut)
     .onUpdate((obj) => {
       params.focusTargetY = focusY
@@ -100,7 +101,8 @@ export function createZoomController(
   let isInitialBoot = true
   let currentZoomTween: TWEEN.Tween<{ zoom: number }> | null = null
   let currentFocusTween: TWEEN.Tween<{ strength: number }> | null = null
-  let baseTimeline = createBaseTimeline(params, 0.75, 25000, updateCamera)
+  const { target, durationMs } = SEQUENCE.zoom.baseLine
+  let baseTimeline = createBaseTimeline(params, target, durationMs, updateCamera)
 
   const stopAllTweens = () => {
     baseTimeline.stop()
@@ -109,7 +111,7 @@ export function createZoomController(
   }
 
   const startBaseTimeline = () => {
-    baseTimeline = createBaseTimeline(params, 0.75, 25000, updateCamera)
+    baseTimeline = createBaseTimeline(params, target, durationMs, updateCamera)
     baseTimeline.start()
   }
 
@@ -120,21 +122,22 @@ export function createZoomController(
     }
     isInitialBoot = false
 
-    const target = ZOOM_TARGETS[state]
-    if (!target) return
+    const key = STATE_KEY[state]
+    const cfg = key ? SEQUENCE.zoom.states[key] : null
+    if (!cfg) return
 
     stopAllTweens()
 
-    const duration = target.duration ?? 150
-    const focusY = resolveYPosition(target.focusY, s, screenH)
+    const dur = cfg.durationMs
+    const focusY = resolveYPosition(cfg.focusY, s, screenH)
 
-    currentZoomTween = createZoomTween(params, target.zoom, duration, updateCamera, () => {
+    currentZoomTween = createZoomTween(params, cfg.zoom, dur, updateCamera, () => {
       currentZoomTween = null
       startBaseTimeline()
     })
 
     if (focusY > 0) {
-      currentFocusTween = createFocusTween(params, focusY, duration, updateCamera, () => {
+      currentFocusTween = createFocusTween(params, focusY, dur, updateCamera, () => {
         currentFocusTween = null
       })
     }

@@ -11,7 +11,7 @@ import {
 } from './app-helpers'
 import { type BootAnim, createBootAnim, destroyBootAnim, runBootAnim } from './boot'
 import { applyCamera } from './camera'
-import { COLOR_ACTIVE, C_PROMPT, FONT_FAMILY } from './constants'
+import { FONT_FAMILY, LAYOUT, MOUSE_DEFAULTS, PALETTE } from './constants'
 import { createFlickerState } from './effects/flicker'
 import type { LineDef } from './events'
 import { createLineBuffer } from './events'
@@ -76,7 +76,15 @@ const KEY_MAP: Record<string, DispatchEvent> = {
   Escape: 'ESC',
 }
 
-export async function createApp(wrap: HTMLDivElement, sets: VerbSets): Promise<() => void> {
+interface AppOptions {
+  onMarketplace?: () => void
+}
+
+export async function createApp(
+  wrap: HTMLDivElement,
+  sets: VerbSets,
+  options?: AppOptions,
+): Promise<() => void> {
   const params = createParams()
 
   const app = new Application()
@@ -111,6 +119,7 @@ export async function createApp(wrap: HTMLDivElement, sets: VerbSets): Promise<(
     dispatch(event, machine, localeSets, idiotSet, {
       enterState,
       updateSuggestion,
+      onMarketplace: options?.onMarketplace,
     })
 
   const updateCamera = () =>
@@ -146,12 +155,12 @@ export async function createApp(wrap: HTMLDivElement, sets: VerbSets): Promise<(
       runBootAnim(bootAnim, params.frameMs, {
         setPrompt: (t) => {
           s.caretText.text = t
-          s.caretText.style.fill = C_PROMPT
+          s.caretText.style.fill = PALETTE.prompt
           s.inputText.x = Math.round(s.caretText.width)
         },
         setInput: (t) => {
           s.inputText.text = t
-          s.inputText.style.fill = COLOR_ACTIVE
+          s.inputText.style.fill = PALETTE.active
         },
         onDone: () => enterState(State.IDLE),
       })
@@ -176,7 +185,7 @@ export async function createApp(wrap: HTMLDivElement, sets: VerbSets): Promise<(
   //   .start()
 
   const zoomCtrl = createZoomController(params, updateCamera, s, app.screen.height)
-  const scrollZoomCtrl = createScrollZoomController(params, updateCamera)
+  const scrollZoomCtrl = createScrollZoomController(s.scrollZoomWrap, app.canvas)
 
   // Mouse-driven camera offsets (composited on top of tweened params in `camera.ts`)
   const mouseState = {
@@ -195,11 +204,11 @@ export async function createApp(wrap: HTMLDivElement, sets: VerbSets): Promise<(
     mouseState.x = (e.clientX - rect.left) / rect.width
     mouseState.y = (e.clientY - rect.top) / rect.height
     // Map cursor to subtle translate offsets (±0.6% of screen)
-    mouseState.targetTX = (mouseState.x - 0.5) * -1.2
-    mouseState.targetTY = (mouseState.y - 0.5) * -1.2
+    mouseState.targetTX = (mouseState.x - 0.5) * -MOUSE_DEFAULTS.translateRange
+    mouseState.targetTY = (mouseState.y - 0.5) * -MOUSE_DEFAULTS.translateRange
     // Map cursor to subtle zoom factor
     const dist = Math.hypot(mouseState.x - 0.5, mouseState.y - 0.5)
-    mouseState.targetZoom = 1 - dist * 0.016
+    mouseState.targetZoom = 1 - dist * MOUSE_DEFAULTS.zoomFactor
   }
   window.addEventListener('mousemove', onMouseMove)
 
@@ -216,7 +225,7 @@ export async function createApp(wrap: HTMLDivElement, sets: VerbSets): Promise<(
     TWEEN.update()
 
     // Smooth interpolation for mouse-driven camera (lerp factor 0.05 = subtle delay)
-    const lerpFactor = 0.02
+    const lerpFactor = MOUSE_DEFAULTS.lerpFactor
     mouseState.currentTX += (mouseState.targetTX - mouseState.currentTX) * lerpFactor
     mouseState.currentTY += (mouseState.targetTY - mouseState.currentTY) * lerpFactor
     mouseState.currentZoom += (mouseState.targetZoom - mouseState.currentZoom) * lerpFactor
@@ -287,7 +296,7 @@ export async function createApp(wrap: HTMLDivElement, sets: VerbSets): Promise<(
     s.deadPixelSprite.visible = params.deadPixelsEnabled
     s.verbText.style.fill = hexToNum(params.colorVerb)
     s.ellipsisText.style.fill = hexToNum(params.colorEllipsis)
-    s.metaText.style.fill = hexToNum(params.colorMeta)
+    s.metaText.style.fill = PALETTE.suggestion
     s.highlightText.style.fill = hexToNum(params.colorHighlight)
     syncResolution()
     syncFontSize()
@@ -318,7 +327,7 @@ export async function createApp(wrap: HTMLDivElement, sets: VerbSets): Promise<(
       style: { fontFamily: FONT_FAMILY, fontSize: params.fontSize },
     })
     lctx.chW = m.width
-    const baseLineHeight = Math.round(params.fontSize * 1.24)
+    const baseLineHeight = Math.round(params.fontSize * LAYOUT.lineHeightRatio)
     lctx.lineHeight = baseLineHeight + params.lineHeightOffset
     m.destroy()
   }

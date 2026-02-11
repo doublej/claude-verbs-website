@@ -1,8 +1,9 @@
 import { Text } from 'pixi.js'
+import { LAYOUT } from './constants'
 import { makeStyle } from './helpers'
 import type { Params } from './params'
 
-const POOL_CAP = 40
+const POOL_CAP = LAYOUT.textPoolCap
 
 export interface TextPool {
   acquire(str: string, color: number): Text

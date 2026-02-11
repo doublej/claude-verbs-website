@@ -1,5 +1,7 @@
 import type { VerbSet } from '$lib/data/types'
 
+export const SKIP_THRESHOLD = 4
+
 export enum State {
   IDLE = 0,
   BROWSING = 1,
@@ -57,6 +59,7 @@ export type DispatchEvent =
 interface Callbacks {
   enterState: (state: State) => void
   updateSuggestion: () => void
+  onMarketplace?: () => void
 }
 
 function dispatchIdle(
@@ -84,12 +87,15 @@ function dispatchIdle(
 }
 
 function selectActiveSet(m: Machine, localeSets: VerbSet[], idiotSet: VerbSet | null): VerbSet {
-  return m.skipCount >= 4 && idiotSet ? idiotSet : localeSets[m.browseIndex % localeSets.length]
+  return m.skipCount >= SKIP_THRESHOLD && idiotSet
+    ? idiotSet
+    : localeSets[m.browseIndex % localeSets.length]
 }
 
 function browseDown(m: Machine, localeSets: VerbSet[], idiotSet: VerbSet | null): void {
   m.skipCount++
-  if (!(m.skipCount >= 4 && idiotSet)) m.browseIndex = (m.browseIndex + 1) % localeSets.length
+  if (!(m.skipCount >= SKIP_THRESHOLD && idiotSet))
+    m.browseIndex = (m.browseIndex + 1) % localeSets.length
 }
 
 function dispatchBrowsing(
@@ -116,7 +122,7 @@ function dispatchBrowsing(
 }
 
 function browseUp(m: Machine, idiotSet: VerbSet | null, cb: Callbacks): void {
-  if (m.skipCount >= 4 && idiotSet) {
+  if (m.skipCount >= SKIP_THRESHOLD && idiotSet) {
     m.skipCount = 3
     cb.updateSuggestion()
   } else if (m.browseIndex - 1 <= 0) cb.enterState(State.IDLE)
@@ -135,7 +141,7 @@ function dispatchPostDemo(event: DispatchEvent, m: Machine, cb: Callbacks): void
     const act = POST_SUGGESTIONS[m.postIndex].action
     if (act === 'copy' && m.activeSet)
       navigator.clipboard.writeText(`bunx claude-verbs install ${m.activeSet.name}`)
-    else if (act === 'marketplace') window.location.href = '/marketplace'
+    else if (act === 'marketplace') cb.onMarketplace?.()
   } else if (event === 'ARROW_DOWN') {
     m.tabCompleted = false
     m.postIndex = (m.postIndex + 1) % POST_SUGGESTIONS.length

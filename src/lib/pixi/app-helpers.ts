@@ -1,6 +1,6 @@
 import type { VerbSet, VerbSets } from '$lib/data/types'
 import { type Application, Container, Text, Texture } from 'pixi.js'
-import { COLOR_ACTIVE, COLOR_SUGGESTION, C_PROMPT, FONT_FAMILY } from './constants'
+import { FONT_FAMILY, PALETTE } from './constants'
 import { buildDeadPixelLayer } from './effects/dead-pixels'
 import { buildGlareCanvas } from './effects/glare'
 import { buildHeaderRows } from './header'
@@ -8,7 +8,7 @@ import { hexToNum, normalizeVerbs, shuffle } from './helpers'
 import type { LayoutCtx } from './layout'
 import type { Params } from './params'
 import type { SceneRefs } from './scene'
-import { type Machine, POST_SUGGESTIONS, State } from './state-machine'
+import { type Machine, POST_SUGGESTIONS, SKIP_THRESHOLD, State } from './state-machine'
 import type { TextPool } from './text-pool'
 import type { TickerState } from './ticker'
 
@@ -45,7 +45,7 @@ function updateIdleSuggestion(
       ? '   \u2191\u2193 browse \u00b7 enter to demo \u00b7 \u00b7 tab to complete'
       : ''
   s.promptText.text = `\u276f ${label}${hint}`
-  s.promptText.style.fill = machine.tabCompleted ? COLOR_ACTIVE : COLOR_SUGGESTION
+  s.promptText.style.fill = machine.tabCompleted ? PALETTE.active : PALETTE.suggestion
   s.statusText.text = '\u2026/_management\u2026/claude-verbs\u2026/site   main *5'
   s.permsText.text =
     '\u23f5\u23f5 bypass permissions on (shift+tab to cycle) \u00b7 5 files +322 -66'
@@ -58,7 +58,7 @@ function getBrowsingText(
   localeSets: VerbSet[],
   idiotSet: VerbSet | null,
 ): string {
-  if (machine.skipCount >= 4 && idiotSet) return 'Show me some verbs of an idt'
+  if (machine.skipCount >= SKIP_THRESHOLD && idiotSet) return 'Show me some verbs of an idt'
   const name = localeSets[machine.browseIndex % localeSets.length]?.name
   return name ? `Show me some verbs of ${name}` : ''
 }
@@ -82,7 +82,7 @@ function updateActiveSuggestion(
       hint = '\u2191\u2193 browse \u00b7 enter to select \u00b7 \u00b7 tab to complete'
   }
   s.promptText.text = hint ? `\u276f ${text}   ${hint}` : `\u276f ${text}`
-  s.promptText.style.fill = COLOR_ACTIVE
+  s.promptText.style.fill = PALETTE.active
   s.verbText.text = ''
   s.ellipsisText.visible = false
   s.highlightText.visible = false
@@ -116,7 +116,7 @@ export function resetDemoState(
   s.verbText.style.fill = hexToNum(params.colorVerb)
   s.ellipsisText.visible = true
   s.promptText.text = '\u276f'
-  s.promptText.style.fill = C_PROMPT
+  s.promptText.style.fill = PALETTE.prompt
   ts.tokenCount = 0
   ts.startTime = Date.now()
   ts.lastFrameTime = 0

@@ -7,7 +7,6 @@ export interface Params {
   tokenRate: number
   colorVerb: string
   colorEllipsis: string
-  colorMeta: string
   bgColor: string
   colorHighlight: string
   glareOpacity: number
@@ -43,7 +42,6 @@ export interface Params {
   exposure: number
   zoom: number
   mouseZoom: number
-  scrollZoom: number
   focusTargetY: number
   focusStrength: number
   screenPadding: number
@@ -60,6 +58,7 @@ function getTheme(): 'light' | 'dark' {
 }
 
 export function createParams(): Params {
+  // Avoid circular import: CAMERA_DEFAULTS values inlined from constants.ts
   const theme = getTheme()
   const isLight = theme === 'light'
 
@@ -72,21 +71,20 @@ export function createParams(): Params {
     tokenRate: 70,
     colorVerb: isLight ? '#b45454' : '#d78787',
     colorEllipsis: isLight ? '#737373' : '#a2a2a2',
-    colorMeta: isLight ? '#8b8b8b' : '#555555',
     bgColor: isLight ? '#f5f5f5' : '#0d1117',
     colorHighlight: isLight ? '#e0d9c2' : '#56533e',
     glareOpacity: 0,
-    perspective: 3000,
-    rotateX: 5,
-    rotateY: 8,
-    rotateZ: -4,
+    perspective: 3000, // CAMERA_DEFAULTS.perspective
+    rotateX: 5, // CAMERA_DEFAULTS.rotateX
+    rotateY: 8, // CAMERA_DEFAULTS.rotateY
+    rotateZ: -4, // CAMERA_DEFAULTS.rotateZ
     scale: 1,
     translateX: 0,
     translateY: 0,
     mouseTranslateX: 0,
     mouseTranslateY: 0,
-    originX: 4.8,
-    originY: 5.3,
+    originX: 4.8, // CAMERA_DEFAULTS.originX
+    originY: 5.3, // CAMERA_DEFAULTS.originY
     displayDownscale: 0.5,
     imageRendering: 'pixelated',
     fontSize: 48,
@@ -108,7 +106,6 @@ export function createParams(): Params {
     exposure: 1,
     zoom: 1.5,
     mouseZoom: 1,
-    scrollZoom: 1,
     focusTargetY: 0,
     focusStrength: 0,
     screenPadding: 0.15,

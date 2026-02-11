@@ -1,4 +1,5 @@
 import type { Container, Text } from 'pixi.js'
+import { SEQUENCE } from './config'
 import { SPINNER_FRAMES, SPINNER_TIMELINE } from './constants'
 import { type FlickerState, applyFlicker } from './effects/flicker'
 import { type LineBuffer, type LineDef, mkPromo, mkStateDiagram, nextLine } from './events'
@@ -64,12 +65,12 @@ export function tickScroll(
     return
 
   const elapsed = now - ts.startTime
-  if (!ts.stateDiagramShown && elapsed >= 30000) {
+  if (!ts.stateDiagramShown && elapsed >= SEQUENCE.demo.stateDiagramMs) {
     const diagram = mkStateDiagram()
     lineBuffer.unshift(...diagram.lines)
     ts.stateDiagramShown = true
   }
-  if (!ts.promoShown && elapsed >= 45000) {
+  if (!ts.promoShown && elapsed >= SEQUENCE.demo.promoMs) {
     const promo = mkPromo()
     lineBuffer.unshift(...promo.lines)
     ts.promoShown = true

@@ -1,4 +1,5 @@
 import type { Container, Text } from 'pixi.js'
+import { LAYOUT } from './constants'
 import type { LineDef } from './events'
 import { repeat } from './helpers'
 import type { Params } from './params'
@@ -12,7 +13,7 @@ export interface LayoutCtx {
 }
 
 export function createLayoutCtx(chW: number, fontSize: number, offset: number): LayoutCtx {
-  const baseLineHeight = Math.round(fontSize * 1.24)
+  const baseLineHeight = Math.round(fontSize * LAYOUT.lineHeightRatio)
   return { chW, lineHeight: baseLineHeight + offset, prevRuleCols: 0 }
 }
 
@@ -42,7 +43,7 @@ export function addScrollLine(
   spinnerY: number,
 ): void {
   const txt = pool.acquire(line.t, line.c)
-  txt.x = Math.round((line.col || 3) * lctx.chW)
+  txt.x = Math.round((line.col || LAYOUT.defaultCol) * lctx.chW)
   scrollContainer.addChild(txt)
   scrollItems.push(txt)
   layoutScrollItems(scrollItems, spinnerY, lctx, scrollContainer, pool)
@@ -73,7 +74,7 @@ export function layout(
   pool: TextPool,
 ): void {
   const { chW, lineHeight: lh } = lctx
-  const col3 = Math.round(3 * chW)
+  const col3 = Math.round(LAYOUT.defaultCol * chW)
   ui.verbText.x = col3
   ui.ellipsisText.x = ui.verbText.x + ui.verbText.width
 
@@ -128,7 +129,7 @@ export function layout(
   ui.bottomChrome.visible = true
 
   if (machine.current === State.IDLE) {
-    const idleOffsetY = -5 * lh
+    const idleOffsetY = LAYOUT.idleOffsetLines * lh
     ui.scrollContainer.y = scrollY + idleOffsetY
     ui.bottomChrome.y = scrollY + idleOffsetY
     layoutIdle(ui, lctx, screenH, pad, ch1)

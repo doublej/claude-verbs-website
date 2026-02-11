@@ -1,7 +1,9 @@
+import { EFFECT_DEFAULTS } from '../constants'
+
 export function buildGlareCanvas(w: number, h: number): HTMLCanvasElement {
   const vmax = Math.max(w, h)
-  const gw = Math.round(vmax * 0.6)
-  const gh = Math.round(vmax * 0.4)
+  const gw = Math.round(vmax * EFFECT_DEFAULTS.glareWidth)
+  const gh = Math.round(vmax * EFFECT_DEFAULTS.glareHeight)
   const c = document.createElement('canvas')
   c.width = gw
   c.height = gh

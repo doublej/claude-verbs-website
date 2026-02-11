@@ -1,72 +1,73 @@
-import type { Params } from './params'
+import type { Container } from 'pixi.js'
 
-const MAX_ZOOM = 5
-const DEBOUNCE_MS = 150
-const SPRING_STIFFNESS = 0.08
-const SPRING_DAMPING = 0.72
-const SPRING_REST_THRESHOLD = 0.001
-const SCROLL_SENSITIVITY = 0.003
+const MAX_ZOOM = 2.5
+const HOLD_MS = 600
+const EASE_SPEED = 0.04
+const REST_THRESHOLD = 0.002
+const SCROLL_SENSITIVITY = 0.0015
 
 export interface ScrollZoomController {
   cleanup: () => void
 }
 
 export function createScrollZoomController(
-  params: Params,
-  updateCamera: () => void,
+  wrap: Container,
+  canvas: HTMLCanvasElement,
 ): ScrollZoomController {
-  let debounceTimer: ReturnType<typeof setTimeout> | null = null
-  let springRaf = 0
-  let velocity = 0
-  let snapping = false
+  let holdTimer: ReturnType<typeof setTimeout> | null = null
+  let easeRaf = 0
+  let zoom = 1
 
-  function startSpring() {
-    if (springRaf) return
-    snapping = true
-    velocity = 0
-    tickSpring()
+  function applyZoom(pivotX: number, pivotY: number) {
+    wrap.pivot.set(pivotX, pivotY)
+    wrap.position.set(pivotX, pivotY)
+    wrap.scale.set(zoom)
   }
 
-  function tickSpring() {
-    const displacement = params.scrollZoom - 1
-    velocity = (velocity + displacement * SPRING_STIFFNESS) * SPRING_DAMPING
-    params.scrollZoom -= velocity
-    updateCamera()
+  function startEaseBack() {
+    if (easeRaf) return
+    tickEase()
+  }
 
-    if (
-      Math.abs(displacement) < SPRING_REST_THRESHOLD &&
-      Math.abs(velocity) < SPRING_REST_THRESHOLD
-    ) {
-      params.scrollZoom = 1
-      updateCamera()
-      springRaf = 0
-      snapping = false
+  function tickEase() {
+    // Smooth deceleration — lerp towards 1, no overshoot
+    zoom += (1 - zoom) * EASE_SPEED
+    wrap.scale.set(zoom)
+
+    if (Math.abs(zoom - 1) < REST_THRESHOLD) {
+      zoom = 1
+      wrap.scale.set(1)
+      wrap.pivot.set(0, 0)
+      wrap.position.set(0, 0)
+      easeRaf = 0
       return
     }
-    springRaf = requestAnimationFrame(tickSpring)
+    easeRaf = requestAnimationFrame(tickEase)
   }
 
-  function stopSpring() {
-    if (springRaf) cancelAnimationFrame(springRaf)
-    springRaf = 0
-    snapping = false
-    velocity = 0
+  function stopEase() {
+    if (easeRaf) cancelAnimationFrame(easeRaf)
+    easeRaf = 0
   }
 
   const onWheel = (e: WheelEvent) => {
     e.preventDefault()
 
-    if (snapping) stopSpring()
-    if (debounceTimer) clearTimeout(debounceTimer)
+    stopEase()
+    if (holdTimer) clearTimeout(holdTimer)
 
-    // Velocity-aware: larger scroll gestures zoom more
+    const rect = canvas.getBoundingClientRect()
+    const dpr = window.devicePixelRatio || 1
+    const cursorX = (((e.clientX - rect.left) / rect.width) * canvas.width) / dpr
+    const cursorY = (((e.clientY - rect.top) / rect.height) * canvas.height) / dpr
+
     const delta = -e.deltaY * SCROLL_SENSITIVITY
     if (delta > 0) {
-      params.scrollZoom = Math.min(MAX_ZOOM, params.scrollZoom + delta)
-      updateCamera()
+      zoom = Math.min(MAX_ZOOM, zoom + delta)
+      applyZoom(cursorX, cursorY)
     }
 
-    debounceTimer = setTimeout(startSpring, DEBOUNCE_MS)
+    holdTimer = setTimeout(startEaseBack, HOLD_MS)
   }
 
   window.addEventListener('wheel', onWheel, { passive: false })
@@ -74,8 +75,8 @@ export function createScrollZoomController(
   return {
     cleanup: () => {
       window.removeEventListener('wheel', onWheel)
-      if (debounceTimer) clearTimeout(debounceTimer)
-      stopSpring()
+      if (holdTimer) clearTimeout(holdTimer)
+      stopEase()
     },
   }
 }

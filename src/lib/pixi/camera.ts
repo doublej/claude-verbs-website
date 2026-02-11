@@ -1,6 +1,7 @@
+import { CAMERA_DEFAULTS } from './constants'
 import type { Params } from './params'
 
-export const GRID_DIVISIONS = 32
+export const GRID_DIVISIONS = CAMERA_DEFAULTS.gridDivisions
 const GRID_VERTS = (GRID_DIVISIONS + 1) * (GRID_DIVISIONS + 1)
 
 export function createMeshGeometry(
@@ -73,7 +74,7 @@ export function computeCameraVertices(
   const sry = Math.sin(ry)
   const crx = Math.cos(rx)
   const srx = Math.sin(rx)
-  const z = p.zoom * p.mouseZoom * p.scrollZoom
+  const z = p.zoom * p.mouseZoom
 
   for (let i = 0; i < GRID_VERTS; i++) {
     let x = baseVerts[i * 2] - ox

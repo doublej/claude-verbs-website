@@ -1,12 +1,8 @@
+import { SEQUENCE } from './config'
 import { SPINNER_FRAMES, SPINNER_TIMELINE } from './constants'
 
 const COMMAND = 'claude-verbs run'
 const BASE_FRAME_MS = 100
-const CHAR_MS = 55
-const PRE_BLINK_MS = 800
-const BLINK_MS = 530
-const POST_TYPE_MS = 200
-const LOAD_MS = 1500
 
 export interface BootAnim {
   timers: ReturnType<typeof setTimeout>[]
@@ -49,7 +45,7 @@ export function runBootAnim(b: BootAnim, frameMs: number, ui: BootUI): void {
       cursorOn = !cursorOn
       ui.setInput(cursorOn ? cursor : '')
     },
-    scale(BLINK_MS, frameMs),
+    scale(SEQUENCE.boot.blinkMs, frameMs),
   )
 
   b.timers.push(
@@ -59,7 +55,7 @@ export function runBootAnim(b: BootAnim, frameMs: number, ui: BootUI): void {
         b.blinkId = null
         typeChar(0)
       },
-      scale(PRE_BLINK_MS, frameMs),
+      scale(SEQUENCE.boot.preBlinkMs, frameMs),
     ),
   )
 
@@ -67,9 +63,9 @@ export function runBootAnim(b: BootAnim, frameMs: number, ui: BootUI): void {
     const suffix = i < COMMAND.length ? cursor : ''
     ui.setInput(COMMAND.slice(0, i) + suffix)
     if (i < COMMAND.length) {
-      b.timers.push(setTimeout(() => typeChar(i + 1), scale(CHAR_MS, frameMs)))
+      b.timers.push(setTimeout(() => typeChar(i + 1), scale(SEQUENCE.boot.charMs, frameMs)))
     } else {
-      b.timers.push(setTimeout(startLoad, scale(POST_TYPE_MS, frameMs)))
+      b.timers.push(setTimeout(startLoad, scale(SEQUENCE.boot.postTypeMs, frameMs)))
     }
   }
 
@@ -87,7 +83,7 @@ export function runBootAnim(b: BootAnim, frameMs: number, ui: BootUI): void {
           destroyBootAnim(b)
           ui.onDone()
         },
-        scale(LOAD_MS, frameMs),
+        scale(SEQUENCE.boot.loadMs, frameMs),
       ),
     )
   }

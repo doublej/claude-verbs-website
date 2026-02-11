@@ -13,7 +13,7 @@ import {
 } from 'pixi.js'
 import { createMeshGeometry } from './camera'
 import { FONT_FAMILY, PALETTE } from './constants'
-import { buildDeadPixelLayer } from './effects/dead-pixels'
+import { buildDeadPixelLayers } from './effects/dead-pixels'
 import { buildGlareCanvas } from './effects/glare'
 import { createLcdFilter } from './effects/lcd'
 import { hexToNum, makeStyle } from './helpers'
@@ -48,6 +48,7 @@ export interface SceneRefs {
   bloomFilter: BloomFilter
   adjustmentFilter: AdjustmentFilter
   deadPixelSprite: Sprite
+  stuckPixelSprite: Sprite
   glareSprite: Sprite
   scrollZoomWrap: Container
   cameraMesh: MeshSimple
@@ -182,14 +183,23 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
   scrollZoomWrap.addChild(cameraMesh)
   app.stage.addChild(scrollZoomWrap)
 
-  // Dead pixels + glare (screen-space overlays)
-  const deadPixelCanvas = buildDeadPixelLayer(screenW, screenH, params.deadPixelsEnabled)
-  const deadPixelTexture = Texture.from({ resource: deadPixelCanvas, scaleMode: 'nearest' })
+  // Dead pixels — rendered in display-texture space so they align with LCD grid cells
+  const dpLayers = buildDeadPixelLayers(padDW, padDH, params.deadPixelsEnabled)
+  const deadPixelTexture = Texture.from({ resource: dpLayers.dark, scaleMode: 'nearest' })
   const deadPixelSprite = new Sprite({ texture: deadPixelTexture, label: 'deadPixels' })
-  deadPixelSprite.width = screenW
-  deadPixelSprite.height = screenH
+  deadPixelSprite.width = padDW
+  deadPixelSprite.height = padDH
   deadPixelSprite.blendMode = 'multiply'
   deadPixelSprite.visible = params.deadPixelsEnabled
+
+  const stuckTexture = Texture.from({ resource: dpLayers.stuck, scaleMode: 'nearest' })
+  const stuckPixelSprite = new Sprite({ texture: stuckTexture, label: 'stuckPixels' })
+  stuckPixelSprite.width = padDW
+  stuckPixelSprite.height = padDH
+  stuckPixelSprite.blendMode = 'add'
+  stuckPixelSprite.visible = params.deadPixelsEnabled
+
+  display.addChild(deadPixelSprite, stuckPixelSprite)
 
   const glareCanvas = buildGlareCanvas(screenW, screenH)
   const glareTexture = Texture.from({ resource: glareCanvas, scaleMode: 'linear' })
@@ -200,7 +210,7 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
   glareSprite.y = -screenH * 0.1
 
   const overlayContainer = new Container({ label: 'overlays' })
-  overlayContainer.addChild(deadPixelSprite, glareSprite)
+  overlayContainer.addChild(glareSprite)
   scrollZoomWrap.addChild(overlayContainer)
 
   // Measure char width
@@ -240,6 +250,7 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
     bloomFilter,
     adjustmentFilter,
     deadPixelSprite,
+    stuckPixelSprite,
     glareSprite,
     scrollZoomWrap,
     cameraMesh,

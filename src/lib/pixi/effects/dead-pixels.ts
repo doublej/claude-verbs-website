@@ -1,34 +1,51 @@
 import { EFFECT_DEFAULTS, PALETTE } from '../constants'
 
-let seed = EFFECT_DEFAULTS.deadPixelSeed
-
-function seededRand(): number {
-  seed = (seed * 16807 + 0) % 2147483647
-  return seed / 2147483647
-}
-
-const COLORED_PIXELS: Record<number, string> = {
+/** Dark dead pixels (rendered with multiply blend to darken content). */
+const DARK_PIXELS: Record<number, string> = {
   3: PALETTE.deadPixelRed,
   7: PALETTE.deadPixelBlue,
   10: PALETTE.deadPixelGreen,
-  11: PALETTE.deadPixelRed,
 }
 
-export function buildDeadPixelLayer(w: number, h: number, enabled: boolean): HTMLCanvasElement {
-  const c = document.createElement('canvas')
-  const dpr = window.devicePixelRatio || 1
-  c.width = Math.round(w * dpr)
-  c.height = Math.round(h * dpr)
-  if (!enabled) return c
+/** Stuck-on red pixels — always glow red regardless of content. */
+const STUCK_RED_INDICES = new Set([4, 9])
 
-  const ctx = c.getContext('2d')!
-  const px = Math.round(EFFECT_DEFAULTS.deadPixelSize * dpr)
-  seed = EFFECT_DEFAULTS.deadPixelSeed
+function snapToGrid(v: number, grid: number): number {
+  return Math.floor(v / grid) * grid
+}
+
+interface DeadPixelLayers {
+  dark: HTMLCanvasElement
+  stuck: HTMLCanvasElement
+}
+
+/** Build two canvases: dark dead pixels + stuck-on red pixels, both LCD-grid-aligned. */
+export function buildDeadPixelLayers(w: number, h: number, enabled: boolean): DeadPixelLayers {
+  const dark = document.createElement('canvas')
+  const stuck = document.createElement('canvas')
+  dark.width = w
+  dark.height = h
+  stuck.width = w
+  stuck.height = h
+  if (!enabled) return { dark, stuck }
+
+  const darkCtx = dark.getContext('2d')!
+  const stuckCtx = stuck.getContext('2d')!
+  const grid = EFFECT_DEFAULTS.lcdGrid
+
   for (let i = 0; i < EFFECT_DEFAULTS.deadPixelCount; i++) {
-    ctx.fillStyle = COLORED_PIXELS[i] ?? PALETTE.deadPixel
-    const x = Math.round((0.15 + seededRand() * 0.7) * c.width)
-    const y = Math.round((0.1 + seededRand() * 0.6) * c.height)
-    ctx.fillRect(x, y, px, px)
+    const rawX = (0.15 + Math.random() * 0.7) * w
+    const rawY = (0.1 + Math.random() * 0.6) * h
+    const x = snapToGrid(rawX, grid)
+    const y = snapToGrid(rawY, grid)
+
+    if (STUCK_RED_INDICES.has(i)) {
+      stuckCtx.fillStyle = '#ff0000'
+      stuckCtx.fillRect(x, y, grid, grid)
+    } else {
+      darkCtx.fillStyle = DARK_PIXELS[i] ?? PALETTE.deadPixel
+      darkCtx.fillRect(x, y, grid, grid)
+    }
   }
-  return c
+  return { dark, stuck }
 }

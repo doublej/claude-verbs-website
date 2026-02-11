@@ -120,18 +120,11 @@ export async function createApp(
   const scrollItems: (Text | Container)[] = []
   const bootAnim: BootAnim = createBootAnim()
 
-  const onMarketplace = options?.onMarketplace
-    ? () => {
-        scrollZoomCtrl.cleanup()
-        options.onMarketplace?.()
-      }
-    : undefined
-
   const doDispatch = (event: DispatchEvent) =>
     dispatch(event, machine, localeSets, idiotSet, {
       enterState,
       updateSuggestion,
-      onMarketplace,
+      onMarketplace: options?.onMarketplace,
     })
 
   const updateCamera = () =>
@@ -250,7 +243,7 @@ export async function createApp(
 
     tickSpinner(now, ts, s, params)
     tickScroll(now, ts, s, machine, params, lineBuffer, bufState, scrollItems, pool, lctx)
-    if (machine.current === State.DEMO || machine.current === State.BUGGED)
+    if (machine.current === State.DEMO || machine.current === State.POST_DEMO || machine.current === State.BUGGED)
       tickDemo(now, ts, s, params, lctx)
     tickLayout(ts, s, params, machine, lctx, scrollItems, pool)
     tickFlicker(s, machine, params, flicker, lctx)
@@ -306,6 +299,7 @@ export async function createApp(
     s.adjustmentFilter.brightness = params.brightness * params.exposure
     s.adjustmentFilter.saturation = params.saturation
     s.deadPixelSprite.visible = params.deadPixelsEnabled
+    s.stuckPixelSprite.visible = params.deadPixelsEnabled
     s.verbText.style.fill = hexToNum(params.colorVerb)
     s.ellipsisText.style.fill = hexToNum(params.colorEllipsis)
     s.metaText.style.fill = PALETTE.suggestion

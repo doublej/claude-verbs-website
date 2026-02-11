@@ -7,7 +7,7 @@ import { fmtElapsed, shuffle } from './helpers'
 import { type LayoutCtx, addScrollLine, layout } from './layout'
 import type { Params } from './params'
 import type { SceneRefs } from './scene'
-import { type Machine, State } from './state-machine'
+import { type Machine, State, stateName } from './state-machine'
 import type { TextPool } from './text-pool'
 
 export interface TickerState {
@@ -87,7 +87,7 @@ export function tickScroll(
     ts.layoutDirty = true
   }
 
-  s.statusText.text = '\u2026/_management\u2026/claude-verbs\u2026/site   main *5'
+  s.statusText.text = `\u2026/claude-verbs-website   main *5   [${stateName(machine.current)}]`
   s.permsText.text =
     '\u23f5\u23f5 bypass permissions on (shift+tab to cycle) \u00b7 5 files +322 -66'
   const h = Math.floor(elapsed / 3600000)

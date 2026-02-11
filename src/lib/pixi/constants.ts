@@ -2,35 +2,29 @@ export const SPINNER_FRAMES = ['·', '✻', '✽', '✶', '✳', '✢']
 export const SPINNER_TIMELINE = [0, 0, 1, 2, 3, 4, 5, 5]
 export const FONT_FAMILY = '"SF Mono", "Fira Code", "Cascadia Code", monospace'
 
-type Theme = 'light' | 'dark'
-
-function getTheme(): Theme {
-  if (typeof document === 'undefined') return 'dark'
-  const attr = document.documentElement.getAttribute('data-theme')
-  return attr === 'light' ? 'light' : 'dark'
+function isLight(): boolean {
+  if (typeof document === 'undefined') return false
+  return document.documentElement.getAttribute('data-theme') === 'light'
 }
 
-const theme = getTheme()
-const isLight = theme === 'light'
-
-/** Centralised color palette — single source of truth for all TUI colors. */
+/** Centralised color palette — reads theme at access time so it stays in sync. */
 export const PALETTE = {
-  border: isLight ? 0xd0d7de : 0x30363d,
-  dim: isLight ? 0x6e7781 : 0x6e7681,
-  lineNum: isLight ? 0x9ca3af : 0x484f58,
-  tool: isLight ? 0x57606a : 0x8b949e,
-  path: isLight ? 0x24292f : 0xc9d1d9,
-  ok: isLight ? 0x22c55e : 0x4ade80,
-  warn: isLight ? 0xd97706 : 0xd29922,
-  error: isLight ? 0xdc2626 : 0xf85149,
-  prompt: isLight ? 0x7c3aed : 0xbc8cff,
-  accent: isLight ? 0x0969da : 0x79c0ff,
-  suggestion: isLight ? 0x8b8b8b : 0x555555,
-  active: isLight ? 0x000000 : 0xffffff,
-  deadPixel: isLight ? '#d0d0d0' : '#0a0c10',
-  deadPixelRed: isLight ? '#e8a0a0' : '#3a0808',
-  deadPixelBlue: isLight ? '#a0a0e8' : '#08083a',
-  deadPixelGreen: isLight ? '#a0e8a0' : '#083a08',
+  get border() { return isLight() ? 0xd0d7de : 0x30363d },
+  get dim() { return isLight() ? 0x6e7781 : 0x6e7681 },
+  get lineNum() { return isLight() ? 0x9ca3af : 0x484f58 },
+  get tool() { return isLight() ? 0x57606a : 0x8b949e },
+  get path() { return isLight() ? 0x24292f : 0xc9d1d9 },
+  get ok() { return isLight() ? 0x22c55e : 0x4ade80 },
+  get warn() { return isLight() ? 0xd97706 : 0xd29922 },
+  get error() { return isLight() ? 0xdc2626 : 0xf85149 },
+  get prompt() { return isLight() ? 0x7c3aed : 0xbc8cff },
+  get accent() { return isLight() ? 0x0969da : 0x79c0ff },
+  get suggestion() { return isLight() ? 0x8b8b8b : 0x555555 },
+  get active() { return isLight() ? 0x000000 : 0xffffff },
+  get deadPixel() { return isLight() ? '#d0d0d0' : '#0a0c10' },
+  get deadPixelRed() { return isLight() ? '#e8a0a0' : '#3a0808' },
+  get deadPixelBlue() { return isLight() ? '#a0a0e8' : '#08083a' },
+  get deadPixelGreen() { return isLight() ? '#a0e8a0' : '#083a08' },
 }
 
 export const LAYOUT = {
@@ -61,7 +55,6 @@ export const MOUSE_DEFAULTS = {
 export const EFFECT_DEFAULTS = {
   deadPixelCount: 12,
   deadPixelSize: 3,
-  deadPixelSeed: 42,
   glareWidth: 0.6,
   glareHeight: 0.4,
   lcdGrid: 4.0,

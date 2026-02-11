@@ -11,6 +11,19 @@ export enum State {
   BOOT = 5,
 }
 
+const STATE_NAMES: Record<State, string> = {
+  [State.IDLE]: 'IDLE',
+  [State.BROWSING]: 'BROWSING',
+  [State.DEMO]: 'DEMO',
+  [State.POST_DEMO]: 'POST_DEMO',
+  [State.BUGGED]: 'BUGGED',
+  [State.BOOT]: 'BOOT',
+}
+
+export function stateName(s: State): string {
+  return STATE_NAMES[s] ?? `UNKNOWN(${s})`
+}
+
 export interface Machine {
   current: State
   previous: State
@@ -43,7 +56,7 @@ export interface PostSuggestion {
 }
 
 export const POST_SUGGESTIONS: PostSuggestion[] = [
-  { text: 'copy command to get access to spinner verb cli', action: 'copy' },
+  { text: 'copy install command to clipboard', action: 'copy' },
   { text: 'show marketplace', action: 'marketplace' },
 ]
 
@@ -142,7 +155,7 @@ function dispatchPostDemo(event: DispatchEvent, m: Machine, cb: Callbacks): void
   } else if (event === 'ENTER') {
     const act = POST_SUGGESTIONS[m.postIndex].action
     if (act === 'copy' && m.activeSet)
-      navigator.clipboard.writeText(`bunx claude-verbs install ${m.activeSet.name}`)
+      navigator.clipboard.writeText(`bunx github:doublej/claude-verbs-cli install ${m.activeSet.name}`)
     else if (act === 'marketplace') cb.onMarketplace?.()
   } else if (event === 'ARROW_DOWN') {
     m.tabCompleted = false

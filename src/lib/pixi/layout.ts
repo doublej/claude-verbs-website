@@ -89,7 +89,7 @@ export function layout(
       : Math.round(screenH / 2 - lh + lh * params.offsetY)
 
   const scrollY =
-    params.absoluteY !== 0 ? Math.round(lh * params.absoluteY) : Math.round(lh * params.offsetY)
+    params.absoluteY !== 0 ? Math.round(lh * params.absoluteY) : 0
 
   ui.spinnerLine.x = leftX
   ui.spinnerLine.y = spinnerY
@@ -124,11 +124,11 @@ export function layout(
 
   ui.inputContainer.visible = false
   ui.scrollContainer.visible = true
-  ui.spinnerLine.visible = machine.current === State.DEMO
-  ui.metaLine.visible = machine.current === State.DEMO
+  ui.spinnerLine.visible = machine.current === State.DEMO || machine.current === State.POST_DEMO
+  ui.metaLine.visible = machine.current === State.DEMO || machine.current === State.POST_DEMO
   ui.bottomChrome.visible = true
 
-  if (machine.current === State.IDLE) {
+  if (machine.current === State.IDLE || machine.current === State.BROWSING) {
     const idleOffsetY = LAYOUT.idleOffsetLines * lh
     ui.scrollContainer.y = scrollY + idleOffsetY
     ui.bottomChrome.y = scrollY + idleOffsetY

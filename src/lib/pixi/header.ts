@@ -56,7 +56,7 @@ export function buildHeaderRows(cols: number, sets: VerbSets, params: Params): H
     },
     row('', '', PALETTE.border),
     row('Welcome!', 'Getting started', cv),
-    row('', 'claude-verbs install <name>', PALETTE.dim),
+    row('', 'bunx github:doublej/claude-verbs-cli install <name>', PALETTE.dim),
     row('\u2590\u259b\u2588\u2588\u2588\u259c\u258c', repeat('\u2500', 25), cv),
     row('\u259d\u259c\u2588\u2588\u2588\u2588\u2588\u259b\u2598', `${n} verb sets available`, cv),
     row('\u2598\u2598 \u259d\u259d', 'Arrow keys to browse', PALETTE.dim),

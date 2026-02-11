@@ -9,7 +9,7 @@ export const SEQUENCE = {
       IDLE: { zoom: 1.0, focusY: 'prompt' as const, durationMs: 300 },
       BROWSING: { zoom: 1.35, focusY: 'prompt' as const, durationMs: 180 },
       DEMO: { zoom: 0.8, focusY: 'spinner' as const, durationMs: 250 },
-      POST_DEMO: { zoom: 1.15, focusY: 'prompt' as const, durationMs: 200 },
+      POST_DEMO: { zoom: 1, focusY: 'prompt' as const, durationMs: 200 },
       BUGGED: { zoom: 0.65, focusY: 'center' as const, durationMs: 100 },
     },
   },

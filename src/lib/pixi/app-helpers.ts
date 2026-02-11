@@ -1,14 +1,14 @@
 import type { VerbSet, VerbSets } from '$lib/data/types'
 import { type Application, Container, Text, Texture } from 'pixi.js'
 import { FONT_FAMILY, PALETTE } from './constants'
-import { buildDeadPixelLayer } from './effects/dead-pixels'
+import { buildDeadPixelLayers } from './effects/dead-pixels'
 import { buildGlareCanvas } from './effects/glare'
 import { buildHeaderRows } from './header'
 import { hexToNum, normalizeVerbs, shuffle } from './helpers'
 import type { LayoutCtx } from './layout'
 import type { Params } from './params'
 import type { SceneRefs } from './scene'
-import { type Machine, POST_SUGGESTIONS, SKIP_THRESHOLD, State } from './state-machine'
+import { type Machine, POST_SUGGESTIONS, SKIP_THRESHOLD, State, stateName } from './state-machine'
 import type { TextPool } from './text-pool'
 import type { TickerState } from './ticker'
 
@@ -46,7 +46,7 @@ function updateIdleSuggestion(
       : ''
   s.promptText.text = `\u276f ${label}${hint}`
   s.promptText.style.fill = machine.tabCompleted ? PALETTE.active : PALETTE.suggestion
-  s.statusText.text = '\u2026/_management\u2026/claude-verbs\u2026/site   main *5'
+  s.statusText.text = `\u2026/claude-verbs-website   main *5   [${stateName(machine.current)}]`
   s.permsText.text =
     '\u23f5\u23f5 bypass permissions on (shift+tab to cycle) \u00b7 5 files +322 -66'
   s.infoText.text = '00:00 | tip: /git:commit'
@@ -139,11 +139,17 @@ export function handleResize(
 ): void {
   const w = app.screen.width
   const h = app.screen.height
-  const dpCanvas = buildDeadPixelLayer(w, h, params.deadPixelsEnabled)
+  const rtW = s.displayRT.width
+  const rtH = s.displayRT.height
+  const dpLayers = buildDeadPixelLayers(rtW, rtH, params.deadPixelsEnabled)
   s.deadPixelSprite.texture.destroy(true)
-  s.deadPixelSprite.texture = Texture.from({ resource: dpCanvas, scaleMode: 'nearest' })
-  s.deadPixelSprite.width = w
-  s.deadPixelSprite.height = h
+  s.deadPixelSprite.texture = Texture.from({ resource: dpLayers.dark, scaleMode: 'nearest' })
+  s.deadPixelSprite.width = rtW
+  s.deadPixelSprite.height = rtH
+  s.stuckPixelSprite.texture.destroy(true)
+  s.stuckPixelSprite.texture = Texture.from({ resource: dpLayers.stuck, scaleMode: 'nearest' })
+  s.stuckPixelSprite.width = rtW
+  s.stuckPixelSprite.height = rtH
   const gc = buildGlareCanvas(w, h)
   s.glareSprite.texture.destroy(true)
   s.glareSprite.texture = Texture.from({ resource: gc, scaleMode: 'nearest' })

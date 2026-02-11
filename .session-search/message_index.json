@@ -1,0 +1,452 @@
+[
+  {
+    "timestamp": "2026-02-11T12:41:35.213Z",
+    "session_id": "c975f202-18bf-40f7-bc09-8139d345e60a",
+    "uuid": "843b2325-147e-4393-bd65-327c6464499d",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/c975f202-18bf-40f7-bc09-8139d345e60a.jsonl",
+    "source_line": 79,
+    "preview": "The spinner UI does not show at all anymore",
+    "char_count": 43
+  },
+  {
+    "timestamp": "2026-02-11T12:47:21.310Z",
+    "session_id": "c975f202-18bf-40f7-bc09-8139d345e60a",
+    "uuid": "73666a71-702c-4442-90c8-db1fa6229d6c",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/c975f202-18bf-40f7-bc09-8139d345e60a.jsonl",
+    "source_line": 139,
+    "preview": "When we reach the end of the spinner verb list, start over",
+    "char_count": 58
+  },
+  {
+    "timestamp": "2026-02-11T12:49:12.024Z",
+    "session_id": "acb5acf9-9eff-44aa-947a-649702ab43fa",
+    "uuid": "ca99067d-3072-42d0-8da8-343006f8ee1d",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/acb5acf9-9eff-44aa-947a-649702ab43fa.jsonl",
+    "source_line": 2,
+    "preview": "put a square button at the right side against the viewport, like 40px height, quite some padding, cl",
+    "char_count": 145
+  },
+  {
+    "timestamp": "2026-02-11T12:50:10.909Z",
+    "session_id": "acb5acf9-9eff-44aa-947a-649702ab43fa",
+    "uuid": "78fa0a40-4588-46d1-9956-d866c9f0e0d0",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/acb5acf9-9eff-44aa-947a-649702ab43fa.jsonl",
+    "source_line": 41,
+    "preview": "remove the radius, temove the border, remove the glwo",
+    "char_count": 53
+  },
+  {
+    "timestamp": "2026-02-11T12:52:32.745Z",
+    "session_id": "3660e20b-0eb9-4efc-befa-1204d39f24fb",
+    "uuid": "3cbfec11-adb9-458b-a81a-0ac4dc9bdaa2",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/3660e20b-0eb9-4efc-befa-1204d39f24fb.jsonl",
+    "source_line": 6,
+    "preview": "bind a very slight, delayed and smoothed out rotation and and zoom to the cursor pos",
+    "char_count": 84
+  },
+  {
+    "timestamp": "2026-02-11T12:53:23.643Z",
+    "session_id": "670afd5d-5baa-4544-9079-db411d4f15c1",
+    "uuid": "b31770d3-bda9-4653-a9c1-4e296f04f98e",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/670afd5d-5baa-4544-9079-db411d4f15c1.jsonl",
+    "source_line": 10,
+    "preview": "use pixi skill, add controllable bloom, brightness, saturation, exposure. (tweakpane)",
+    "char_count": 85
+  },
+  {
+    "timestamp": "2026-02-11T12:54:46.109Z",
+    "session_id": "899f211a-e553-4ad4-945e-e9ad0050b0d9",
+    "uuid": "ea71e428-21e5-47d2-be5a-84db68373e6a",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/899f211a-e553-4ad4-945e-e9ad0050b0d9.jsonl",
+    "source_line": 6,
+    "preview": "there should be transitions throughout the pixi code but they do not play, use svelte and pixi skill",
+    "char_count": 118
+  },
+  {
+    "timestamp": "2026-02-11T12:55:08.844Z",
+    "session_id": "899f211a-e553-4ad4-945e-e9ad0050b0d9",
+    "uuid": "3bd0f91d-a16d-4901-8208-fa3f36303629",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/899f211a-e553-4ad4-945e-e9ad0050b0d9.jsonl",
+    "source_line": 45,
+    "preview": "Base directory for this skill: /Users/jurrejan/.claude/skills/pixijs-dev  # PixiJS Development  Buil",
+    "char_count": 721
+  },
+  {
+    "timestamp": "2026-02-11T12:58:03.949Z",
+    "session_id": "ee208d5f-d2fd-48c2-aaf7-282431940416",
+    "uuid": "e773a918-e1aa-457d-970c-8841b953c402",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/ee208d5f-d2fd-48c2-aaf7-282431940416.jsonl",
+    "source_line": 6,
+    "preview": "There's a cursor position vs camera connection but its not the offset i imagined, its pushing the va",
+    "char_count": 124
+  },
+  {
+    "timestamp": "2026-02-11T13:00:01.871Z",
+    "session_id": "ee208d5f-d2fd-48c2-aaf7-282431940416",
+    "uuid": "ff68c443-e257-4c93-a4ac-1c20ea4257ae",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/ee208d5f-d2fd-48c2-aaf7-282431940416.jsonl",
+    "source_line": 51,
+    "preview": "list all values that are affected",
+    "char_count": 33
+  },
+  {
+    "timestamp": "2026-02-11T13:00:48.859Z",
+    "session_id": "ee208d5f-d2fd-48c2-aaf7-282431940416",
+    "uuid": "3cd1b8f8-a74f-4caf-8c85-1d76d3f18285",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/ee208d5f-d2fd-48c2-aaf7-282431940416.jsonl",
+    "source_line": 71,
+    "preview": "remove the rotatation impact, add some position impact",
+    "char_count": 54
+  },
+  {
+    "timestamp": "2026-02-11T13:01:18.459Z",
+    "session_id": "899f211a-e553-4ad4-945e-e9ad0050b0d9",
+    "uuid": "429701d2-add1-4b2a-9d49-92df2186f9c5",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/899f211a-e553-4ad4-945e-e9ad0050b0d9.jsonl",
+    "source_line": 200,
+    "preview": "there should be transitions throughout the pixi code but they do not play, use svelte and pixi skill",
+    "char_count": 118
+  },
+  {
+    "timestamp": "2026-02-11T13:02:23.196Z",
+    "session_id": "ee208d5f-d2fd-48c2-aaf7-282431940416",
+    "uuid": "199bf5df-16dd-4aae-9e47-abbde6beb9cd",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/ee208d5f-d2fd-48c2-aaf7-282431940416.jsonl",
+    "source_line": 94,
+    "preview": "Make the smoothing more aggressive, reduce the value inpact x0.4",
+    "char_count": 64
+  },
+  {
+    "timestamp": "2026-02-11T13:03:51.758Z",
+    "session_id": "c158bc7f-7725-48b8-b518-3b1441769672",
+    "uuid": "a51c962f-b98f-4d51-a463-4c712c4c10ee",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/c158bc7f-7725-48b8-b518-3b1441769672.jsonl",
+    "source_line": 6,
+    "preview": "When landing on idle: position offsety -5",
+    "char_count": 41
+  },
+  {
+    "timestamp": "2026-02-11T13:05:46.014Z",
+    "session_id": "c158bc7f-7725-48b8-b518-3b1441769672",
+    "uuid": "3777017a-d949-4e85-bc62-a6d116b1e2bc",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/c158bc7f-7725-48b8-b518-3b1441769672.jsonl",
+    "source_line": 55,
+    "preview": "The position y offset affect some elements differently",
+    "char_count": 54
+  },
+  {
+    "timestamp": "2026-02-11T13:45:03.705Z",
+    "session_id": "c158bc7f-7725-48b8-b518-3b1441769672",
+    "uuid": "ef8c7299-ba77-4971-9073-963dba381a10",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/c158bc7f-7725-48b8-b518-3b1441769672.jsonl",
+    "source_line": 104,
+    "preview": "Review outstanding changes and find ways to simplify the code without removing essential features.  ",
+    "char_count": 372
+  },
+  {
+    "timestamp": "2026-02-11T13:45:03.705Z",
+    "session_id": "c158bc7f-7725-48b8-b518-3b1441769672",
+    "uuid": "61eaf648-2ef7-42e6-a55e-136ebaf9935b",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/c158bc7f-7725-48b8-b518-3b1441769672.jsonl",
+    "source_line": 103,
+    "preview": "<command-message>simplify</command-message> <command-name>/simplify</command-name>",
+    "char_count": 82
+  },
+  {
+    "timestamp": "2026-02-11T13:48:18.676Z",
+    "session_id": "c158bc7f-7725-48b8-b518-3b1441769672",
+    "uuid": "3717e25e-1cb2-4995-aee5-e500a2fb61e6",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/c158bc7f-7725-48b8-b518-3b1441769672.jsonl",
+    "source_line": 122,
+    "preview": "Run simplification on the entire TUI component.  - json driven sequencing (timing, zoom, focus chara",
+    "char_count": 170
+  },
+  {
+    "timestamp": "2026-02-11T13:49:03.217Z",
+    "session_id": "86aca758-39c9-4ee3-bdc1-faca0f6a1382",
+    "uuid": "26b4d282-f9c0-4dbb-b2eb-04674cb00fd6",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/86aca758-39c9-4ee3-bdc1-faca0f6a1382.jsonl",
+    "source_line": 6,
+    "preview": "how did we trigger the deploy to coudflare?",
+    "char_count": 43
+  },
+  {
+    "timestamp": "2026-02-11T13:50:43.156Z",
+    "session_id": "86aca758-39c9-4ee3-bdc1-faca0f6a1382",
+    "uuid": "6a208bb8-d187-4fd9-909b-194c86d5b689",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/86aca758-39c9-4ee3-bdc1-faca0f6a1382.jsonl",
+    "source_line": 103,
+    "preview": "All references to this project now need to read \"Claude Verbs\"",
+    "char_count": 62
+  },
+  {
+    "timestamp": "2026-02-11T13:53:22.957Z",
+    "session_id": "1127ce3e-c1c1-40d8-a64c-fe27c6ae23db",
+    "uuid": "5f5c250a-899d-4f37-b247-2e82bdb60fc7",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/1127ce3e-c1c1-40d8-a64c-fe27c6ae23db.jsonl",
+    "source_line": 2,
+    "preview": "Add an elastic scroll based zoom, once the scroll events stop (some debounce there) the zoom level g",
+    "char_count": 199
+  },
+  {
+    "timestamp": "2026-02-11T13:53:39.141Z",
+    "session_id": "1127ce3e-c1c1-40d8-a64c-fe27c6ae23db",
+    "uuid": "f1f94d31-e41d-4c3e-8d32-43e7296222bf",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/1127ce3e-c1c1-40d8-a64c-fe27c6ae23db.jsonl",
+    "source_line": 23,
+    "preview": "Base directory for this skill: /Users/jurrejan/.claude/skills/pixijs-dev  # PixiJS Development  Buil",
+    "char_count": 646
+  },
+  {
+    "timestamp": "2026-02-11T13:53:39.141Z",
+    "session_id": "1127ce3e-c1c1-40d8-a64c-fe27c6ae23db",
+    "uuid": "af98dbd8-df37-4547-97d2-f6dedb4694a7",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/1127ce3e-c1c1-40d8-a64c-fe27c6ae23db.jsonl",
+    "source_line": 22,
+    "preview": "<command-message>pixijs-dev</command-message> <command-name>/pixijs-dev</command-name>",
+    "char_count": 86
+  },
+  {
+    "timestamp": "2026-02-11T13:55:40.904Z",
+    "session_id": "1127ce3e-c1c1-40d8-a64c-fe27c6ae23db",
+    "uuid": "be975a3d-e3bb-4a5f-a999-f7c0d39a77c9",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/1127ce3e-c1c1-40d8-a64c-fe27c6ae23db.jsonl",
+    "source_line": 135,
+    "preview": "does not feel organic, not elastic, does not snap back",
+    "char_count": 54
+  },
+  {
+    "timestamp": "2026-02-11T13:55:48.734Z",
+    "session_id": "1127ce3e-c1c1-40d8-a64c-fe27c6ae23db",
+    "uuid": "1074efa7-3819-4e43-b0f3-feaaf86f5404",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/1127ce3e-c1c1-40d8-a64c-fe27c6ae23db.jsonl",
+    "source_line": 146,
+    "preview": "does not feel organic, not elastic, does not snap back",
+    "char_count": 54
+  },
+  {
+    "timestamp": "2026-02-11T13:56:04.061Z",
+    "session_id": "86aca758-39c9-4ee3-bdc1-faca0f6a1382",
+    "uuid": "1ce6b571-aae7-44a3-b4d1-26df94fc7ee6",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/86aca758-39c9-4ee3-bdc1-faca0f6a1382.jsonl",
+    "source_line": 273,
+    "preview": "Implement a dark/light mode switch",
+    "char_count": 34
+  },
+  {
+    "timestamp": "2026-02-11T13:59:53.389Z",
+    "session_id": "9bd41a86-21a4-4349-b95d-1916d58d9c13",
+    "uuid": "8d88b785-4749-40e1-b027-a9b4428ba600",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/9bd41a86-21a4-4349-b95d-1916d58d9c13.jsonl",
+    "source_line": 3,
+    "preview": "Implement the following plan:  # Dark/Light Mode Toggle Implementation Plan  ## Context  The Claude ",
+    "char_count": 6070
+  },
+  {
+    "timestamp": "2026-02-11T14:51:44.429Z",
+    "session_id": "41190667-ce51-43b7-af8a-8e53416299d5",
+    "uuid": "71edba70-5d5a-471f-a213-1a2293a5d73b",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/41190667-ce51-43b7-af8a-8e53416299d5.jsonl",
+    "source_line": 3,
+    "preview": "Implement the following plan:  # TUI Simplification: Config Consolidation  ## Context The PixiJS TUI",
+    "char_count": 5660
+  },
+  {
+    "timestamp": "2026-02-11T15:00:10.858Z",
+    "session_id": "41190667-ce51-43b7-af8a-8e53416299d5",
+    "uuid": "abe88338-99da-40f7-9b30-4012985dc337",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/41190667-ce51-43b7-af8a-8e53416299d5.jsonl",
+    "source_line": 474,
+    "preview": "any colors that are so close we could merge trhem?",
+    "char_count": 50
+  },
+  {
+    "timestamp": "2026-02-11T15:00:26.162Z",
+    "session_id": "c1f85379-0cea-4b55-917f-8777f05a99b4",
+    "uuid": "e8c16384-c0fb-424b-a736-f801b4b12429",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/c1f85379-0cea-4b55-917f-8777f05a99b4.jsonl",
+    "source_line": 6,
+    "preview": "pixi: are there any colors so close to eachother we coudl merge them?",
+    "char_count": 69
+  },
+  {
+    "timestamp": "2026-02-11T15:02:11.389Z",
+    "session_id": "1127ce3e-c1c1-40d8-a64c-fe27c6ae23db",
+    "uuid": "a4b7709b-b3d9-48ca-bd05-c8df2c4a061d",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/1127ce3e-c1c1-40d8-a64c-fe27c6ae23db.jsonl",
+    "source_line": 175,
+    "preview": "This session is being continued from a previous conversation that ran out of context. The summary be",
+    "char_count": 9373
+  },
+  {
+    "timestamp": "2026-02-11T15:03:45.461Z",
+    "session_id": "1127ce3e-c1c1-40d8-a64c-fe27c6ae23db",
+    "uuid": "a9fe78c2-0686-44ab-ab6b-05b6c8bc1396",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/1127ce3e-c1c1-40d8-a64c-fe27c6ae23db.jsonl",
+    "source_line": 180,
+    "preview": "Make it zoom towards where the cursor is",
+    "char_count": 40
+  },
+  {
+    "timestamp": "2026-02-11T15:04:42.995Z",
+    "session_id": "c1f85379-0cea-4b55-917f-8777f05a99b4",
+    "uuid": "27325c70-52d3-4478-940e-460616926e0f",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/c1f85379-0cea-4b55-917f-8777f05a99b4.jsonl",
+    "source_line": 19,
+    "preview": "Focus on just the colors in the pixi tui emulator",
+    "char_count": 49
+  },
+  {
+    "timestamp": "2026-02-11T15:06:44.759Z",
+    "session_id": "1127ce3e-c1c1-40d8-a64c-fe27c6ae23db",
+    "uuid": "7e7d716b-bdc8-4c3c-963d-825364b64f49",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/1127ce3e-c1c1-40d8-a64c-fe27c6ae23db.jsonl",
+    "source_line": 226,
+    "preview": "<bash-input>open . -a Zed</bash-input>",
+    "char_count": 38
+  },
+  {
+    "timestamp": "2026-02-11T15:06:44.978Z",
+    "session_id": "1127ce3e-c1c1-40d8-a64c-fe27c6ae23db",
+    "uuid": "9c3dc825-813d-4178-907d-ab1057e6eb95",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/1127ce3e-c1c1-40d8-a64c-fe27c6ae23db.jsonl",
+    "source_line": 227,
+    "preview": "<bash-stdout></bash-stdout><bash-stderr></bash-stderr>",
+    "char_count": 54
+  },
+  {
+    "timestamp": "2026-02-11T15:09:30.486Z",
+    "session_id": "1127ce3e-c1c1-40d8-a64c-fe27c6ae23db",
+    "uuid": "20be18a2-b1dd-46fc-9e62-0bd6111a5a93",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/1127ce3e-c1c1-40d8-a64c-fe27c6ae23db.jsonl",
+    "source_line": 229,
+    "preview": "I think we need to move all this scroll zooming to a whole new container, its fighting other zoom/or",
+    "char_count": 123
+  },
+  {
+    "timestamp": "2026-02-11T15:10:21.458Z",
+    "session_id": "c1f85379-0cea-4b55-917f-8777f05a99b4",
+    "uuid": "d237e9df-0e54-4db8-b93b-fc84f52fafcf",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/c1f85379-0cea-4b55-917f-8777f05a99b4.jsonl",
+    "source_line": 37,
+    "preview": "merge all colors in 5% range from each other",
+    "char_count": 44
+  },
+  {
+    "timestamp": "2026-02-11T15:15:37.813Z",
+    "session_id": "1127ce3e-c1c1-40d8-a64c-fe27c6ae23db",
+    "uuid": "c5c4baaf-7674-429a-8652-74ed5b9a11fd",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/1127ce3e-c1c1-40d8-a64c-fe27c6ae23db.jsonl",
+    "source_line": 326,
+    "preview": "Base directory for this skill: /Users/jurrejan/.claude/skills/animation-easing  # Animation Easing: ",
+    "char_count": 10592
+  },
+  {
+    "timestamp": "2026-02-11T15:15:37.813Z",
+    "session_id": "1127ce3e-c1c1-40d8-a64c-fe27c6ae23db",
+    "uuid": "4944c0ab-0f41-457e-b436-3e1bc61bc012",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/1127ce3e-c1c1-40d8-a64c-fe27c6ae23db.jsonl",
+    "source_line": 325,
+    "preview": "<command-message>animation-easing</command-message> <command-name>/animation-easing</command-name>",
+    "char_count": 98
+  },
+  {
+    "timestamp": "2026-02-11T15:16:21.219Z",
+    "session_id": "c1f85379-0cea-4b55-917f-8777f05a99b4",
+    "uuid": "5ed94c12-b013-4437-9926-d555cfef683a",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/c1f85379-0cea-4b55-917f-8777f05a99b4.jsonl",
+    "source_line": 165,
+    "preview": "<task-notification> <task-id>bd0cda5</task-id> <output-file>/private/tmp/claude-501/-Users-jurrejan-",
+    "char_count": 462
+  },
+  {
+    "timestamp": "2026-02-11T15:16:24.865Z",
+    "session_id": "1127ce3e-c1c1-40d8-a64c-fe27c6ae23db",
+    "uuid": "b6d12036-ebd8-4f3e-911c-317d964e943f",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/1127ce3e-c1c1-40d8-a64c-fe27c6ae23db.jsonl",
+    "source_line": 334,
+    "preview": "<task-notification> <task-id>ba5ecff</task-id> <output-file>/private/tmp/claude-501/-Users-jurrejan-",
+    "char_count": 490
+  },
+  {
+    "timestamp": "2026-02-11T15:19:46.249Z",
+    "session_id": "1127ce3e-c1c1-40d8-a64c-fe27c6ae23db",
+    "uuid": "f9110d60-3279-4350-994e-eb91bdb21bc8",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/1127ce3e-c1c1-40d8-a64c-fe27c6ae23db.jsonl",
+    "source_line": 342,
+    "preview": "The elastic is silly, it should feel like you can explore the screen a bit. Need better timings",
+    "char_count": 95
+  },
+  {
+    "timestamp": "2026-02-11T15:22:27.844Z",
+    "session_id": "a784e9fe-fce9-40c0-9c0c-200d81b92116",
+    "uuid": "43ab5f29-4a53-4ec0-ac2a-8470e9508077",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/a784e9fe-fce9-40c0-9c0c-200d81b92116.jsonl",
+    "source_line": 6,
+    "preview": "Remove emoji's from light/dark switch, use simple icons. Don't allow emoji anywhere",
+    "char_count": 83
+  },
+  {
+    "timestamp": "2026-02-11T15:25:30.013Z",
+    "session_id": "2dccc496-1795-41f9-824c-409be58880c6",
+    "uuid": "ab6dccac-f658-46e0-b46d-a41dba584899",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/2dccc496-1795-41f9-824c-409be58880c6.jsonl",
+    "source_line": 6,
+    "preview": "remove hero block from marketplace, place the rest of the page under the pixi element on the homepag",
+    "char_count": 101
+  },
+  {
+    "timestamp": "2026-02-11T15:35:01.141Z",
+    "session_id": "2dccc496-1795-41f9-824c-409be58880c6",
+    "uuid": "1e28b66d-8931-400c-9713-d25d0ac3b93e",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/2dccc496-1795-41f9-824c-409be58880c6.jsonl",
+    "source_line": 92,
+    "preview": "Put the skip button back. Until the user has clicked that or until the user has selected marketplace",
+    "char_count": 266
+  },
+  {
+    "timestamp": "2026-02-11T15:39:09.104Z",
+    "session_id": "c293fe1d-ea97-4479-9fe0-4a19f9a80cd9",
+    "uuid": "2f2be8be-2232-4237-88cc-e1c09d5e345b",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/c293fe1d-ea97-4479-9fe0-4a19f9a80cd9.jsonl",
+    "source_line": 3,
+    "preview": "Implement the following plan:  # Scroll-lock with skip button and fade reveal  ## Context  The homep",
+    "char_count": 3154
+  },
+  {
+    "timestamp": "2026-02-11T15:45:24.169Z",
+    "session_id": "bf64adcd-b93b-4013-9496-489dcd52de65",
+    "uuid": "3995b3ae-d748-4a09-a0f4-2f3398b2a9e7",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/bf64adcd-b93b-4013-9496-489dcd52de65.jsonl",
+    "source_line": 6,
+    "preview": "add 10 more dead pixels, add a couple red and blue or green ones",
+    "char_count": 64
+  },
+  {
+    "timestamp": "2026-02-11T15:45:37.796Z",
+    "session_id": "750a37ac-a8a3-4883-abab-8a14552d761b",
+    "uuid": "311d301f-46b6-4bd2-a567-e87b1309e2b6",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/750a37ac-a8a3-4883-abab-8a14552d761b.jsonl",
+    "source_line": 6,
+    "preview": "the lcd shader blocks overlap a little in height",
+    "char_count": 48
+  },
+  {
+    "timestamp": "2026-02-11T15:48:30.908Z",
+    "session_id": "6b4c9e71-a517-4780-b538-a40ba9b81ac2",
+    "uuid": "0493e59d-3690-4da9-b18f-b130f3c8f87d",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/6b4c9e71-a517-4780-b538-a40ba9b81ac2.jsonl",
+    "source_line": 6,
+    "preview": "when someone skips to the marketplace, disable the scroll hijack in pixi",
+    "char_count": 72
+  },
+  {
+    "timestamp": "2026-02-11T15:50:05.570Z",
+    "session_id": "750a37ac-a8a3-4883-abab-8a14552d761b",
+    "uuid": "483eb285-f2ef-4dfc-8bf8-15d9e3538b3b",
+    "source_file": "/Users/jurrejan/.claude/projects/-Users-jurrejan-Documents-development-web-claude-verbs-website/750a37ac-a8a3-4883-abab-8a14552d761b.jsonl",
+    "source_line": 26,
+    "preview": "commit and push",
+    "char_count": 15
+  }
+]

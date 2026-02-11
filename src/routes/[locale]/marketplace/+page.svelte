@@ -82,7 +82,7 @@ const { data }: { data: PageData } = $props()
         </div>
       </div>
       <div class="contribute__link">
-        <a href="https://github.com/doublej/claude-verbs/blob/main/CONTRIBUTING.md">
+        <a href="https://github.com/doublej/claude-verbs-cli/blob/main/CONTRIBUTING.md">
           Read the Contributing Guide
         </a>
       </div>

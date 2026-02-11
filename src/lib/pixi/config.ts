@@ -1,6 +1,13 @@
 /** Timing, zoom, and sequencing configuration for the TUI animation. */
 export const SEQUENCE = {
-  boot: { charMs: 55, preBlinkMs: 800, blinkMs: 530, postTypeMs: 200, loadMs: 1500 },
+  boot: {
+    charMs: 55,
+    preBlinkMs: 800,
+    blinkMs: 530,
+    postTypeMs: 200,
+    loadMs: 1500,
+    postLoadMs: 600,
+  },
   zoom: {
     baseLine: { target: 0.75, durationMs: 25000 },
     focusStrength: 0.6,

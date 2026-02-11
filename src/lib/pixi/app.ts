@@ -6,6 +6,7 @@ import {
   exitCurrentState,
   handleResize,
   initHeader,
+  removeIntroRows,
   resetDemoState,
   updateSuggestionUI,
 } from './app-helpers'
@@ -150,7 +151,10 @@ export async function createApp(
   }
 
   function enterState(state: State): void {
-    if (machine.current === State.BOOT) destroyBootAnim(bootAnim)
+    if (machine.current === State.BOOT) {
+      destroyBootAnim(bootAnim)
+      removeIntroRows(introCount, s, scrollItems, ts)
+    }
     exitCurrentState(machine)
     machine.previous = machine.current
     machine.current = state
@@ -243,7 +247,11 @@ export async function createApp(
 
     tickSpinner(now, ts, s, params)
     tickScroll(now, ts, s, machine, params, lineBuffer, bufState, scrollItems, pool, lctx)
-    if (machine.current === State.DEMO || machine.current === State.POST_DEMO || machine.current === State.BUGGED)
+    if (
+      machine.current === State.DEMO ||
+      machine.current === State.POST_DEMO ||
+      machine.current === State.BUGGED
+    )
       tickDemo(now, ts, s, params, lctx)
     tickLayout(ts, s, params, machine, lctx, scrollItems, pool)
     tickFlicker(s, machine, params, flicker, lctx)
@@ -274,7 +282,7 @@ export async function createApp(
     if (machine.current === State.IDLE) doDispatch('ENTER')
   })
 
-  initHeader(sets, params, s, lctx, scrollItems)
+  const introCount = initHeader(sets, params, s, lctx, scrollItems)
   enterState(State.BOOT)
 
   // biome-ignore lint/suspicious/noExplicitAny: window augmentation for devtools

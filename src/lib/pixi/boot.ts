@@ -80,8 +80,19 @@ export function runBootAnim(b: BootAnim, frameMs: number, ui: BootUI): void {
     b.timers.push(
       setTimeout(
         () => {
-          destroyBootAnim(b)
-          ui.onDone()
+          if (b.spinnerId) clearInterval(b.spinnerId)
+          b.spinnerId = null
+          ui.setPrompt('$ ')
+          ui.setInput(COMMAND)
+          b.timers.push(
+            setTimeout(
+              () => {
+                destroyBootAnim(b)
+                ui.onDone()
+              },
+              scale(SEQUENCE.boot.postLoadMs, frameMs),
+            ),
+          )
         },
         scale(SEQUENCE.boot.loadMs, frameMs),
       ),

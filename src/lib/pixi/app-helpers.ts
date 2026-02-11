@@ -5,6 +5,7 @@ import { buildDeadPixelLayers } from './effects/dead-pixels'
 import { buildGlareCanvas } from './effects/glare'
 import { buildHeaderRows } from './header'
 import { hexToNum, normalizeVerbs, shuffle } from './helpers'
+import { buildIntroRows } from './intro'
 import type { LayoutCtx } from './layout'
 import type { Params } from './params'
 import type { SceneRefs } from './scene'
@@ -49,7 +50,7 @@ function updateIdleSuggestion(
   s.statusText.text = `\u2026/claude-verbs-website   main *5   [${stateName(machine.current)}]`
   s.permsText.text =
     '\u23f5\u23f5 bypass permissions on (shift+tab to cycle) \u00b7 5 files +322 -66'
-  s.infoText.text = '00:00 | tip: /git:commit'
+  s.infoText.text = '00:00:00.000 | tip: /git:commit'
   ts.layoutDirty = true
 }
 
@@ -158,15 +159,14 @@ export function handleResize(
   updateCamera()
 }
 
-export function initHeader(
-  sets: VerbSets,
+function addRows(
+  rows: { parts: { text: string; color: number }[] }[],
   params: Params,
   s: SceneRefs,
   lctx: LayoutCtx,
   scrollItems: (Text | Container)[],
 ): void {
-  const headerRows = buildHeaderRows(80, sets, params)
-  for (const hr of headerRows) {
+  for (const hr of rows) {
     const rowContainer = new Container()
     rowContainer.x = Math.round(lctx.chW)
     let xOff = 0
@@ -182,4 +182,31 @@ export function initHeader(
     s.scrollContainer.addChild(rowContainer)
     scrollItems.push(rowContainer)
   }
+}
+
+export function initHeader(
+  sets: VerbSets,
+  params: Params,
+  s: SceneRefs,
+  lctx: LayoutCtx,
+  scrollItems: (Text | Container)[],
+): number {
+  const introRows = buildIntroRows()
+  addRows(introRows, params, s, lctx, scrollItems)
+  addRows(buildHeaderRows(80, sets, params), params, s, lctx, scrollItems)
+  return introRows.length
+}
+
+export function removeIntroRows(
+  introCount: number,
+  s: SceneRefs,
+  scrollItems: (Text | Container)[],
+  ts: TickerState,
+): void {
+  const removed = scrollItems.splice(0, introCount)
+  for (const item of removed) {
+    s.scrollContainer.removeChild(item)
+    item.destroy({ children: true })
+  }
+  ts.layoutDirty = true
 }

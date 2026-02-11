@@ -90,9 +90,12 @@ export function tickScroll(
   s.statusText.text = `\u2026/claude-verbs-website   main *5   [${stateName(machine.current)}]`
   s.permsText.text =
     '\u23f5\u23f5 bypass permissions on (shift+tab to cycle) \u00b7 5 files +322 -66'
-  const h = Math.floor(elapsed / 3600000)
-  const m = Math.floor((elapsed % 3600000) / 60000)
-  s.infoText.text = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')} | tip: /git:commit`
+  const d = new Date()
+  const hh = String(d.getHours()).padStart(2, '0')
+  const mm = String(d.getMinutes()).padStart(2, '0')
+  const ss = String(d.getSeconds()).padStart(2, '0')
+  const ms = String(d.getMilliseconds()).padStart(3, '0')
+  s.infoText.text = `${hh}:${mm}:${ss}.${ms} | tip: /git:commit`
 }
 
 export function tickDemo(

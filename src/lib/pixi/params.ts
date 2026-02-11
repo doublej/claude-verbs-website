@@ -93,7 +93,7 @@ export function createParams(): Params {
     deadPixelsEnabled: true,
     offsetX: 0,
     offsetY: 0,
-    absoluteX: 0,
+    absoluteX: 15,
     absoluteY: 0,
     flickerNormalPct: 20,
     flickerMaxYLines: 4,

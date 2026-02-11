@@ -49,7 +49,8 @@ void main() {
     else if (col < 3.0) mask = vec3(0.2, 0.2, 1.0);
     else mask = vec3(0.4, 0.4, 0.4);
 
-    float rowFade = mod(gl_FragCoord.y, 4.0) < 3.0 ? 1.0 : 0.9;
+    float rowInCell = mod(pixelCoord.y, gridSize);
+    float rowFade = rowInCell < gridSize - 1.0 ? 1.0 : 0.6;
 
     finalColor = vec4(color.rgb * mask * rowFade, color.a);
 }

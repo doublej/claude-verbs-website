@@ -1,6 +1,6 @@
 type Theme = 'light' | 'dark' | 'system'
 
-let theme = $state<Theme>('system')
+let theme = $state<Theme>('light')
 
 function getSystemTheme(): 'light' | 'dark' {
   if (typeof window === 'undefined') return 'dark'
@@ -20,7 +20,7 @@ function initTheme(): void {
   if (typeof window === 'undefined') return
 
   const stored = localStorage.getItem('theme') as Theme | null
-  theme = stored ?? 'system'
+  theme = stored ?? 'light'
   applyTheme(theme)
 
   const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')

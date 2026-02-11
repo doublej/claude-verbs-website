@@ -43,13 +43,13 @@ function getLabel(): string {
 <style>
 	.theme-toggle {
 		position: fixed;
-		top: 1rem;
-		right: 1rem;
+		top: 0;
+		right: 0;
 		width: 44px;
 		height: 44px;
 		border-radius: 0;
 		background: var(--bg-raised);
-		border: 1px solid var(--border);
+		border: none;
 		color: var(--text);
 		cursor: pointer;
 		display: flex;
@@ -62,7 +62,6 @@ function getLabel(): string {
 
 	.theme-toggle:hover {
 		background: var(--bg-surface);
-		border-color: var(--border-accent);
 		transform: scale(1.05);
 	}
 

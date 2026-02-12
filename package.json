@@ -27,6 +27,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@cloudflare/workerd-linux-64": "^1.20260210.0",
     "@tweenjs/tween.js": "^25.0.0",
     "pixi-filters": "^6.1.5",
     "pixi.js": "^8.16.0"

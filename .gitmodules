@@ -1,0 +1,3 @@
+[submodule "src/lib/data/sets"]
+	path = src/lib/data/sets
+	url = https://github.com/doublej/claude-verbs.git

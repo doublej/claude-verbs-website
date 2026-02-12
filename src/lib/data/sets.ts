@@ -27,7 +27,7 @@ function toVerbSet(raw: RawSetJson): VerbSet {
   }
 }
 
-const modules = import.meta.glob<RawSetJson>('./sets/**/*.json', {
+const modules = import.meta.glob<RawSetJson>('./sets/*.json', {
   eager: true,
   import: 'default',
 })
@@ -39,7 +39,7 @@ export function loadSets(): VerbSets {
 
   const sets: VerbSets = {}
   for (const [path, raw] of Object.entries(modules)) {
-    if (path.includes('schema.json')) continue
+    if (path.includes('schema.json') || path.includes('index.json') || path.includes('_template.json')) continue
     const set = toVerbSet(raw)
     const lang = localeToLang(raw.language)
     if (!sets[lang]) sets[lang] = []

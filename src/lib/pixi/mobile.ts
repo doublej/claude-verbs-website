@@ -25,6 +25,7 @@ export function applyMobileOverrides(params: Params): void {
   params.absoluteY = 0
   params.offsetX = 3
   params.offsetY = -2
+  params.lcdEnabled = true
   params.deadPixelsEnabled = false
   params.bloomStrength = 1
   params.displayDownscale = 0.5

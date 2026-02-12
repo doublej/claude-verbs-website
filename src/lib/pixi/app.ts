@@ -1,6 +1,6 @@
 import type { VerbSet, VerbSets } from '$lib/data/types'
 import * as TWEEN from '@tweenjs/tween.js'
-import { Application, type Container, Text } from 'pixi.js'
+import { Application, type Container, type Text } from 'pixi.js'
 import {
   applyStateEntry,
   exitCurrentState,
@@ -8,16 +8,19 @@ import {
   initHeader,
   removeIntroRows,
   resetDemoState,
+  syncFontSize,
+  syncResolution,
   updateSuggestionUI,
 } from './app-helpers'
 import { type BootAnim, createBootAnim, destroyBootAnim, runBootAnim } from './boot'
 import { applyCamera } from './camera'
-import { FONT_FAMILY, LAYOUT, MOUSE_DEFAULTS, PALETTE } from './constants'
+import { MOUSE_DEFAULTS, PALETTE } from './constants'
 import { createFlickerState } from './effects/flicker'
 import type { LineDef } from './events'
 import { createLineBuffer } from './events'
 import { hexToNum, shuffle } from './helpers'
 import { createLayoutCtx } from './layout'
+import { applyMobileOverrides, initMobileDemo, isMobile } from './mobile'
 import { createParams, displaySize } from './params'
 import { buildScene } from './scene'
 import { createScrollZoomController } from './scroll-zoom'
@@ -25,6 +28,7 @@ import { type DispatchEvent, State, createMachine, dispatch } from './state-mach
 import { createTextPool } from './text-pool'
 import {
   createTickerState,
+  tickClock,
   tickDemo,
   tickFlicker,
   tickLayout,
@@ -32,13 +36,6 @@ import {
   tickSpinner,
 } from './ticker'
 import { createZoomController } from './zoom'
-
-function updateContainerFontSize(items: (Text | Container)[], fontSize: number): void {
-  for (const item of items)
-    if ('children' in item)
-      for (const child of (item as Container).children)
-        if ('style' in child) (child as Text).style.fontSize = fontSize
-}
 
 function resolveLocale(sets: VerbSets, preferredLang?: string): string {
   if (preferredLang && sets[preferredLang]) return preferredLang
@@ -94,6 +91,8 @@ export async function createApp(
   options?: AppOptions,
 ): Promise<AppHandle> {
   const params = createParams()
+  const mobile = isMobile()
+  if (mobile) applyMobileOverrides(params)
 
   const app = new Application()
   await app.init({
@@ -110,6 +109,7 @@ export async function createApp(
   const s = buildScene(app, params, initDW, initDH)
   const pool = createTextPool(params)
   const machine = createMachine()
+  machine.mobile = mobile
   const flicker = createFlickerState()
   const lctx = createLayoutCtx(s.chW, params.fontSize, params.lineHeightOffset)
   const ts = createTickerState()
@@ -178,27 +178,16 @@ export async function createApp(
     } else {
       applyStateEntry(state, machine, updateSuggestion, startDemo)
     }
-    zoomCtrl.applyJumpcut(state)
+    zoomCtrl?.applyJumpcut(state)
     ts.layoutDirty = true
   }
 
-  syncResolution()
+  syncResolution(app, s, params)
   updateCamera()
 
-  // Scale animation removed - using zoom system instead
-  // new TWEEN.Tween({ scale: params.scale })
-  //   .to({ scale: 0.5 }, 15000)
-  //   .easing(TWEEN.Easing.Cubic.Out)
-  //   .onUpdate((obj) => {
-  //     params.scale = obj.scale
-  //     updateCamera()
-  //   })
-  //   .start()
+  const zoomCtrl = mobile ? null : createZoomController(params, updateCamera, s, app.screen.height)
+  const scrollZoomCtrl = mobile ? null : createScrollZoomController(s.scrollZoomWrap, app.canvas)
 
-  const zoomCtrl = createZoomController(params, updateCamera, s, app.screen.height)
-  const scrollZoomCtrl = createScrollZoomController(s.scrollZoomWrap, app.canvas)
-
-  // Mouse-driven camera offsets (composited on top of tweened params in `camera.ts`)
   const mouseState = {
     x: 0.5,
     y: 0.5,
@@ -210,21 +199,21 @@ export async function createApp(
     currentZoom: 1,
   }
 
-  const onMouseMove = (e: MouseEvent) => {
-    const rect = app.canvas.getBoundingClientRect()
-    mouseState.x = (e.clientX - rect.left) / rect.width
-    mouseState.y = (e.clientY - rect.top) / rect.height
-    // Map cursor to subtle translate offsets (±0.6% of screen)
-    mouseState.targetTX = (mouseState.x - 0.5) * -MOUSE_DEFAULTS.translateRange
-    mouseState.targetTY = (mouseState.y - 0.5) * -MOUSE_DEFAULTS.translateRange
-    // Map cursor to subtle zoom factor
-    const dist = Math.hypot(mouseState.x - 0.5, mouseState.y - 0.5)
-    mouseState.targetZoom = 1 - dist * MOUSE_DEFAULTS.zoomFactor
-  }
-  window.addEventListener('mousemove', onMouseMove)
+  const onMouseMove = mobile
+    ? null
+    : (e: MouseEvent) => {
+        const rect = app.canvas.getBoundingClientRect()
+        mouseState.x = (e.clientX - rect.left) / rect.width
+        mouseState.y = (e.clientY - rect.top) / rect.height
+        mouseState.targetTX = (mouseState.x - 0.5) * -MOUSE_DEFAULTS.translateRange
+        mouseState.targetTY = (mouseState.y - 0.5) * -MOUSE_DEFAULTS.translateRange
+        const dist = Math.hypot(mouseState.x - 0.5, mouseState.y - 0.5)
+        mouseState.targetZoom = 1 - dist * MOUSE_DEFAULTS.zoomFactor
+      }
+  if (onMouseMove) window.addEventListener('mousemove', onMouseMove)
 
   const onResize = () => {
-    syncResolution()
+    syncResolution(app, s, params)
     handleResize(app, s, params, updateCamera)
     ts.layoutDirty = true
   }
@@ -235,19 +224,19 @@ export async function createApp(
     // Tweens default to `performance.now()`; passing `Date.now()` causes them to jump/finish instantly.
     TWEEN.update()
 
-    // Smooth interpolation for mouse-driven camera (lerp factor 0.05 = subtle delay)
-    const lerpFactor = MOUSE_DEFAULTS.lerpFactor
-    mouseState.currentTX += (mouseState.targetTX - mouseState.currentTX) * lerpFactor
-    mouseState.currentTY += (mouseState.targetTY - mouseState.currentTY) * lerpFactor
-    mouseState.currentZoom += (mouseState.targetZoom - mouseState.currentZoom) * lerpFactor
-
-    // Apply smoothed values to params
-    params.mouseTranslateX = mouseState.currentTX
-    params.mouseTranslateY = mouseState.currentTY
-    params.mouseZoom = mouseState.currentZoom
+    if (!mobile) {
+      const lerpFactor = MOUSE_DEFAULTS.lerpFactor
+      mouseState.currentTX += (mouseState.targetTX - mouseState.currentTX) * lerpFactor
+      mouseState.currentTY += (mouseState.targetTY - mouseState.currentTY) * lerpFactor
+      mouseState.currentZoom += (mouseState.targetZoom - mouseState.currentZoom) * lerpFactor
+      params.mouseTranslateX = mouseState.currentTX
+      params.mouseTranslateY = mouseState.currentTY
+      params.mouseZoom = mouseState.currentZoom
+    }
     updateCamera()
 
     tickSpinner(now, ts, s, params)
+    tickClock(s)
     tickScroll(now, ts, s, machine, params, lineBuffer, bufState, scrollItems, pool, lctx)
     if (
       machine.current === State.DEMO ||
@@ -275,7 +264,7 @@ export async function createApp(
       doDispatch('TAB')
     } else if (e.key === '`') toggleDevtools()
   }
-  document.addEventListener('keydown', onKeyDown)
+  if (!mobile) document.addEventListener('keydown', onKeyDown)
 
   s.inputContainer.on('pointertap', () => doDispatch('ENTER'))
   s.promptText.eventMode = 'static'
@@ -284,9 +273,23 @@ export async function createApp(
     if (machine.current === State.IDLE) doDispatch('ENTER')
   })
 
-  const introCount = initHeader(sets, params, s, lctx, scrollItems)
-  enterState(State.BOOT)
-
+  let introCount = 0
+  let mobileTapHandler: (() => void) | null = null
+  if (mobile) {
+    mobileTapHandler = initMobileDemo({
+      machine,
+      localeSets,
+      ts,
+      s,
+      params,
+      scrollItems,
+      pool,
+      canvas: app.canvas,
+    })
+  } else {
+    introCount = initHeader(sets, params, s, lctx, scrollItems)
+    enterState(State.BOOT)
+  }
   // biome-ignore lint/suspicious/noExplicitAny: window augmentation for devtools
   ;(window as any).__spinnerAPI = {
     app,
@@ -314,56 +317,10 @@ export async function createApp(
     s.ellipsisText.style.fill = hexToNum(params.colorEllipsis)
     s.metaText.style.fill = PALETTE.suggestion
     s.highlightText.style.fill = hexToNum(params.colorHighlight)
-    syncResolution()
-    syncFontSize()
+    syncResolution(app, s, params)
+    syncFontSize(params, lctx, s, scrollItems)
     app.canvas.style.imageRendering = params.imageRendering
     ts.layoutDirty = true
-  }
-
-  function syncFontSize(): void {
-    const texts = [
-      s.glyphText,
-      s.verbText,
-      s.ellipsisText,
-      s.highlightText,
-      s.metaText,
-      s.caretText,
-      s.inputText,
-      s.ruleTop,
-      s.promptText,
-      s.ruleBottom,
-      s.statusText,
-      s.permsText,
-      s.infoText,
-    ]
-    for (const t of texts) t.style.fontSize = params.fontSize
-    updateContainerFontSize(scrollItems, params.fontSize)
-    const m = new Text({
-      text: 'M',
-      style: { fontFamily: FONT_FAMILY, fontSize: params.fontSize },
-    })
-    lctx.chW = m.width
-    const baseLineHeight = Math.round(params.fontSize * LAYOUT.lineHeightRatio)
-    lctx.lineHeight = baseLineHeight + params.lineHeightOffset
-    m.destroy()
-  }
-
-  function syncResolution(): void {
-    const [dW, dH] = displaySize(app.screen.width, app.screen.height, params.displayDownscale)
-    const padX = Math.round(dW * params.screenPadding)
-    const padY = Math.round(dH * params.screenPadding)
-    const padDW = dW + 2 * padX
-    const padDH = dH + 2 * padY
-    s.displayRT.resize(padDW, padDH)
-    s.bgContainer.clear()
-    s.bgContainer.rect(0, 0, padDW, padDH)
-    s.bgContainer.fill(hexToNum(params.bgColor))
-    s.tuiContainer.x = padX
-    s.tuiContainer.y = padY
-    s.contentW = dW
-    s.contentH = dH
-    s.padY = padY
-    s.lcdFilter.enabled = params.lcdEnabled
   }
 
   let devtoolsLoaded = false
@@ -380,10 +337,11 @@ export async function createApp(
     cleanup: () => {
       destroyed = true
       destroyBootAnim(bootAnim)
-      scrollZoomCtrl.cleanup()
+      scrollZoomCtrl?.cleanup()
       window.removeEventListener('resize', onResize)
-      window.removeEventListener('mousemove', onMouseMove)
-      document.removeEventListener('keydown', onKeyDown)
+      if (onMouseMove) window.removeEventListener('mousemove', onMouseMove)
+      if (!mobile) document.removeEventListener('keydown', onKeyDown)
+      if (mobileTapHandler) app.canvas.removeEventListener('pointerup', mobileTapHandler)
       if (machine.demoTimer) clearTimeout(machine.demoTimer)
       pool.flush()
       app.destroy(true, { children: true })
@@ -392,6 +350,6 @@ export async function createApp(
       // biome-ignore lint/suspicious/noExplicitAny: cleanup window globals
       ;(window as any).__PIXI_DEVTOOLS__ = undefined
     },
-    disableScrollZoom: () => scrollZoomCtrl.cleanup(),
+    disableScrollZoom: () => scrollZoomCtrl?.cleanup(),
   }
 }

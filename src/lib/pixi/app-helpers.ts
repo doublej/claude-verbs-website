@@ -1,13 +1,13 @@
 import type { VerbSet, VerbSets } from '$lib/data/types'
 import { type Application, Container, Text, Texture } from 'pixi.js'
-import { FONT_FAMILY, PALETTE } from './constants'
+import { FONT_FAMILY, LAYOUT, PALETTE } from './constants'
 import { buildDeadPixelLayers } from './effects/dead-pixels'
 import { buildGlareCanvas } from './effects/glare'
 import { buildHeaderRows } from './header'
 import { hexToNum, normalizeVerbs, shuffle } from './helpers'
 import { buildIntroRows } from './intro'
 import type { LayoutCtx } from './layout'
-import type { Params } from './params'
+import { type Params, displaySize } from './params'
 import type { SceneRefs } from './scene'
 import { type Machine, POST_SUGGESTIONS, SKIP_THRESHOLD, State, stateName } from './state-machine'
 import type { TextPool } from './text-pool'
@@ -50,7 +50,6 @@ function updateIdleSuggestion(
   s.statusText.text = `\u2026/claude-verbs-website   main *5   [${stateName(machine.current)}]`
   s.permsText.text =
     '\u23f5\u23f5 bypass permissions on (shift+tab to cycle) \u00b7 5 files +322 -66'
-  s.infoText.text = '00:00:00.000 | tip: /git:commit'
   ts.layoutDirty = true
 }
 
@@ -209,4 +208,58 @@ export function removeIntroRows(
     item.destroy({ children: true })
   }
   ts.layoutDirty = true
+}
+
+function updateContainerFontSize(items: (Text | Container)[], fontSize: number): void {
+  for (const item of items)
+    if ('children' in item)
+      for (const child of (item as Container).children)
+        if ('style' in child) (child as Text).style.fontSize = fontSize
+}
+
+export function syncFontSize(
+  params: Params,
+  lctx: LayoutCtx,
+  s: SceneRefs,
+  scrollItems: (Text | Container)[],
+): void {
+  const texts = [
+    s.glyphText,
+    s.verbText,
+    s.ellipsisText,
+    s.highlightText,
+    s.metaText,
+    s.caretText,
+    s.inputText,
+    s.ruleTop,
+    s.promptText,
+    s.ruleBottom,
+    s.statusText,
+    s.permsText,
+    s.infoText,
+  ]
+  for (const t of texts) t.style.fontSize = params.fontSize
+  updateContainerFontSize(scrollItems, params.fontSize)
+  const m = new Text({ text: 'M', style: { fontFamily: FONT_FAMILY, fontSize: params.fontSize } })
+  lctx.chW = m.width
+  lctx.lineHeight = Math.round(params.fontSize * LAYOUT.lineHeightRatio) + params.lineHeightOffset
+  m.destroy()
+}
+
+export function syncResolution(app: Application, s: SceneRefs, params: Params): void {
+  const [dW, dH] = displaySize(app.screen.width, app.screen.height, params.displayDownscale)
+  const padX = Math.round(dW * params.screenPadding)
+  const padY = Math.round(dH * params.screenPadding)
+  const padDW = dW + 2 * padX
+  const padDH = dH + 2 * padY
+  s.displayRT.resize(padDW, padDH)
+  s.bgContainer.clear()
+  s.bgContainer.rect(0, 0, padDW, padDH)
+  s.bgContainer.fill(hexToNum(params.bgColor))
+  s.tuiContainer.x = padX
+  s.tuiContainer.y = padY
+  s.contentW = dW
+  s.contentH = dH
+  s.padY = padY
+  s.lcdFilter.enabled = params.lcdEnabled
 }

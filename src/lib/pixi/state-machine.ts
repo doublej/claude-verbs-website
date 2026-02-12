@@ -34,6 +34,7 @@ export interface Machine {
   demoTimer: ReturnType<typeof setTimeout> | null
   hasSubmitted: boolean
   tabCompleted: boolean
+  mobile: boolean
 }
 
 export function createMachine(): Machine {
@@ -47,6 +48,7 @@ export function createMachine(): Machine {
     demoTimer: null,
     hasSubmitted: false,
     tabCompleted: false,
+    mobile: false,
   }
 }
 

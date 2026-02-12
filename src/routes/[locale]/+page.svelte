@@ -2,6 +2,7 @@
 import Gallery from '$lib/components/Gallery.svelte'
 import { loadSets } from '$lib/data/sets'
 import { type AppHandle, createApp } from '$lib/pixi/app'
+import { isMobile } from '$lib/pixi/mobile'
 import { getResolvedTheme } from '$lib/theme.svelte'
 import { onMount } from 'svelte'
 import type { PageData } from './$types'
@@ -9,6 +10,7 @@ import type { PageData } from './$types'
 const { data }: { data: PageData } = $props()
 
 let wrap: HTMLDivElement
+let mobile = $state(false)
 let revealed = $state(false)
 let scrollLocked = $state(true)
 let appHandle: AppHandle | undefined
@@ -28,12 +30,19 @@ $effect(() => {
 
 onMount(() => {
   window.scrollTo(0, 0)
+  mobile = isMobile()
+  if (mobile) {
+    scrollLocked = false
+    revealed = true
+  }
   const sets = loadSets()
 
   function init() {
-    createApp(wrap, sets, { onMarketplace: unlock, preferredLang: data.preferredLang }).then((handle) => {
-      appHandle = handle
-    })
+    createApp(wrap, sets, { onMarketplace: unlock, preferredLang: data.preferredLang }).then(
+      (handle) => {
+        appHandle = handle
+      },
+    )
   }
 
   init()
@@ -72,8 +81,8 @@ onMount(() => {
 	/>
 </svelte:head>
 
-<div bind:this={wrap} id="canvas-wrap" class:revealed>
-	{#if !revealed}
+<div bind:this={wrap} id="canvas-wrap" class:revealed class:mobile>
+	{#if !revealed && !mobile}
 		<button class="skip-btn" onclick={unlock}>SKIP TO MARKETPLACE</button>
 	{/if}
 </div>
@@ -222,6 +231,10 @@ onMount(() => {
 		margin-top: 100svh;
 	}
 
+	:global(body:has(#canvas-wrap.mobile)) main {
+		margin-top: 0;
+	}
+
 	/* ---- Sections ---- */
 
 	section { padding: 4rem 0; }
@@ -344,6 +357,12 @@ onMount(() => {
 	footer a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
 	footer a:hover { color: var(--accent); }
 	footer .footer__sep { margin: 0 0.5rem; }
+
+	#canvas-wrap.mobile {
+		position: relative;
+		height: 60svh;
+		z-index: 0;
+	}
 
 	@media (max-width: 600px) {
 		section { padding: 2.5rem 0; }

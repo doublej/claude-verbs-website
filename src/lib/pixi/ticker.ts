@@ -90,6 +90,9 @@ export function tickScroll(
   s.statusText.text = `\u2026/claude-verbs-website   main *5   [${stateName(machine.current)}]`
   s.permsText.text =
     '\u23f5\u23f5 bypass permissions on (shift+tab to cycle) \u00b7 5 files +322 -66'
+}
+
+export function tickClock(s: SceneRefs): void {
   const d = new Date()
   const hh = String(d.getHours()).padStart(2, '0')
   const mm = String(d.getMinutes()).padStart(2, '0')

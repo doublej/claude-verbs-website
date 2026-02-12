@@ -2,6 +2,7 @@ import type { Container, Text } from 'pixi.js'
 import { LAYOUT } from './constants'
 import type { LineDef } from './events'
 import { repeat } from './helpers'
+import { layoutMobile } from './mobile'
 import type { Params } from './params'
 import { type Machine, State } from './state-machine'
 import type { TextPool } from './text-pool'
@@ -49,6 +50,7 @@ export function addScrollLine(
   layoutScrollItems(scrollItems, spinnerY, lctx, scrollContainer, pool)
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: multi-state layout dispatch
 export function layout(
   screenW: number,
   screenH: number,
@@ -73,6 +75,11 @@ export function layout(
   },
   pool: TextPool,
 ): void {
+  if (machine.mobile) {
+    layoutMobile(screenW, screenH, lctx, ui)
+    return
+  }
+
   const { chW, lineHeight: lh } = lctx
   const col3 = Math.round(LAYOUT.defaultCol * chW)
   ui.verbText.x = col3

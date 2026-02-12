@@ -8,11 +8,8 @@
 		<script>
 			(function() {
 				const stored = localStorage.getItem('theme');
-				const theme = stored || 'light';
-				const resolved = theme === 'system'
-					? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-					: theme;
-				document.documentElement.setAttribute('data-theme', resolved);
+				const theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+				document.documentElement.setAttribute('data-theme', theme);
 			})();
 		</script>
 		%sveltekit.head%

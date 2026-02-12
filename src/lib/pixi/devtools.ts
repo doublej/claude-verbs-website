@@ -1,3 +1,4 @@
+import type { Graphics } from 'pixi.js'
 import type { DofFilter } from './effects/dof'
 import { updateDofUniforms } from './effects/dof'
 import type { Params } from './params'
@@ -8,6 +9,7 @@ export async function initDevtools(
   params: Params,
   dofFilter: DofFilter,
   markDirty: () => void,
+  focusCrosshair?: Graphics,
 ): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- tweakpane types need @tweakpane/core
   const { Pane } = (await import('tweakpane')) as any
@@ -45,8 +47,16 @@ export async function initDevtools(
   bind(fCam, 'rotateX', { min: -45, max: 45, step: 0.5 })
   bind(fCam, 'rotateY', { min: -45, max: 45, step: 0.5 })
   bind(fCam, 'rotateZ', { min: -45, max: 45, step: 0.5 })
+  bind(fCam, 'focusTargetX', { min: 0, max: 2000, step: 10 })
   bind(fCam, 'focusTargetY', { min: 0, max: 2000, step: 10 })
   bind(fCam, 'focusStrength', { min: 0, max: 1, step: 0.1 })
+  if (focusCrosshair) {
+    const toggle = { showFocusTarget: focusCrosshair.visible }
+    fCam.addBinding(toggle, 'showFocusTarget').on('change', (ev: { value: boolean }) => {
+      focusCrosshair.visible = ev.value
+      markDirty()
+    })
+  }
 
   const fR = pane.addFolder({ title: 'Display', expanded: true })
   bind(fR, 'displayDownscale', { min: 0.5, max: 8, step: 0.5 })

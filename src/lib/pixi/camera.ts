@@ -62,9 +62,13 @@ export function computeCameraVertices(
 ): void {
   const ox = (p.originX / 100) * w
   const oy = (p.originY / 100) * h
-  const tx = ((p.translateX + p.mouseTranslateX) / 100) * w
-  const focusOffset = p.focusTargetY > 0 ? (h / 2 - p.focusTargetY) * p.focusStrength : 0
-  const ty = ((p.translateY + p.mouseTranslateY) / 100) * h + focusOffset
+  const ds = p.displayDownscale
+  const ftx = p.focusTargetX * ds
+  const fty = p.focusTargetY * ds
+  const focusOffsetX = ftx > 0 ? (w / 2 - ftx) * p.focusStrength : 0
+  const tx = ((p.translateX + p.mouseTranslateX) / 100) * w + focusOffsetX
+  const focusOffsetY = fty > 0 ? (h / 2 - fty) * p.focusStrength : 0
+  const ty = ((p.translateY + p.mouseTranslateY) / 100) * h + focusOffsetY
   const rz = (p.rotateZ * Math.PI) / 180
   const ry = (p.rotateY * Math.PI) / 180
   const rx = (p.rotateX * Math.PI) / 180

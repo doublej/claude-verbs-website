@@ -1,10 +1,11 @@
 import type { Container, Text } from 'pixi.js'
+import { SEQUENCE, stateConfig } from './config'
 import { LAYOUT } from './constants'
 import type { LineDef } from './events'
 import { countColumns, repeat } from './helpers'
 import { layoutMobile } from './mobile'
 import type { Params } from './params'
-import { type Machine, State } from './state-machine'
+import type { Machine } from './state-machine'
 import type { TextPool } from './text-pool'
 
 export interface LayoutCtx {
@@ -121,8 +122,14 @@ export function layout(
   ui.bottomChrome.x = leftX
   ui.bottomChrome.y = scrollY
 
-  if (machine.current === State.BOOT || machine.current === State.BOOT_READY) {
-    ui.inputContainer.visible = true
+  const cfg = stateConfig(machine.current)
+
+  ui.inputContainer.visible = cfg.showInput
+  ui.spinnerLine.visible = cfg.showSpinner
+  ui.metaLine.visible = cfg.showMeta
+
+  const hasScrollContent = ui.scrollItems.length > 0
+  if (!hasScrollContent) {
     ui.inputContainer.x = leftX
     ui.inputContainer.y = Math.round(lh)
     const outputLines = ui.bootOutputText.text ? ui.bootOutputText.text.split('\n').length : 0
@@ -134,28 +141,24 @@ export function layout(
     ui.bootHintText.x = 0
     ui.bootHintText.y = promptY + Math.round(lh)
     ui.scrollContainer.visible = false
-    ui.spinnerLine.visible = false
-    ui.metaLine.visible = false
     ui.bottomChrome.visible = false
     return
   }
 
-  ui.inputContainer.visible = false
   ui.caretText.y = 0
   ui.inputText.y = 0
   ui.scrollContainer.visible = true
-  ui.spinnerLine.visible = machine.current === State.DEMO || machine.current === State.POST_DEMO
-  ui.metaLine.visible = machine.current === State.DEMO || machine.current === State.POST_DEMO
   ui.bottomChrome.visible = true
 
-  if (machine.current === State.IDLE || machine.current === State.BROWSING) {
-    const idleOffsetY = LAYOUT.idleOffsetLines * lh
-    ui.scrollContainer.y = scrollY + idleOffsetY
-    ui.bottomChrome.y = scrollY + idleOffsetY
-    layoutIdle(ui, lctx, screenH, pad, ch1)
-  } else {
+  const offsetY = SEQUENCE.scrollOffset * lh
+  ui.scrollContainer.y = scrollY + offsetY
+  ui.bottomChrome.y = scrollY + offsetY
+
+  if (cfg.showSpinner) {
     layoutScrollItems(ui.scrollItems, ui.spinnerLine.y, lctx, ui.scrollContainer, pool)
     layoutChrome(ui, ui.metaLine.y + lh + pad, lh, pad, ch1)
+  } else {
+    layoutIdle(ui, lctx, screenH, pad, ch1)
   }
 }
 

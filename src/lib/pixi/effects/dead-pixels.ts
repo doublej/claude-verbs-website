@@ -1,14 +1,14 @@
 import { EFFECT_DEFAULTS, PALETTE } from '../constants'
 
-/** Dark dead pixels (rendered with multiply blend to darken content). */
-const DARK_PIXELS: Record<number, string> = {
-  3: PALETTE.deadPixelRed,
-  7: PALETTE.deadPixelBlue,
-  10: PALETTE.deadPixelGreen,
-}
-
 /** Stuck-on red pixels — always glow red regardless of content. */
 const STUCK_RED_INDICES = new Set([4, 9])
+
+function getDeadPixelColor(index: number): string {
+  if (index === 3) return PALETTE.deadPixelRed
+  if (index === 7) return PALETTE.deadPixelBlue
+  if (index === 10) return PALETTE.deadPixelGreen
+  return PALETTE.deadPixel
+}
 
 function snapToGrid(v: number, grid: number): number {
   return Math.floor(v / grid) * grid
@@ -43,7 +43,7 @@ export function buildDeadPixelLayers(w: number, h: number, enabled: boolean): De
       stuckCtx.fillStyle = '#ff0000'
       stuckCtx.fillRect(x, y, grid, grid)
     } else {
-      darkCtx.fillStyle = DARK_PIXELS[i] ?? PALETTE.deadPixel
+      darkCtx.fillStyle = getDeadPixelColor(i)
       darkCtx.fillRect(x, y, grid, grid)
     }
   }

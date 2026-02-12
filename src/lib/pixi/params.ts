@@ -1,3 +1,5 @@
+import { SEQUENCE } from './config'
+
 export interface Params {
   frameMs: number
   verbMs: number
@@ -42,6 +44,7 @@ export interface Params {
   exposure: number
   zoom: number
   mouseZoom: number
+  focusTargetX: number
   focusTargetY: number
   focusStrength: number
   screenPadding: number
@@ -58,7 +61,6 @@ function getTheme(): 'light' | 'dark' {
 }
 
 export function createParams(): Params {
-  // Avoid circular import: CAMERA_DEFAULTS values inlined from constants.ts
   const theme = getTheme()
   const isLight = theme === 'light'
 
@@ -104,8 +106,9 @@ export function createParams(): Params {
     brightness: 1,
     saturation: 1,
     exposure: 1,
-    zoom: 1.5,
+    zoom: SEQUENCE.zoom.initial,
     mouseZoom: 1,
+    focusTargetX: 0,
     focusTargetY: 0,
     focusStrength: 0,
     screenPadding: 0.15,

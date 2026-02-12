@@ -4,23 +4,25 @@ export const SKIP_THRESHOLD = 4
 export const BUGGED_TIMEOUT_MS = 8_000
 
 export enum State {
-  IDLE = 0,
-  BROWSING = 1,
-  DEMO = 2,
-  POST_DEMO = 3,
-  BUGGED = 4,
-  BOOT = 5,
-  BOOT_READY = 6,
+  INTRO = 0,
+  INTRO_READY = 1,
+  IDLE = 2,
+  BROWSING = 3,
+  DEMO = 4,
+  POST_DEMO = 5,
+  BUGGED = 6,
+  ESC_COUNTDOWN = 7,
 }
 
 const STATE_NAMES: Record<State, string> = {
+  [State.INTRO]: 'INTRO',
+  [State.INTRO_READY]: 'INTRO_READY',
   [State.IDLE]: 'IDLE',
   [State.BROWSING]: 'BROWSING',
   [State.DEMO]: 'DEMO',
   [State.POST_DEMO]: 'POST_DEMO',
   [State.BUGGED]: 'BUGGED',
-  [State.BOOT]: 'BOOT',
-  [State.BOOT_READY]: 'BOOT_READY',
+  [State.ESC_COUNTDOWN]: 'ESC_COUNTDOWN',
 }
 
 export function stateName(s: State): string {
@@ -65,7 +67,7 @@ export interface PostSuggestion {
 }
 
 export const POST_SUGGESTIONS: PostSuggestion[] = [
-  { text: 'continue to marketplace', action: 'marketplace' },
+  { text: 'browse sets', action: 'marketplace' },
   { text: 'copy command', action: 'copy' },
   { text: 'navigate more demos', action: 'browse' },
 ]
@@ -201,13 +203,13 @@ export function dispatch(
       dispatchBrowsing(event, machine, localeSets, idiotSet, callbacks)
       break
     case State.DEMO:
-      if (event === 'ESC' || event === 'DEMO_TIMEOUT') callbacks.enterState(State.POST_DEMO)
+      if (event === 'DEMO_TIMEOUT') callbacks.enterState(State.POST_DEMO)
       else if (event === 'SHIFT_TAB') callbacks.enterState(State.BUGGED)
       break
     case State.POST_DEMO:
       dispatchPostDemo(event, machine, callbacks)
       break
-    case State.BOOT_READY:
+    case State.INTRO_READY:
       if (event === 'ENTER') callbacks.enterState(State.IDLE)
       break
     case State.BUGGED:

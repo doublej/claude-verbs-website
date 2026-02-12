@@ -8,3 +8,7 @@ Thumbs.db
 node_modules/
 .svelte-kit/
 build/
+
+# Generated Open Graph cards for verb sets.
+/static/og/sets/*.png
+/static/og/sets/.generated.json

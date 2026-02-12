@@ -1,11 +1,10 @@
 import type { VerbSet, VerbSets } from '$lib/data/types'
 import { Application, type Container, type Text } from 'pixi.js'
 import {
+  addHeaderRows,
   applyStateEntry,
   exitCurrentState,
   handleResize,
-  initHeader,
-  removeIntroRows,
   resetDemoState,
   syncFontSize,
   syncResolution,
@@ -13,7 +12,7 @@ import {
 } from './app-helpers'
 import { type BootAnim, createBootAnim, destroyBootAnim, runBootAnim } from './boot'
 import { applyCamera } from './camera'
-import { MOUSE_DEFAULTS, PALETTE } from './constants'
+import { MOUSE_DEFAULTS, PALETTE, refreshPalette } from './constants'
 import { createBreathingState, tickBreathing } from './effects/breathing'
 import { updateDofUniforms } from './effects/dof'
 import { createFlickerState } from './effects/flicker'
@@ -45,6 +44,7 @@ import {
 } from './ticker'
 import { tweenGroup } from './tween-group'
 import { createZoomController } from './zoom'
+import { createFocusCrosshair, updateFocusCrosshair } from './debug-focus'
 
 function resolveLocale(sets: VerbSets, preferredLang?: string): string {
   if (preferredLang && sets[preferredLang]) return preferredLang
@@ -97,6 +97,7 @@ export interface AppHandle {
   enableScrollZoom: () => void
   restartExperience: () => void
   setOverlapped: (v: boolean) => void
+  skipToMarketplace: () => void
 }
 
 export async function createApp(
@@ -104,6 +105,7 @@ export async function createApp(
   sets: VerbSets,
   options?: AppOptions,
 ): Promise<AppHandle> {
+  refreshPalette()
   const params = createParams()
   const mobile = isMobile()
   if (mobile) applyMobileOverrides(params)
@@ -121,6 +123,7 @@ export async function createApp(
 
   const [initDW, initDH] = displaySize(app.screen.width, app.screen.height, params.displayDownscale)
   const s = buildScene(app, params, initDW, initDH)
+  const focusCrosshair = createFocusCrosshair(s.tuiContainer)
   const pool = createTextPool(params)
   const machine = createMachine()
   machine.mobile = mobile
@@ -174,18 +177,23 @@ export async function createApp(
   }
 
   function clearBootTexts(): void {
+    s.caretText.text = ''
+    s.inputText.text = ''
     s.bootOutputText.text = ''
     s.bootHintText.text = ''
   }
 
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: multi-state entry dispatch
   function enterState(state: State): void {
-    if (machine.current === State.BOOT || machine.current === State.BOOT_READY) {
+    if (machine.current === State.INTRO || machine.current === State.INTRO_READY) {
       destroyBootAnim(bootAnim)
       resetEsc(escSkip)
-      if (state !== State.BOOT_READY) {
+      if (state !== State.INTRO_READY) {
         clearBootTexts()
-        removeIntroRows(introCount, s, scrollItems, ts)
+        if (!headerAdded) {
+          addHeaderRows(sets, params, s, lctx, scrollItems)
+          headerAdded = true
+        }
       }
     }
     exitCurrentState(machine)
@@ -196,7 +204,7 @@ export async function createApp(
       flicker.mode = 0
       machine.buggedTimer = setTimeout(() => doDispatch('BUGGED_TIMEOUT'), BUGGED_TIMEOUT_MS)
     }
-    if (state === State.BOOT) {
+    if (state === State.INTRO) {
       runBootAnim(bootAnim, params.frameMs, {
         setPrompt: (t) => {
           s.caretText.text = t
@@ -214,7 +222,7 @@ export async function createApp(
         setHint: (t) => {
           s.bootHintText.text = t
         },
-        onReady: () => enterState(State.BOOT_READY),
+        onReady: () => enterState(State.INTRO_READY),
       })
     } else {
       applyStateEntry(state, machine, updateSuggestion, startDemo)
@@ -227,7 +235,9 @@ export async function createApp(
   syncResolution(app, s, params)
   flushCamera()
 
-  const zoomCtrl = mobile ? null : createZoomController(params, updateCamera, s, app.screen.height)
+  const zoomCtrl = mobile
+    ? null
+    : createZoomController(params, updateCamera, syncParamsToScene, s, lctx, app.screen.height)
   const scrollZoomCtrl = mobile ? null : createScrollZoomController(s.scrollZoomWrap, app.canvas)
 
   let cameraDirty = true
@@ -289,17 +299,23 @@ export async function createApp(
     if (
       machine.current === State.DEMO ||
       machine.current === State.POST_DEMO ||
-      machine.current === State.BUGGED
+      machine.current === State.BUGGED ||
+      machine.current === State.ESC_COUNTDOWN
     )
       tickDemo(now, ts, s, params, lctx)
     tickLayout(ts, s, params, machine, lctx, scrollItems, pool)
     tickFlicker(s, machine, params, flicker, lctx)
     if (!mobile) tickBreathing(breathing, s.breathingWrap, now, app.screen.width, app.screen.height)
+    const escTick = tickEsc(escSkip)
+    if (escTick.justActivated) {
+      options?.onEscSkipActivated?.()
+      if (machine.current !== State.ESC_COUNTDOWN) enterState(State.ESC_COUNTDOWN)
+    }
     if (escSkip.activated) {
-      const p = tickEsc(escSkip)
-      options?.onEscSkipProgress?.(p)
-      if (p >= 1) {
+      options?.onEscSkipProgress?.(escTick.progress)
+      if (escTick.progress >= 1) {
         resetEsc(escSkip)
+        enterState(State.POST_DEMO)
         options?.onMarketplace?.()
       }
     }
@@ -316,6 +332,7 @@ export async function createApp(
       updateDofUniforms(s.dofFilter)
     }
 
+    updateFocusCrosshair(focusCrosshair, params)
     s.display.renderable = true
     app.renderer.render({ container: s.display, target: s.displayRT })
     s.display.renderable = false
@@ -345,7 +362,11 @@ export async function createApp(
     } else if (e.key === '`') toggleDevtools()
   }
   const onKeyUp = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') escKeyUp(escSkip)
+    if (e.key === 'Escape') {
+      escKeyUp(escSkip)
+      options?.onEscSkipProgress?.(0)
+      if (machine.current === State.ESC_COUNTDOWN) enterState(machine.previous)
+    }
   }
   if (!mobile) {
     document.addEventListener('keydown', onKeyDown)
@@ -359,7 +380,7 @@ export async function createApp(
     if (machine.current === State.IDLE) doDispatch('ENTER')
   })
 
-  let introCount = 0
+  let headerAdded = false
   let mobileTapHandler: (() => void) | null = null
   if (mobile) {
     mobileTapHandler = initMobileDemo({
@@ -373,8 +394,7 @@ export async function createApp(
       canvas: app.canvas,
     })
   } else {
-    introCount = initHeader(sets, params, s, lctx, scrollItems)
-    enterState(State.BOOT)
+    enterState(State.INTRO)
   }
   // biome-ignore lint/suspicious/noExplicitAny: window augmentation for devtools
   ;(window as any).__spinnerAPI = {
@@ -413,7 +433,7 @@ export async function createApp(
     if (devtoolsLoaded) return
     devtoolsLoaded = true
     const { initDevtools } = await import('./devtools')
-    initDevtools(params, s.dofFilter, syncParamsToScene)
+    initDevtools(params, s.dofFilter, syncParamsToScene, focusCrosshair)
   }
 
   if (location.hostname === 'localhost') toggleDevtools()
@@ -440,7 +460,7 @@ export async function createApp(
     }
     machine.overlapped = false
     scrollZoomCtrl?.enable()
-    enterState(State.BOOT)
+    enterState(State.INTRO)
   }
 
   return {
@@ -470,6 +490,11 @@ export async function createApp(
     restartExperience,
     setOverlapped: (v: boolean) => {
       machine.overlapped = v
+    },
+    skipToMarketplace: () => {
+      resetEsc(escSkip)
+      enterState(State.POST_DEMO)
+      options?.onMarketplace?.()
     },
   }
 }

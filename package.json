@@ -18,7 +18,8 @@
   "description": "Platform to exchange Claude Verbs sets",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "og:generate": "bun run src/lib/og/generate.ts",
+    "build": "bun run og:generate && vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",

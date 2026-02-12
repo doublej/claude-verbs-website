@@ -9,9 +9,12 @@ const { data }: { data: PageData } = $props()
 
 const set = $derived(data.set)
 const author = $derived(data.author)
+const seo = $derived(data.seo)
 const normalizedVerbs = $derived(set.verbs.map((v) => v.replace(/^\s*I(?:[\u2019']m| am)\s+/i, '')))
 const installCmd = $derived(`bunx github:doublej/claude-verbs-cli install ${set.name}`)
-const hasMore = $derived(set.verbCount > normalizedVerbs.length)
+const PREVIEW_LIMIT = 12
+const previewVerbs = $derived(normalizedVerbs.slice(0, PREVIEW_LIMIT))
+const hasMore = $derived(set.verbCount > previewVerbs.length)
 
 let copied = $state(false)
 let currentVerb = $state('')
@@ -52,16 +55,32 @@ onMount(() => {
 </script>
 
 <svelte:head>
-  <title>{set.displayName} — Claude Verbs</title>
-  <meta name="description" content="{set.description} — {set.verbCount} themed spinner verbs for Claude Code." />
+  <title>{seo.title}</title>
+  <meta name="description" content={seo.description} />
+  <link rel="canonical" href={seo.canonicalUrl} />
+  <meta property="og:title" content={seo.title} />
+  <meta property="og:description" content={seo.description} />
+  <meta property="og:type" content={seo.ogType} />
+  <meta property="og:url" content={seo.ogUrl} />
+  <meta property="og:image" content={seo.ogImageUrl} />
+  <meta property="og:image:width" content={String(seo.ogImageWidth)} />
+  <meta property="og:image:height" content={String(seo.ogImageHeight)} />
+  <meta property="og:image:alt" content={seo.ogImageAlt} />
+  <meta name="twitter:card" content={seo.twitterCard} />
+  <meta name="twitter:title" content={seo.title} />
+  <meta name="twitter:description" content={seo.description} />
+  <meta name="twitter:image" content={seo.twitterImageUrl} />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+    rel="stylesheet"
+  />
 </svelte:head>
 
 <main class="detail">
   <div class="container">
-    <a class="back" href="/{data.locale}/marketplace">&#8592; all sets</a>
+    <a class="back" href="/{data.locale}#browse">&#8592; all sets</a>
 
     <h1 class="detail__name">{set.displayName}</h1>
     <p class="detail__desc">{set.description}</p>
@@ -100,9 +119,9 @@ onMount(() => {
     </div>
 
     <div class="verbs">
-      <div class="verbs__label">{hasMore ? `Preview (${normalizedVerbs.length} of ${set.verbCount})` : 'All verbs'}</div>
+      <div class="verbs__label">{hasMore ? `Preview (${previewVerbs.length} of ${set.verbCount})` : 'All verbs'}</div>
       <div class="verbs__list">
-        {#each normalizedVerbs as verb}
+        {#each previewVerbs as verb}
           <div class="verbs__item">{verb}</div>
         {/each}
       </div>
@@ -114,6 +133,14 @@ onMount(() => {
 </main>
 
 <style>
+  :global(body) {
+    font-family: var(--mono);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
   .container { max-width: var(--max-w); margin: 0 auto; padding: 0 1.5rem; }
 
   .detail { padding: 3rem 0 4rem; }

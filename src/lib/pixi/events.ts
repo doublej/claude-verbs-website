@@ -206,7 +206,7 @@ export function mkStateDiagram(): Event {
       },
       { t: '     \u2502                     \u2502 ENTER (action)', c: PALETTE.border },
       { t: '     \u2502                     \u251c\u2500 copy command', c: PALETTE.border },
-      { t: '     \u2502                     \u2514\u2500 navigate marketplace', c: PALETTE.border },
+      { t: '     \u2502                     \u2514\u2500 browse sets', c: PALETTE.border },
       { t: '     \u2502', c: PALETTE.border },
       {
         t: '     \u2502              \u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557',

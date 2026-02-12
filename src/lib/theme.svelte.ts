@@ -1,40 +1,44 @@
-type Theme = 'light' | 'dark' | 'system'
+type Theme = 'light' | 'dark'
 
 let theme = $state<Theme>('light')
+let wasDetected = $state(false)
 
-function getSystemTheme(): 'light' | 'dark' {
+function getSystemTheme(): Theme {
   if (typeof window === 'undefined') return 'dark'
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
-function resolveTheme(t: Theme): 'light' | 'dark' {
-  return t === 'system' ? getSystemTheme() : t
-}
-
 function applyTheme(t: Theme): void {
-  const resolved = resolveTheme(t)
-  document.documentElement.setAttribute('data-theme', resolved)
+  document.documentElement.setAttribute('data-theme', t)
 }
 
 function initTheme(): void {
   if (typeof window === 'undefined') return
 
   const stored = localStorage.getItem('theme') as Theme | null
-  theme = stored ?? 'light'
+  if (stored) {
+    theme = stored
+  } else {
+    theme = getSystemTheme()
+    wasDetected = true
+  }
   applyTheme(theme)
-
-  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-  mediaQuery.addEventListener('change', () => {
-    if (theme === 'system') applyTheme('system')
-  })
 }
 
 export function getTheme(): Theme {
   return theme
 }
 
-export function getResolvedTheme(): 'light' | 'dark' {
-  return resolveTheme(theme)
+export function getResolvedTheme(): Theme {
+  return theme
+}
+
+export function getWasDetected(): boolean {
+  return wasDetected
+}
+
+export function clearDetected(): void {
+  wasDetected = false
 }
 
 export function setTheme(newTheme: Theme): void {

@@ -4,7 +4,6 @@ import { FONT_FAMILY, LAYOUT, PALETTE } from './constants'
 import { buildDeadPixelLayers } from './effects/dead-pixels'
 import { buildHeaderRows } from './header'
 import { countColumns, hexToNum, normalizeVerbs, shuffle } from './helpers'
-import { buildIntroRows } from './intro'
 import type { LayoutCtx } from './layout'
 import { type Params, displaySize } from './params'
 import type { SceneRefs } from './scene'
@@ -180,31 +179,14 @@ function addRows(
   }
 }
 
-export function initHeader(
+export function addHeaderRows(
   sets: VerbSets,
   params: Params,
   s: SceneRefs,
   lctx: LayoutCtx,
   scrollItems: (Text | Container)[],
-): number {
-  const introRows = buildIntroRows()
-  addRows(introRows, params, s, lctx, scrollItems)
-  addRows(buildHeaderRows(80, sets, params), params, s, lctx, scrollItems)
-  return introRows.length
-}
-
-export function removeIntroRows(
-  introCount: number,
-  s: SceneRefs,
-  scrollItems: (Text | Container)[],
-  ts: TickerState,
 ): void {
-  const removed = scrollItems.splice(0, introCount)
-  for (const item of removed) {
-    s.scrollContainer.removeChild(item)
-    item.destroy({ children: true })
-  }
-  ts.layoutDirty = true
+  addRows(buildHeaderRows(80, sets, params), params, s, lctx, scrollItems)
 }
 
 function updateContainerFontSize(items: (Text | Container)[], fontSize: number): void {

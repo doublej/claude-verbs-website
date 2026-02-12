@@ -65,6 +65,13 @@ export function tickScroll(
   pool: TextPool,
   lctx: LayoutCtx,
 ): void {
+  if (ts.statusDirty) {
+    s.statusText.text = `\u2026/claude-verbs-website   main *5   [${stateName(machine.current)}]`
+    s.permsText.text =
+      '\u23f5\u23f5 bypass permissions on (shift+tab to cycle) \u00b7 5 files +322 -66'
+    ts.statusDirty = false
+  }
+
   if (!machine.hasSubmitted || machine.current === State.IDLE || machine.current === State.BROWSING)
     return
 
@@ -91,12 +98,6 @@ export function tickScroll(
     ts.layoutDirty = true
   }
 
-  if (ts.statusDirty) {
-    s.statusText.text = `\u2026/claude-verbs-website   main *5   [${stateName(machine.current)}]`
-    s.permsText.text =
-      '\u23f5\u23f5 bypass permissions on (shift+tab to cycle) \u00b7 5 files +322 -66'
-    ts.statusDirty = false
-  }
 }
 
 const CLOCK_THROTTLE_MS = 100

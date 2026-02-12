@@ -1,46 +1,71 @@
 import { Easing, Tween } from '@tweenjs/tween.js'
-import { SEQUENCE } from './config'
+import { type FocusTarget, SEQUENCE, type TweenableKey, TWEENABLE_KEYS, stateConfig } from './config'
+import type { LayoutCtx } from './layout'
 import type { Params } from './params'
 import type { SceneRefs } from './scene'
-import { State } from './state-machine'
+import type { State } from './state-machine'
 import { tweenGroup } from './tween-group'
-
-export interface ZoomTarget {
-  zoom: number
-  focusY: number | 'header' | 'spinner' | 'prompt' | 'bootHint' | 'center'
-  duration?: number
-}
 
 export interface ZoomController {
   applyJumpcut: (state: State) => void
 }
 
-const STATE_KEY: Record<State, keyof typeof SEQUENCE.zoom.states> = {
-  [State.BOOT]: 'BOOT',
-  [State.IDLE]: 'IDLE',
-  [State.BROWSING]: 'BROWSING',
-  [State.DEMO]: 'DEMO',
-  [State.POST_DEMO]: 'POST_DEMO',
-  [State.BUGGED]: 'BUGGED',
-  [State.BOOT_READY]: 'BOOT_READY',
+type EffectsState = Record<TweenableKey, number>
+
+function readEffects(params: Params): EffectsState {
+  return Object.fromEntries(TWEENABLE_KEYS.map((k) => [k, params[k]])) as EffectsState
 }
 
-function resolveYPosition(focusY: number | string, s: SceneRefs, screenH: number): number {
-  if (typeof focusY === 'number') return focusY
+function createEffectsTween(
+  params: Params,
+  targets: EffectsState,
+  duration: number,
+  syncScene: () => void,
+  onComplete: () => void,
+): Tween<EffectsState> {
+  return new Tween(readEffects(params), tweenGroup)
+    .to(targets, duration)
+    .easing(Easing.Cubic.InOut)
+    .onUpdate((obj) => {
+      for (const k of TWEENABLE_KEYS) params[k] = obj[k]
+      syncScene()
+    })
+    .onComplete(onComplete)
+    .start()
+}
 
-  switch (focusY) {
+function globalY(child: { getGlobalPosition: () => { y: number } }): number {
+  return child.getGlobalPosition().y
+}
+
+interface FocusPosition {
+  x: number
+  y: number
+}
+
+function resolveFocusPosition(
+  focus: FocusTarget,
+  s: SceneRefs,
+  lctx: LayoutCtx,
+  screenH: number,
+): FocusPosition {
+  if (typeof focus === 'object') {
+    return {
+      x: (focus.char ?? 0) * lctx.chW,
+      y: focus.line * lctx.lineHeight,
+    }
+  }
+  switch (focus) {
     case 'header':
-      return s.scrollContainer.children[0]?.y ?? screenH * 0.3
+      return { x: 0, y: s.scrollContainer.children[0] ? globalY(s.scrollContainer.children[0]) : screenH * 0.3 }
     case 'spinner':
-      return s.spinnerLine.y
+      return { x: 0, y: globalY(s.spinnerLine) }
     case 'prompt':
-      return s.promptText.y
+      return { x: 0, y: globalY(s.promptText) }
     case 'bootHint':
-      return s.inputContainer.y + s.bootHintText.y + s.bootHintText.height / 2
+      return { x: 0, y: globalY(s.bootHintText) }
     case 'center':
-      return screenH / 2
-    default:
-      return 0
+      return { x: 0, y: screenH / 2 }
   }
 }
 
@@ -62,18 +87,29 @@ function createZoomTween(
     .start()
 }
 
+interface FocusTweenState {
+  targetX: number
+  targetY: number
+  strength: number
+}
+
 function createFocusTween(
   params: Params,
-  focusY: number,
+  pos: FocusPosition,
+  strength: number,
   duration: number,
   updateCamera: () => void,
   onComplete: () => void,
-): Tween<{ strength: number }> {
-  return new Tween({ strength: params.focusStrength }, tweenGroup)
-    .to({ strength: SEQUENCE.zoom.focusStrength }, duration)
+): Tween<FocusTweenState> {
+  return new Tween(
+    { targetX: params.focusTargetX, targetY: params.focusTargetY, strength: params.focusStrength },
+    tweenGroup,
+  )
+    .to({ targetX: pos.x, targetY: pos.y, strength }, duration)
     .easing(Easing.Cubic.InOut)
     .onUpdate((obj) => {
-      params.focusTargetY = focusY
+      params.focusTargetX = obj.targetX
+      params.focusTargetY = obj.targetY
       params.focusStrength = obj.strength
       updateCamera()
     })
@@ -96,21 +132,28 @@ function createBaseTimeline(
     })
 }
 
+function effectTargets(cfg: ReturnType<typeof stateConfig>): EffectsState {
+  return Object.fromEntries(TWEENABLE_KEYS.map((k) => [k, cfg[k]])) as EffectsState
+}
+
 export function createZoomController(
   params: Params,
   updateCamera: () => void,
+  syncScene: () => void,
   s: SceneRefs,
+  lctx: LayoutCtx,
   screenH: number,
 ): ZoomController {
-  let isInitialBoot = true
   let currentZoomTween: Tween<{ zoom: number }> | null = null
-  let currentFocusTween: Tween<{ strength: number }> | null = null
+  let currentEffectsTween: Tween<EffectsState> | null = null
+  let currentFocusTween: Tween<FocusTweenState> | null = null
   const { target, durationMs } = SEQUENCE.zoom.baseLine
   let baseTimeline = createBaseTimeline(params, target, durationMs, updateCamera)
 
   const stopAllTweens = () => {
     baseTimeline.stop()
     currentZoomTween?.stop()
+    currentEffectsTween?.stop()
     currentFocusTween?.stop()
   }
 
@@ -119,46 +162,26 @@ export function createZoomController(
     baseTimeline.start()
   }
 
-  const startCreepZoom = () => {
-    const { creepTarget, creepDurationMs } = SEQUENCE.zoom.bootReadyCreep
-    currentZoomTween = new Tween({ zoom: params.zoom }, tweenGroup)
-      .to({ zoom: creepTarget }, creepDurationMs)
-      .easing(Easing.Quadratic.In)
-      .onUpdate((obj) => {
-        params.zoom = obj.zoom
-        updateCamera()
-      })
-      .onComplete(() => {
-        currentZoomTween = null
-      })
-      .start()
-  }
-
   const applyJumpcut = (state: State) => {
-    if (isInitialBoot && state === State.BOOT) {
-      isInitialBoot = false
-      return
-    }
-    isInitialBoot = false
-
-    const key = STATE_KEY[state]
-    const cfg = key ? SEQUENCE.zoom.states[key] : null
+    const cfg = stateConfig(state)
     if (!cfg) return
 
     stopAllTweens()
 
     const dur = cfg.durationMs
-    const focusY = resolveYPosition(cfg.focusY, s, screenH)
+    const pos = resolveFocusPosition(cfg.focusY, s, lctx, screenH)
 
-    const isBootReady = state === State.BOOT_READY
     currentZoomTween = createZoomTween(params, cfg.zoom, dur, updateCamera, () => {
       currentZoomTween = null
-      if (isBootReady) startCreepZoom()
-      else startBaseTimeline()
+      startBaseTimeline()
     })
 
-    if (focusY > 0) {
-      currentFocusTween = createFocusTween(params, focusY, dur, updateCamera, () => {
+    currentEffectsTween = createEffectsTween(params, effectTargets(cfg), dur, syncScene, () => {
+      currentEffectsTween = null
+    })
+
+    if (pos.x > 0 || pos.y > 0) {
+      currentFocusTween = createFocusTween(params, pos, cfg.focusStrength, dur, updateCamera, () => {
         currentFocusTween = null
       })
     }

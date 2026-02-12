@@ -15,7 +15,13 @@ let revealed = $state(false)
 let scrollLocked = $state(true)
 let escHintActive = $state(false)
 let escProgress = $state(0)
+let restartHintActive = $state(false)
+let restartProgress = $state(0)
+let restartHoldStart = 0
+let restartRaf = 0
 let appHandle: AppHandle | undefined
+
+const RESTART_HOLD_MS = 1500
 
 function unlock() {
   if (revealed) return
@@ -32,8 +38,57 @@ function lock() {
   scrollLocked = true
   escHintActive = false
   escProgress = 0
+  cancelRestart()
   appHandle?.setOverlapped(false)
   appHandle?.restartExperience()
+}
+
+function showRestartHint() {
+  if (restartHintActive) return
+  restartHintActive = true
+  restartProgress = 0
+}
+
+function cancelRestart() {
+  restartHintActive = false
+  restartProgress = 0
+  restartHoldStart = 0
+  if (restartRaf) {
+    cancelAnimationFrame(restartRaf)
+    restartRaf = 0
+  }
+}
+
+function tickRestart() {
+  if (!restartHoldStart) {
+    restartRaf = 0
+    return
+  }
+  restartProgress = Math.min((Date.now() - restartHoldStart) / RESTART_HOLD_MS, 1)
+  if (restartProgress >= 1) {
+    cancelRestart()
+    lock()
+    return
+  }
+  restartRaf = requestAnimationFrame(tickRestart)
+}
+
+function onRestartKeyDown(e: KeyboardEvent) {
+  if (e.key !== 'Enter' || !restartHintActive) return
+  e.preventDefault()
+  if (restartHoldStart) return
+  restartHoldStart = Date.now()
+  restartRaf = requestAnimationFrame(tickRestart)
+}
+
+function onRestartKeyUp(e: KeyboardEvent) {
+  if (e.key !== 'Enter') return
+  restartHoldStart = 0
+  restartProgress = 0
+  if (restartRaf) {
+    cancelAnimationFrame(restartRaf)
+    restartRaf = 0
+  }
 }
 
 $effect(() => {
@@ -42,9 +97,10 @@ $effect(() => {
 })
 
 onMount(() => {
-  window.scrollTo(0, 0)
+  const skipIntro = window.location.hash === '#browse'
+  if (!skipIntro) window.scrollTo(0, 0)
   mobile = isMobile()
-  if (mobile) {
+  if (mobile || skipIntro) {
     scrollLocked = false
     revealed = true
   }
@@ -58,10 +114,15 @@ onMount(() => {
       },
       onEscSkipProgress: (p: number) => {
         escProgress = p
+        if (p === 0) escHintActive = false
       },
       preferredLang: data.preferredLang,
     }).then((handle) => {
       appHandle = handle
+      if (skipIntro) {
+        handle.disableScrollZoom()
+        handle.setOverlapped(true)
+      }
     })
   }
 
@@ -82,15 +143,21 @@ onMount(() => {
 
   function onScroll() {
     if (mobile || !revealed) return
-    if (window.scrollY <= 0) lock()
+    if (window.scrollY <= 0) showRestartHint()
+    else cancelRestart()
   }
 
   window.addEventListener('scroll', onScroll, { passive: true })
+  document.addEventListener('keydown', onRestartKeyDown)
+  document.addEventListener('keyup', onRestartKeyUp)
 
   return () => {
     appHandle?.cleanup()
     observer.disconnect()
     window.removeEventListener('scroll', onScroll)
+    document.removeEventListener('keydown', onRestartKeyDown)
+    document.removeEventListener('keyup', onRestartKeyUp)
+    cancelRestart()
   }
 })
 </script>
@@ -111,20 +178,28 @@ onMount(() => {
 
 <div bind:this={wrap} id="canvas-wrap" class:revealed class:mobile>
 	{#if !revealed && !mobile}
-		<button class="skip-btn" class:esc-active={escHintActive} onclick={unlock}>
+		<button class="skip-btn" class:esc-active={escHintActive} onclick={() => appHandle ? appHandle.skipToMarketplace() : unlock()}>
 			{#if escHintActive}
-				<span class="skip-btn__sizer" aria-hidden="true">SKIP TO MARKETPLACE</span>
+				<span class="skip-btn__sizer" aria-hidden="true">SKIP INTRO</span>
 				<span class="skip-btn__label">HOLD ESC 3 SEC.</span>
 				<span class="skip-btn__fill" style="transform: scaleX({escProgress})"></span>
 			{:else}
-				SKIP TO MARKETPLACE
+				SKIP INTRO
 			{/if}
 		</button>
 	{/if}
 </div>
 
+{#if restartHintActive && !mobile}
+	<div class="restart-hint">
+		<span class="restart-hint__sizer" aria-hidden="true">HOLD ENTER TO RESTART</span>
+		<span class="restart-hint__label">HOLD ENTER TO RESTART</span>
+		<span class="restart-hint__fill" style="transform: scaleX({restartProgress})"></span>
+	</div>
+{/if}
+
 <main>
-	<section class="gallery" aria-label="Verb set gallery">
+	<section id="browse" class="gallery" aria-label="Verb set gallery">
 		<div class="page-frame">
 			<h2 class="section-heading">Browse Sets</h2>
 			<Gallery sets={data.sets} authors={data.authors} preferredLang={data.preferredLang} />
@@ -286,6 +361,45 @@ onMount(() => {
 
 	@keyframes skip-blink {
 		50% { opacity: 0.3; }
+	}
+
+	.restart-hint {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		z-index: 10;
+		font: 700 0.72rem var(--mono);
+		color: var(--bg);
+		background: var(--accent);
+		height: 40px;
+		padding: 0 1.5rem;
+		overflow: hidden;
+		white-space: nowrap;
+		animation: restart-fade-in 0.3s ease-out;
+	}
+
+	.restart-hint__sizer { opacity: 0; display: flex; align-items: center; height: 100%; }
+
+	.restart-hint__label {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.restart-hint__fill {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--bg) 40%, transparent);
+		transform-origin: left;
+		pointer-events: none;
+	}
+
+	@keyframes restart-fade-in {
+		from { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+		to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 	}
 
 	#canvas-wrap :global(canvas) {

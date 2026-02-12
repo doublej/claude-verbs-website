@@ -6,6 +6,7 @@ export interface Params {
   charDwellMs: number
   tokenRate: number
   colorVerb: string
+  colorVerbHighlight: string
   colorEllipsis: string
   bgColor: string
   colorHighlight: string
@@ -70,6 +71,7 @@ export function createParams(): Params {
     charDwellMs: 550,
     tokenRate: 70,
     colorVerb: isLight ? '#b45454' : '#d78787',
+    colorVerbHighlight: isLight ? '#b8960a' : '#fde047',
     colorEllipsis: isLight ? '#737373' : '#a2a2a2',
     bgColor: isLight ? '#f5f5f5' : '#0d1117',
     colorHighlight: isLight ? '#e0d9c2' : '#56533e',

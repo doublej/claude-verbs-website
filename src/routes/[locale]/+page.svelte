@@ -13,6 +13,8 @@ let wrap: HTMLDivElement
 let mobile = $state(false)
 let revealed = $state(false)
 let scrollLocked = $state(true)
+let escHintActive = $state(false)
+let escProgress = $state(0)
 let appHandle: AppHandle | undefined
 
 function unlock() {
@@ -27,6 +29,8 @@ function lock() {
   if (!revealed || mobile) return
   revealed = false
   scrollLocked = true
+  escHintActive = false
+  escProgress = 0
   appHandle?.restartExperience()
 }
 
@@ -45,11 +49,18 @@ onMount(() => {
   const sets = loadSets()
 
   function init() {
-    createApp(wrap, sets, { onMarketplace: unlock, preferredLang: data.preferredLang }).then(
-      (handle) => {
-        appHandle = handle
+    createApp(wrap, sets, {
+      onMarketplace: unlock,
+      onEscSkipActivated: () => {
+        escHintActive = true
       },
-    )
+      onEscSkipProgress: (p: number) => {
+        escProgress = p
+      },
+      preferredLang: data.preferredLang,
+    }).then((handle) => {
+      appHandle = handle
+    })
   }
 
   init()
@@ -98,7 +109,15 @@ onMount(() => {
 
 <div bind:this={wrap} id="canvas-wrap" class:revealed class:mobile>
 	{#if !revealed && !mobile}
-		<button class="skip-btn" onclick={unlock}>SKIP TO MARKETPLACE</button>
+		<button class="skip-btn" class:esc-active={escHintActive} onclick={unlock}>
+			{#if escHintActive}
+				<span class="skip-btn__sizer" aria-hidden="true">SKIP TO MARKETPLACE</span>
+				<span class="skip-btn__label">HOLD ESC 3 SEC.</span>
+				<span class="skip-btn__fill" style="transform: scaleX({escProgress})"></span>
+			{:else}
+				SKIP TO MARKETPLACE
+			{/if}
+		</button>
 	{/if}
 </div>
 
@@ -235,9 +254,37 @@ onMount(() => {
 		padding: 0 1.5rem;
 		cursor: pointer;
 		transition: filter 0.2s;
+		overflow: hidden;
+		white-space: nowrap;
 	}
 
 	.skip-btn:hover { filter: brightness(1.3); }
+
+	.skip-btn__sizer { opacity: 0; }
+
+	.skip-btn__label {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.skip-btn__fill {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--bg) 40%, transparent);
+		transform-origin: left;
+		pointer-events: none;
+	}
+
+	.skip-btn.esc-active {
+		animation: skip-blink 0.15s ease-in-out 4;
+	}
+
+	@keyframes skip-blink {
+		50% { opacity: 0.3; }
+	}
 
 	#canvas-wrap :global(canvas) {
 		display: block;

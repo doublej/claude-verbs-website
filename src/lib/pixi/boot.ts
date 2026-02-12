@@ -1,6 +1,6 @@
 import { SEQUENCE } from './config'
 
-const COMMAND = 'claude-verbs run'
+const COMMAND = 'claude-verbs demo start'
 const BASE_FRAME_MS = 100
 
 export interface BootAnim {
@@ -104,7 +104,6 @@ export function runBootAnim(b: BootAnim, frameMs: number, ui: BootUI): void {
   }
 
   function startTypeCommand(): void {
-    ui.setOutput('')
     typeChar(0)
   }
 
@@ -120,7 +119,7 @@ export function runBootAnim(b: BootAnim, frameMs: number, ui: BootUI): void {
 
   function showReady(): void {
     ui.setInput(COMMAND)
-    ui.setHint(' \u2219 press Enter to launch interactive demo')
+    ui.setHint('press \u23ce')
     ui.onReady()
   }
 }

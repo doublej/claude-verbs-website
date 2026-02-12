@@ -23,6 +23,7 @@ export async function initDevtools(params: Params, markDirty: () => void): Promi
 
   const fC = pane.addFolder({ title: 'Colors', expanded: false })
   bind(fC, 'colorVerb')
+  bind(fC, 'colorVerbHighlight')
   bind(fC, 'colorEllipsis')
   bind(fC, 'bgColor')
   bind(fC, 'colorHighlight')

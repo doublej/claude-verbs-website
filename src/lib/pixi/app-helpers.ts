@@ -18,6 +18,10 @@ export function exitCurrentState(machine: Machine): void {
     clearTimeout(machine.demoTimer)
     machine.demoTimer = null
   }
+  if (machine.current === State.BUGGED && machine.buggedTimer) {
+    clearTimeout(machine.buggedTimer)
+    machine.buggedTimer = null
+  }
 }
 
 export function applyStateEntry(
@@ -43,7 +47,7 @@ function updateIdleSuggestion(
   const label = idleSet ? `Show me some verbs of ${idleSet.name}` : 'No sets available'
   const hint =
     idleSet && !machine.tabCompleted
-      ? '   \u2191\u2193 browse \u00b7 enter to demo \u00b7 \u00b7 tab to complete'
+      ? '   \u2191\u2193 browse \u00b7 enter to demo \u00b7 tab to complete'
       : ''
   s.promptText.text = `\u276f ${label}${hint}`
   s.promptText.style.fill = machine.tabCompleted ? PALETTE.active : PALETTE.suggestion
@@ -73,11 +77,11 @@ function updateActiveSuggestion(
   if (machine.current === State.BROWSING) {
     text = getBrowsingText(machine, localeSets, idiotSet)
     if (!machine.tabCompleted)
-      hint = '\u2191\u2193 browse \u00b7 enter to demo \u00b7 \u00b7 tab to complete'
+      hint = '\u2191\u2193 browse \u00b7 enter to demo \u00b7 tab to complete'
   } else if (machine.current === State.POST_DEMO) {
     text = POST_SUGGESTIONS[machine.postIndex].text
     if (!machine.tabCompleted)
-      hint = '\u2191\u2193 browse \u00b7 enter to select \u00b7 \u00b7 tab to complete'
+      hint = '\u2191\u2193 browse \u00b7 enter to select \u00b7 tab to complete'
   }
   s.promptText.text = hint ? `\u276f ${text}   ${hint}` : `\u276f ${text}`
   s.promptText.style.fill = PALETTE.active
@@ -111,7 +115,7 @@ export function resetDemoState(
   if (ts.verbs.length === 0) ts.verbs = ['Thinking', 'Processing']
   ts.verbIdx = 0
   s.verbText.text = ts.verbs[0]
-  s.verbText.style.fill = hexToNum(params.colorVerb)
+  s.verbText.style.fill = hexToNum(params.colorVerbHighlight)
   s.ellipsisText.visible = true
   s.promptText.text = '\u276f'
   s.promptText.style.fill = PALETTE.prompt

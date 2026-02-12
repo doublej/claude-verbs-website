@@ -64,6 +64,8 @@ export function layout(
     scrollItems: (Text | Container)[]
     bottomChrome: Container
     inputContainer: Container
+    caretText: Text
+    inputText: Text
     bootOutputText: Text
     bootHintText: Text
     verbText: Text
@@ -123,10 +125,14 @@ export function layout(
     ui.inputContainer.visible = true
     ui.inputContainer.x = leftX
     ui.inputContainer.y = Math.round(lh)
+    const outputLines = ui.bootOutputText.text ? ui.bootOutputText.text.split('\n').length : 0
     ui.bootOutputText.x = 0
-    ui.bootOutputText.y = Math.round(lh * 1.5)
+    ui.bootOutputText.y = Math.round(lh)
+    const promptY = outputLines > 0 ? Math.round((outputLines + 2) * lh) : 0
+    ui.caretText.y = promptY
+    ui.inputText.y = promptY
     ui.bootHintText.x = 0
-    ui.bootHintText.y = Math.round(lh * 0.2)
+    ui.bootHintText.y = promptY + Math.round(lh)
     ui.scrollContainer.visible = false
     ui.spinnerLine.visible = false
     ui.metaLine.visible = false
@@ -135,6 +141,8 @@ export function layout(
   }
 
   ui.inputContainer.visible = false
+  ui.caretText.y = 0
+  ui.inputText.y = 0
   ui.scrollContainer.visible = true
   ui.spinnerLine.visible = machine.current === State.DEMO || machine.current === State.POST_DEMO
   ui.metaLine.visible = machine.current === State.DEMO || machine.current === State.POST_DEMO

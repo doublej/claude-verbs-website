@@ -1,12 +1,13 @@
-import * as TWEEN from '@tweenjs/tween.js'
+import { Easing, Tween } from '@tweenjs/tween.js'
 import { SEQUENCE } from './config'
 import type { Params } from './params'
 import type { SceneRefs } from './scene'
 import { State } from './state-machine'
+import { tweenGroup } from './tween-group'
 
 export interface ZoomTarget {
   zoom: number
-  focusY: number | 'header' | 'spinner' | 'prompt' | 'center'
+  focusY: number | 'header' | 'spinner' | 'prompt' | 'bootHint' | 'center'
   duration?: number
 }
 
@@ -34,6 +35,8 @@ function resolveYPosition(focusY: number | string, s: SceneRefs, screenH: number
       return s.spinnerLine.y
     case 'prompt':
       return s.promptText.y
+    case 'bootHint':
+      return s.inputContainer.y + s.bootHintText.y + s.bootHintText.height / 2
     case 'center':
       return screenH / 2
     default:
@@ -47,10 +50,10 @@ function createZoomTween(
   duration: number,
   updateCamera: () => void,
   onComplete: () => void,
-): TWEEN.Tween<{ zoom: number }> {
-  return new TWEEN.Tween({ zoom: params.zoom })
+): Tween<{ zoom: number }> {
+  return new Tween({ zoom: params.zoom }, tweenGroup)
     .to({ zoom: targetZoom }, duration)
-    .easing(TWEEN.Easing.Cubic.InOut)
+    .easing(Easing.Cubic.InOut)
     .onUpdate((obj) => {
       params.zoom = obj.zoom
       updateCamera()
@@ -65,10 +68,10 @@ function createFocusTween(
   duration: number,
   updateCamera: () => void,
   onComplete: () => void,
-): TWEEN.Tween<{ strength: number }> {
-  return new TWEEN.Tween({ strength: params.focusStrength })
+): Tween<{ strength: number }> {
+  return new Tween({ strength: params.focusStrength }, tweenGroup)
     .to({ strength: SEQUENCE.zoom.focusStrength }, duration)
-    .easing(TWEEN.Easing.Cubic.InOut)
+    .easing(Easing.Cubic.InOut)
     .onUpdate((obj) => {
       params.focusTargetY = focusY
       params.focusStrength = obj.strength
@@ -83,10 +86,10 @@ function createBaseTimeline(
   targetZoom: number,
   durationMs: number,
   updateCamera: () => void,
-): TWEEN.Tween<{ zoom: number }> {
-  return new TWEEN.Tween({ zoom: params.zoom })
+): Tween<{ zoom: number }> {
+  return new Tween({ zoom: params.zoom }, tweenGroup)
     .to({ zoom: targetZoom }, durationMs)
-    .easing(TWEEN.Easing.Cubic.Out)
+    .easing(Easing.Cubic.Out)
     .onUpdate((obj) => {
       params.zoom = obj.zoom
       updateCamera()
@@ -100,8 +103,8 @@ export function createZoomController(
   screenH: number,
 ): ZoomController {
   let isInitialBoot = true
-  let currentZoomTween: TWEEN.Tween<{ zoom: number }> | null = null
-  let currentFocusTween: TWEEN.Tween<{ strength: number }> | null = null
+  let currentZoomTween: Tween<{ zoom: number }> | null = null
+  let currentFocusTween: Tween<{ strength: number }> | null = null
   const { target, durationMs } = SEQUENCE.zoom.baseLine
   let baseTimeline = createBaseTimeline(params, target, durationMs, updateCamera)
 
@@ -114,6 +117,21 @@ export function createZoomController(
   const startBaseTimeline = () => {
     baseTimeline = createBaseTimeline(params, target, durationMs, updateCamera)
     baseTimeline.start()
+  }
+
+  const startCreepZoom = () => {
+    const { creepTarget, creepDurationMs } = SEQUENCE.zoom.bootReadyCreep
+    currentZoomTween = new Tween({ zoom: params.zoom }, tweenGroup)
+      .to({ zoom: creepTarget }, creepDurationMs)
+      .easing(Easing.Quadratic.In)
+      .onUpdate((obj) => {
+        params.zoom = obj.zoom
+        updateCamera()
+      })
+      .onComplete(() => {
+        currentZoomTween = null
+      })
+      .start()
   }
 
   const applyJumpcut = (state: State) => {
@@ -132,9 +150,11 @@ export function createZoomController(
     const dur = cfg.durationMs
     const focusY = resolveYPosition(cfg.focusY, s, screenH)
 
+    const isBootReady = state === State.BOOT_READY
     currentZoomTween = createZoomTween(params, cfg.zoom, dur, updateCamera, () => {
       currentZoomTween = null
-      startBaseTimeline()
+      if (isBootReady) startCreepZoom()
+      else startBaseTimeline()
     })
 
     if (focusY > 0) {

@@ -10,6 +10,7 @@ export const SEQUENCE = {
   },
   zoom: {
     baseLine: { target: 0.75, durationMs: 25000 },
+    bootReadyCreep: { creepTarget: 3.5, creepDurationMs: 30000 },
     focusStrength: 0.6,
     states: {
       BOOT: { zoom: 1.6, focusY: 'center' as const, durationMs: 200 },
@@ -18,7 +19,7 @@ export const SEQUENCE = {
       DEMO: { zoom: 0.8, focusY: 'spinner' as const, durationMs: 250 },
       POST_DEMO: { zoom: 1, focusY: 'prompt' as const, durationMs: 200 },
       BUGGED: { zoom: 0.65, focusY: 'center' as const, durationMs: 100 },
-      BOOT_READY: { zoom: 1.6, focusY: 'center' as const, durationMs: 200 },
+      BOOT_READY: { zoom: 1.6, focusY: 'bootHint' as const, durationMs: 200 },
     },
   },
   burst: {

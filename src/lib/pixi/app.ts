@@ -1,5 +1,4 @@
 import type { VerbSet, VerbSets } from '$lib/data/types'
-import * as TWEEN from '@tweenjs/tween.js'
 import { Application, type Container, type Text } from 'pixi.js'
 import {
   applyStateEntry,
@@ -17,6 +16,7 @@ import { applyCamera } from './camera'
 import { MOUSE_DEFAULTS, PALETTE } from './constants'
 import { createBreathingState, tickBreathing } from './effects/breathing'
 import { createFlickerState } from './effects/flicker'
+import { type EscSkip, createEscSkip, escKeyDown, escKeyUp, resetEsc, tickEsc } from './esc-skip'
 import type { LineDef } from './events'
 import { createLineBuffer } from './events'
 import { hexToNum, shuffle } from './helpers'
@@ -25,7 +25,13 @@ import { applyMobileOverrides, initMobileDemo, isMobile } from './mobile'
 import { createParams, displaySize } from './params'
 import { buildScene } from './scene'
 import { createScrollZoomController } from './scroll-zoom'
-import { type DispatchEvent, State, createMachine, dispatch } from './state-machine'
+import {
+  BUGGED_TIMEOUT_MS,
+  type DispatchEvent,
+  State,
+  createMachine,
+  dispatch,
+} from './state-machine'
 import { createTextPool } from './text-pool'
 import {
   createTickerState,
@@ -36,6 +42,7 @@ import {
   tickScroll,
   tickSpinner,
 } from './ticker'
+import { tweenGroup } from './tween-group'
 import { createZoomController } from './zoom'
 
 function resolveLocale(sets: VerbSets, preferredLang?: string): string {
@@ -78,6 +85,8 @@ const KEY_MAP: Record<string, DispatchEvent> = {
 
 interface AppOptions {
   onMarketplace?: () => void
+  onEscSkipActivated?: () => void
+  onEscSkipProgress?: (progress: number) => void
   preferredLang?: string
 }
 
@@ -126,6 +135,8 @@ export async function createApp(
   const bufState = createLineBuffer()
   const scrollItems: (Text | Container)[] = []
   const bootAnim: BootAnim = createBootAnim()
+  const escSkip: EscSkip = createEscSkip(params.fontSize, s.chW, s.contentW, s.contentH)
+  s.tuiContainer.addChild(escSkip.popup)
 
   const doDispatch = (event: DispatchEvent) =>
     dispatch(event, machine, localeSets, idiotSet, {
@@ -169,14 +180,20 @@ export async function createApp(
   function enterState(state: State): void {
     if (machine.current === State.BOOT || machine.current === State.BOOT_READY) {
       destroyBootAnim(bootAnim)
-      clearBootTexts()
-      if (state !== State.BOOT_READY) removeIntroRows(introCount, s, scrollItems, ts)
+      resetEsc(escSkip)
+      if (state !== State.BOOT_READY) {
+        clearBootTexts()
+        removeIntroRows(introCount, s, scrollItems, ts)
+      }
     }
     exitCurrentState(machine)
     machine.previous = machine.current
     machine.current = state
     if (state === State.POST_DEMO) machine.postIndex = 0
-    if (state === State.BUGGED) flicker.mode = 0
+    if (state === State.BUGGED) {
+      flicker.mode = 0
+      machine.buggedTimer = setTimeout(() => doDispatch('BUGGED_TIMEOUT'), BUGGED_TIMEOUT_MS)
+    }
     if (state === State.BOOT) {
       runBootAnim(bootAnim, params.frameMs, {
         setPrompt: (t) => {
@@ -190,6 +207,7 @@ export async function createApp(
         },
         setOutput: (t) => {
           s.bootOutputText.text = t
+          ts.layoutDirty = true
         },
         setHint: (t) => {
           s.bootHintText.text = t
@@ -246,7 +264,7 @@ export async function createApp(
   app.ticker.add(() => {
     const now = Date.now()
     // Tweens default to `performance.now()`; passing `Date.now()` causes them to jump/finish instantly.
-    TWEEN.update()
+    tweenGroup.update()
 
     if (!mobile) {
       const lerpFactor = MOUSE_DEFAULTS.lerpFactor
@@ -274,14 +292,33 @@ export async function createApp(
       tickDemo(now, ts, s, params, lctx)
     tickLayout(ts, s, params, machine, lctx, scrollItems, pool)
     tickFlicker(s, machine, params, flicker, lctx)
-    if (!mobile)
-      tickBreathing(breathing, s.scrollZoomWrap, now, app.screen.width, app.screen.height)
+    if (!mobile) tickBreathing(breathing, s.breathingWrap, now, app.screen.width, app.screen.height)
+    if (
+      escSkip.activated &&
+      (machine.current === State.BOOT || machine.current === State.BOOT_READY)
+    ) {
+      const p = tickEsc(escSkip)
+      options?.onEscSkipProgress?.(p)
+      if (p >= 1) {
+        enterState(State.IDLE)
+        options?.onMarketplace?.()
+      }
+    }
     s.display.renderable = true
     app.renderer.render({ container: s.display, target: s.displayRT })
     s.display.renderable = false
   })
 
   const onKeyDown = (e: KeyboardEvent) => {
+    if (
+      e.key === 'Escape' &&
+      (machine.current === State.BOOT || machine.current === State.BOOT_READY)
+    ) {
+      e.preventDefault()
+      const justActivated = escKeyDown(escSkip, e.repeat)
+      if (justActivated) options?.onEscSkipActivated?.()
+      return
+    }
     const mapped = KEY_MAP[e.key]
     if (mapped) {
       e.preventDefault()
@@ -294,7 +331,13 @@ export async function createApp(
       doDispatch('TAB')
     } else if (e.key === '`') toggleDevtools()
   }
-  if (!mobile) document.addEventListener('keydown', onKeyDown)
+  const onKeyUp = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') escKeyUp(escSkip)
+  }
+  if (!mobile) {
+    document.addEventListener('keydown', onKeyDown)
+    document.addEventListener('keyup', onKeyUp)
+  }
 
   s.inputContainer.on('pointertap', () => doDispatch('ENTER'))
   s.promptText.eventMode = 'static'
@@ -343,7 +386,7 @@ export async function createApp(
     s.adjustmentFilter.saturation = params.saturation
     s.deadPixelSprite.visible = params.deadPixelsEnabled
     s.stuckPixelSprite.visible = params.deadPixelsEnabled
-    s.verbText.style.fill = hexToNum(params.colorVerb)
+    s.verbText.style.fill = hexToNum(params.colorVerbHighlight)
     s.ellipsisText.style.fill = hexToNum(params.colorEllipsis)
     s.metaText.style.fill = PALETTE.suggestion
     s.highlightText.style.fill = hexToNum(params.colorHighlight)
@@ -366,6 +409,7 @@ export async function createApp(
   function restartExperience(): void {
     if (mobile) return
     destroyBootAnim(bootAnim)
+    resetEsc(escSkip)
     machine.current = State.IDLE
     machine.previous = State.IDLE
     machine.activeSet = null
@@ -378,6 +422,10 @@ export async function createApp(
       clearTimeout(machine.demoTimer)
       machine.demoTimer = null
     }
+    if (machine.buggedTimer) {
+      clearTimeout(machine.buggedTimer)
+      machine.buggedTimer = null
+    }
     scrollZoomCtrl?.enable()
     enterState(State.BOOT)
   }
@@ -386,12 +434,17 @@ export async function createApp(
     cleanup: () => {
       destroyed = true
       destroyBootAnim(bootAnim)
+      resetEsc(escSkip)
       scrollZoomCtrl?.cleanup()
       window.removeEventListener('resize', onResize)
       if (onMouseMove) window.removeEventListener('mousemove', onMouseMove)
-      if (!mobile) document.removeEventListener('keydown', onKeyDown)
+      if (!mobile) {
+        document.removeEventListener('keydown', onKeyDown)
+        document.removeEventListener('keyup', onKeyUp)
+      }
       if (mobileTapHandler) app.canvas.removeEventListener('pointerup', mobileTapHandler)
       if (machine.demoTimer) clearTimeout(machine.demoTimer)
+      if (machine.buggedTimer) clearTimeout(machine.buggedTimer)
       pool.flush()
       app.destroy(true, { children: true })
       // biome-ignore lint/suspicious/noExplicitAny: cleanup window globals

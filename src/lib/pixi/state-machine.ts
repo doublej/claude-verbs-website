@@ -1,6 +1,7 @@
 import type { VerbSet } from '$lib/data/types'
 
 export const SKIP_THRESHOLD = 4
+export const BUGGED_TIMEOUT_MS = 8_000
 
 export enum State {
   IDLE = 0,
@@ -34,6 +35,7 @@ export interface Machine {
   skipCount: number
   postIndex: number
   demoTimer: ReturnType<typeof setTimeout> | null
+  buggedTimer: ReturnType<typeof setTimeout> | null
   hasSubmitted: boolean
   tabCompleted: boolean
   mobile: boolean
@@ -48,6 +50,7 @@ export function createMachine(): Machine {
     skipCount: 0,
     postIndex: 0,
     demoTimer: null,
+    buggedTimer: null,
     hasSubmitted: false,
     tabCompleted: false,
     mobile: false,
@@ -72,6 +75,7 @@ export type DispatchEvent =
   | 'ESC'
   | 'SHIFT_TAB'
   | 'DEMO_TIMEOUT'
+  | 'BUGGED_TIMEOUT'
 
 interface Callbacks {
   enterState: (state: State) => void
@@ -174,6 +178,10 @@ function dispatchPostDemo(event: DispatchEvent, m: Machine, cb: Callbacks): void
   } else if (event === 'SHIFT_TAB') cb.enterState(State.BUGGED)
 }
 
+function dispatchBugged(event: DispatchEvent, m: Machine, cb: Callbacks): void {
+  if (event === 'ESC' || event === 'BUGGED_TIMEOUT') cb.enterState(m.previous)
+}
+
 export function dispatch(
   event: DispatchEvent,
   machine: Machine,
@@ -199,7 +207,7 @@ export function dispatch(
       if (event === 'ENTER') callbacks.enterState(State.IDLE)
       break
     case State.BUGGED:
-      if (event === 'ESC') callbacks.enterState(machine.previous)
+      dispatchBugged(event, machine, callbacks)
       break
   }
 }

@@ -53,6 +53,7 @@ export interface SceneRefs {
   deadPixelSprite: Sprite
   stuckPixelSprite: Sprite
   glareSprite: Sprite
+  breathingWrap: Container
   scrollZoomWrap: Container
   cameraMesh: MeshSimple
   cameraMeshBaseVerts: Float32Array
@@ -73,7 +74,7 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
   const padDH = dH + 2 * padY
 
   // Text objects
-  const styleMain = makeStyle(hexToNum(params.colorVerb), params)
+  const styleMain = makeStyle(hexToNum(params.colorVerbHighlight), params)
   const styleEllipsis = makeStyle(hexToNum(params.colorEllipsis), params)
   const styleMeta = makeStyle(PALETTE.suggestion, params)
   const styleHighlight = makeStyle(hexToNum(params.colorHighlight), params)
@@ -192,10 +193,12 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
     indices,
     label: 'camera',
   })
-  // Scroll-zoom wrapper (scale/pivot driven by scroll-zoom controller)
+  // Breathing wrapper (subtle scale pulse) → scroll-zoom wrapper (user scroll zoom)
+  const breathingWrap = new Container({ label: 'breathingWrap' })
   const scrollZoomWrap = new Container({ label: 'scrollZoomWrap' })
   scrollZoomWrap.addChild(cameraMesh)
-  app.stage.addChild(scrollZoomWrap)
+  breathingWrap.addChild(scrollZoomWrap)
+  app.stage.addChild(breathingWrap)
 
   // Dead pixels — rendered in display-texture space so they align with LCD grid cells
   const dpLayers = buildDeadPixelLayers(padDW, padDH, params.deadPixelsEnabled)
@@ -268,6 +271,7 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
     deadPixelSprite,
     stuckPixelSprite,
     glareSprite,
+    breathingWrap,
     scrollZoomWrap,
     cameraMesh,
     cameraMeshBaseVerts,

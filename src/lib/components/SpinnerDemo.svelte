@@ -70,7 +70,7 @@ onMount(() => {
   }
 
   .spinner__verb {
-    color: var(--text);
+    color: var(--accent);
     white-space: nowrap;
     overflow: hidden;
   }

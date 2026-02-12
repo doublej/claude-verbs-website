@@ -23,6 +23,13 @@ function unlock() {
   window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })
 }
 
+function lock() {
+  if (!revealed || mobile) return
+  revealed = false
+  scrollLocked = true
+  appHandle?.restartExperience()
+}
+
 $effect(() => {
   document.body.classList.toggle('scroll-locked', scrollLocked)
   return () => document.body.classList.remove('scroll-locked')
@@ -60,9 +67,17 @@ onMount(() => {
 
   observer.observe(document.documentElement, { attributes: true })
 
+  function onScroll() {
+    if (mobile || !revealed) return
+    if (window.scrollY <= 0) lock()
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true })
+
   return () => {
     appHandle?.cleanup()
     observer.disconnect()
+    window.removeEventListener('scroll', onScroll)
   }
 })
 </script>

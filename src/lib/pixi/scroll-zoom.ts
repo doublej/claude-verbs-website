@@ -8,6 +8,8 @@ const SCROLL_SENSITIVITY = 0.0015
 
 export interface ScrollZoomController {
   cleanup: () => void
+  enable: () => void
+  disable: () => void
 }
 
 export function createScrollZoomController(
@@ -70,10 +72,24 @@ export function createScrollZoomController(
     holdTimer = setTimeout(startEaseBack, HOLD_MS)
   }
 
+  let enabled = true
   window.addEventListener('wheel', onWheel, { passive: false })
 
   return {
     cleanup: () => {
+      enabled = false
+      window.removeEventListener('wheel', onWheel)
+      if (holdTimer) clearTimeout(holdTimer)
+      stopEase()
+    },
+    enable: () => {
+      if (enabled) return
+      enabled = true
+      window.addEventListener('wheel', onWheel, { passive: false })
+    },
+    disable: () => {
+      if (!enabled) return
+      enabled = false
       window.removeEventListener('wheel', onWheel)
       if (holdTimer) clearTimeout(holdTimer)
       stopEase()

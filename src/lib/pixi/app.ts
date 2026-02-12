@@ -83,6 +83,8 @@ interface AppOptions {
 export interface AppHandle {
   cleanup: () => void
   disableScrollZoom: () => void
+  enableScrollZoom: () => void
+  restartExperience: () => void
 }
 
 export async function createApp(
@@ -357,6 +359,25 @@ export async function createApp(
 
   if (location.hostname === 'localhost') toggleDevtools()
 
+  function restartExperience(): void {
+    if (mobile) return
+    destroyBootAnim(bootAnim)
+    machine.current = State.IDLE
+    machine.previous = State.IDLE
+    machine.activeSet = null
+    machine.browseIndex = 0
+    machine.skipCount = 0
+    machine.postIndex = 0
+    machine.hasSubmitted = false
+    machine.tabCompleted = false
+    if (machine.demoTimer) {
+      clearTimeout(machine.demoTimer)
+      machine.demoTimer = null
+    }
+    scrollZoomCtrl?.enable()
+    enterState(State.BOOT)
+  }
+
   return {
     cleanup: () => {
       destroyed = true
@@ -374,6 +395,8 @@ export async function createApp(
       // biome-ignore lint/suspicious/noExplicitAny: cleanup window globals
       ;(window as any).__PIXI_DEVTOOLS__ = undefined
     },
-    disableScrollZoom: () => scrollZoomCtrl?.cleanup(),
+    disableScrollZoom: () => scrollZoomCtrl?.disable(),
+    enableScrollZoom: () => scrollZoomCtrl?.enable(),
+    restartExperience,
   }
 }

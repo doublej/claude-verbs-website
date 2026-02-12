@@ -20,7 +20,9 @@ export interface TickerState {
   lastVerbTime: number
   lastTokenTime: number
   lastScrollTime: number
+  lastClockTime: number
   layoutDirty: boolean
+  statusDirty: boolean
   stateDiagramShown: boolean
   promoShown: boolean
 }
@@ -36,7 +38,9 @@ export function createTickerState(): TickerState {
     lastVerbTime: 0,
     lastTokenTime: 0,
     lastScrollTime: 0,
+    lastClockTime: 0,
     layoutDirty: true,
+    statusDirty: true,
     stateDiagramShown: false,
     promoShown: false,
   }
@@ -87,13 +91,20 @@ export function tickScroll(
     ts.layoutDirty = true
   }
 
-  s.statusText.text = `\u2026/claude-verbs-website   main *5   [${stateName(machine.current)}]`
-  s.permsText.text =
-    '\u23f5\u23f5 bypass permissions on (shift+tab to cycle) \u00b7 5 files +322 -66'
+  if (ts.statusDirty) {
+    s.statusText.text = `\u2026/claude-verbs-website   main *5   [${stateName(machine.current)}]`
+    s.permsText.text =
+      '\u23f5\u23f5 bypass permissions on (shift+tab to cycle) \u00b7 5 files +322 -66'
+    ts.statusDirty = false
+  }
 }
 
-export function tickClock(s: SceneRefs): void {
-  const d = new Date()
+const CLOCK_THROTTLE_MS = 100
+
+export function tickClock(now: number, ts: TickerState, s: SceneRefs): void {
+  if (now - ts.lastClockTime < CLOCK_THROTTLE_MS) return
+  ts.lastClockTime = now
+  const d = new Date(now)
   const hh = String(d.getHours()).padStart(2, '0')
   const mm = String(d.getMinutes()).padStart(2, '0')
   const ss = String(d.getSeconds()).padStart(2, '0')

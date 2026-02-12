@@ -100,7 +100,7 @@ export function createParams(): Params {
     flickerGhostAlphaMin: 0.3,
     bloomEnabled: true,
     bloomStrength: 2,
-    bloomQuality: 4,
+    bloomQuality: 2,
     brightness: 1,
     saturation: 1,
     exposure: 1,

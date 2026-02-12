@@ -9,6 +9,7 @@ export enum State {
   POST_DEMO = 3,
   BUGGED = 4,
   BOOT = 5,
+  BOOT_READY = 6,
 }
 
 const STATE_NAMES: Record<State, string> = {
@@ -18,6 +19,7 @@ const STATE_NAMES: Record<State, string> = {
   [State.POST_DEMO]: 'POST_DEMO',
   [State.BUGGED]: 'BUGGED',
   [State.BOOT]: 'BOOT',
+  [State.BOOT_READY]: 'BOOT_READY',
 }
 
 export function stateName(s: State): string {
@@ -192,6 +194,9 @@ export function dispatch(
       break
     case State.POST_DEMO:
       dispatchPostDemo(event, machine, callbacks)
+      break
+    case State.BOOT_READY:
+      if (event === 'ENTER') callbacks.enterState(State.IDLE)
       break
     case State.BUGGED:
       if (event === 'ESC') callbacks.enterState(machine.previous)

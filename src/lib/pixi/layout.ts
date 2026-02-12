@@ -64,6 +64,8 @@ export function layout(
     scrollItems: (Text | Container)[]
     bottomChrome: Container
     inputContainer: Container
+    bootOutputText: Text
+    bootHintText: Text
     verbText: Text
     ellipsisText: Text
     ruleTop: Text
@@ -117,10 +119,14 @@ export function layout(
   ui.bottomChrome.x = leftX
   ui.bottomChrome.y = scrollY
 
-  if (machine.current === State.BOOT) {
+  if (machine.current === State.BOOT || machine.current === State.BOOT_READY) {
     ui.inputContainer.visible = true
     ui.inputContainer.x = leftX
     ui.inputContainer.y = Math.round(lh)
+    ui.bootOutputText.x = 0
+    ui.bootOutputText.y = Math.round(lh * 1.5)
+    ui.bootHintText.x = 0
+    ui.bootHintText.y = Math.round(lh * 0.2)
     ui.scrollContainer.visible = false
     ui.spinnerLine.visible = false
     ui.metaLine.visible = false

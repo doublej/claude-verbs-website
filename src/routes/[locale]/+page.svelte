@@ -123,24 +123,32 @@ onMount(() => {
 				<div class="step">
 					<div class="step__num">1</div>
 					<div class="step__label">Fork</div>
-					<p class="step__desc">Fork the repo and clone it locally</p>
+					<p class="step__desc">Fork doublej/claude-verbs and clone it locally</p>
 				</div>
 				<div class="step">
 					<div class="step__num">2</div>
 					<div class="step__label">Create</div>
-					<p class="step__desc">Add a JSON file in sets/&lt;lang&gt;/ with your verbs</p>
+					<p class="step__desc">Add your JSON file in the claude-verbs repo root</p>
 				</div>
 				<div class="step">
 					<div class="step__num">3</div>
 					<div class="step__label">PR</div>
-					<p class="step__desc">Open a pull request and share it with the community</p>
+					<p class="step__desc">Open a pull request in doublej/claude-verbs</p>
 				</div>
 			</div>
 			<div class="contribute__link">
-				<a href="https://github.com/doublej/claude-verbs-cli/blob/main/CONTRIBUTING.md">
+				<a
+					href="https://github.com/doublej/claude-verbs/blob/main/CONTRIBUTING.md"
+					target="_blank"
+					rel="noopener"
+				>
 					Read the Contributing Guide
 				</a>
 			</div>
+			<p class="contribute__note">
+				Include an author manifest in your PR description: GitHub profile URL, top 3 projects,
+				and a generic one-sentence description.
+			</p>
 		</div>
 	</section>
 </main>
@@ -344,6 +352,15 @@ onMount(() => {
 	.contribute__link a:hover {
 		background: color-mix(in srgb, var(--accent) 20%, transparent);
 		border-color: var(--accent);
+	}
+
+	.contribute__note {
+		text-align: center;
+		color: var(--text-faint);
+		font-size: 0.72rem;
+		max-width: 720px;
+		margin: 1rem auto 0;
+		line-height: 1.6;
 	}
 
 	footer {

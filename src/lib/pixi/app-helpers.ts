@@ -47,9 +47,7 @@ function updateIdleSuggestion(
       : ''
   s.promptText.text = `\u276f ${label}${hint}`
   s.promptText.style.fill = machine.tabCompleted ? PALETTE.active : PALETTE.suggestion
-  s.statusText.text = `\u2026/claude-verbs-website   main *5   [${stateName(machine.current)}]`
-  s.permsText.text =
-    '\u23f5\u23f5 bypass permissions on (shift+tab to cycle) \u00b7 5 files +322 -66'
+  ts.statusDirty = true
   ts.layoutDirty = true
 }
 
@@ -128,6 +126,7 @@ export function resetDemoState(
     if ('style' in scrollItems[i]) pool.release(scrollItems[i] as Text)
   }
   scrollItems.length = 0
+  ts.statusDirty = true
   ts.layoutDirty = true
 }
 
@@ -231,6 +230,8 @@ export function syncFontSize(
     s.metaText,
     s.caretText,
     s.inputText,
+    s.bootOutputText,
+    s.bootHintText,
     s.ruleTop,
     s.promptText,
     s.ruleBottom,
@@ -262,4 +263,8 @@ export function syncResolution(app: Application, s: SceneRefs, params: Params): 
   s.contentH = dH
   s.padY = padY
   s.lcdFilter.enabled = params.lcdEnabled
+  if (s.display.filterArea) {
+    s.display.filterArea.width = padDW
+    s.display.filterArea.height = padDH
+  }
 }

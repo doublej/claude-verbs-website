@@ -39,9 +39,7 @@ export function randInt(lo: number, hi: number): number {
 }
 
 export function repeat(ch: string, n: number): string {
-  let s = ''
-  for (let i = 0; i < n; i++) s += ch
-  return s
+  return n > 0 ? ch.repeat(n) : ''
 }
 
 export function makeStyle(color: number, params: Params) {

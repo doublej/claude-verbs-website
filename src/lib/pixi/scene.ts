@@ -6,6 +6,7 @@ import {
   type Filter,
   Graphics,
   MeshSimple,
+  Rectangle,
   RenderTexture,
   Sprite,
   Text,
@@ -38,6 +39,8 @@ export interface SceneRefs {
   metaText: Text
   caretText: Text
   inputText: Text
+  bootOutputText: Text
+  bootHintText: Text
   ruleTop: Text
   promptText: Text
   ruleBottom: Text
@@ -102,7 +105,17 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
     label: 'inputText',
   })
   inputText.x = Math.round(caretText.width)
-  inputContainer.addChild(caretText, inputText)
+  const bootOutputText = new Text({
+    text: '',
+    style: makeStyle(PALETTE.dim, params),
+    label: 'bootOutput',
+  })
+  const bootHintText = new Text({
+    text: '',
+    style: makeStyle(PALETTE.prompt, params),
+    label: 'bootHint',
+  })
+  inputContainer.addChild(caretText, inputText, bootOutputText, bootHintText)
 
   // Bottom chrome
   const ruleTop = new Text({ text: '', style: makeStyle(PALETTE.border, params), label: 'ruleTop' })
@@ -153,6 +166,7 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
   })
 
   display.filters = [lcdFilter, bloomFilter, adjustmentFilter]
+  display.filterArea = new Rectangle(0, 0, padDW, padDH)
   display.addChild(terminal)
 
   // Add display to stage for devtools visibility, but skip during main render
@@ -240,6 +254,8 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
     metaText,
     caretText,
     inputText,
+    bootOutputText,
+    bootHintText,
     ruleTop,
     promptText,
     ruleBottom,

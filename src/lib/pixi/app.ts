@@ -130,7 +130,7 @@ export async function createApp(
       onMarketplace: options?.onMarketplace,
     })
 
-  const updateCamera = () =>
+  const flushCamera = () =>
     applyCamera(
       app.screen.width,
       app.screen.height,
@@ -139,6 +139,10 @@ export async function createApp(
       s.cameraMeshVerts,
       () => s.cameraMesh.geometry.getBuffer('aPosition').update(),
     )
+
+  const updateCamera = () => {
+    cameraDirty = true
+  }
 
   function updateSuggestion(): void {
     updateSuggestionUI(machine, localeSets, idiotSet, s, ts)
@@ -152,10 +156,17 @@ export async function createApp(
     machine.demoTimer = setTimeout(() => doDispatch('DEMO_TIMEOUT'), params.demoTimeoutMs)
   }
 
+  function clearBootTexts(): void {
+    s.bootOutputText.text = ''
+    s.bootHintText.text = ''
+  }
+
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: multi-state entry dispatch
   function enterState(state: State): void {
-    if (machine.current === State.BOOT) {
+    if (machine.current === State.BOOT || machine.current === State.BOOT_READY) {
       destroyBootAnim(bootAnim)
-      removeIntroRows(introCount, s, scrollItems, ts)
+      clearBootTexts()
+      if (state !== State.BOOT_READY) removeIntroRows(introCount, s, scrollItems, ts)
     }
     exitCurrentState(machine)
     machine.previous = machine.current
@@ -173,20 +184,29 @@ export async function createApp(
           s.inputText.text = t
           s.inputText.style.fill = PALETTE.active
         },
-        onDone: () => enterState(State.IDLE),
+        setOutput: (t) => {
+          s.bootOutputText.text = t
+        },
+        setHint: (t) => {
+          s.bootHintText.text = t
+        },
+        onReady: () => enterState(State.BOOT_READY),
       })
     } else {
       applyStateEntry(state, machine, updateSuggestion, startDemo)
     }
     zoomCtrl?.applyJumpcut(state)
     ts.layoutDirty = true
+    ts.statusDirty = true
   }
 
   syncResolution(app, s, params)
-  updateCamera()
+  flushCamera()
 
   const zoomCtrl = mobile ? null : createZoomController(params, updateCamera, s, app.screen.height)
   const scrollZoomCtrl = mobile ? null : createScrollZoomController(s.scrollZoomWrap, app.canvas)
+
+  let cameraDirty = true
 
   const mouseState = {
     x: 0.5,
@@ -232,11 +252,15 @@ export async function createApp(
       params.mouseTranslateX = mouseState.currentTX
       params.mouseTranslateY = mouseState.currentTY
       params.mouseZoom = mouseState.currentZoom
+      cameraDirty = true
     }
-    updateCamera()
+    if (cameraDirty) {
+      flushCamera()
+      cameraDirty = false
+    }
 
     tickSpinner(now, ts, s, params)
-    tickClock(s)
+    tickClock(now, ts, s)
     tickScroll(now, ts, s, machine, params, lineBuffer, bufState, scrollItems, pool, lctx)
     if (
       machine.current === State.DEMO ||

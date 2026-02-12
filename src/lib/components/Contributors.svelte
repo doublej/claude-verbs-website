@@ -9,7 +9,7 @@ const { usernames, authors }: { usernames: string[]; authors: Authors } = $props
   <p class="contributors__sub">
     Want to be listed here?
     <a href="https://github.com/doublej/claude-verbs/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">
-      Add your username to contributors.json
+      Submit a verb set PR in doublej/claude-verbs
     </a>
   </p>
   <div class="contributors__list">

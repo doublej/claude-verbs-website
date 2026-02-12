@@ -7,6 +7,7 @@ default:
 
 [group('setup')]
 install:
+    git submodule update --init
     bun install
 
 [group('develop')]

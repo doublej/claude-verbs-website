@@ -21,6 +21,7 @@ const STATE_KEY: Record<State, keyof typeof SEQUENCE.zoom.states> = {
   [State.DEMO]: 'DEMO',
   [State.POST_DEMO]: 'POST_DEMO',
   [State.BUGGED]: 'BUGGED',
+  [State.BOOT_READY]: 'BOOT_READY',
 }
 
 function resolveYPosition(focusY: number | string, s: SceneRefs, screenH: number): number {

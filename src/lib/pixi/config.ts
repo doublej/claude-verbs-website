@@ -5,8 +5,8 @@ export const SEQUENCE = {
     preBlinkMs: 800,
     blinkMs: 530,
     postTypeMs: 200,
-    loadMs: 1500,
-    postLoadMs: 600,
+    detectLineMs: 120,
+    postDetectMs: 400,
   },
   zoom: {
     baseLine: { target: 0.75, durationMs: 25000 },
@@ -18,6 +18,7 @@ export const SEQUENCE = {
       DEMO: { zoom: 0.8, focusY: 'spinner' as const, durationMs: 250 },
       POST_DEMO: { zoom: 1, focusY: 'prompt' as const, durationMs: 200 },
       BUGGED: { zoom: 0.65, focusY: 'center' as const, durationMs: 100 },
+      BOOT_READY: { zoom: 1.6, focusY: 'center' as const, durationMs: 200 },
     },
   },
   burst: {

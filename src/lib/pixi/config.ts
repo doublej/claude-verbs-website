@@ -89,6 +89,8 @@ export const SEQUENCE = {
       },
       BUGGED: {},
       ESC_COUNTDOWN: {
+        focusY: { line: 10, char: 40 },
+
         durationMs: 0,
         scale: 1,
         brightness: 1,

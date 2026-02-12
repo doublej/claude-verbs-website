@@ -18,7 +18,7 @@ function makeSet(name: string, description = `${name} themed verbs`) {
     displayName: name.toUpperCase(),
     description,
     author: 'JJ',
-    github: 'jurrejan',
+    github: 'doublej',
     language: 'en_US',
     category: 'entertainment',
     config: {

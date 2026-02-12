@@ -15,6 +15,7 @@ import {
 import { type BootAnim, createBootAnim, destroyBootAnim, runBootAnim } from './boot'
 import { applyCamera } from './camera'
 import { MOUSE_DEFAULTS, PALETTE } from './constants'
+import { createBreathingState, tickBreathing } from './effects/breathing'
 import { createFlickerState } from './effects/flicker'
 import type { LineDef } from './events'
 import { createLineBuffer } from './events'
@@ -113,6 +114,7 @@ export async function createApp(
   const machine = createMachine()
   machine.mobile = mobile
   const flicker = createFlickerState()
+  const breathing = createBreathingState()
   const lctx = createLayoutCtx(s.chW, params.fontSize, params.lineHeightOffset)
   const ts = createTickerState()
 
@@ -272,6 +274,8 @@ export async function createApp(
       tickDemo(now, ts, s, params, lctx)
     tickLayout(ts, s, params, machine, lctx, scrollItems, pool)
     tickFlicker(s, machine, params, flicker, lctx)
+    if (!mobile)
+      tickBreathing(breathing, s.scrollZoomWrap, now, app.screen.width, app.screen.height)
     s.display.renderable = true
     app.renderer.render({ container: s.display, target: s.displayRT })
     s.display.renderable = false

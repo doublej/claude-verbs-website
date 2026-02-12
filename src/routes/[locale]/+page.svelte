@@ -91,7 +91,7 @@ onMount(() => {
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 	<link
-		href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+		href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
 		rel="stylesheet"
 	/>
 </svelte:head>
@@ -104,14 +104,14 @@ onMount(() => {
 
 <main>
 	<section class="gallery" aria-label="Verb set gallery">
-		<div class="container">
+		<div class="page-frame">
 			<h2 class="section-heading">Browse Sets</h2>
 			<Gallery sets={data.sets} authors={data.authors} preferredLang={data.preferredLang} />
 		</div>
 	</section>
 
 	<section class="install" aria-label="Installation instructions">
-		<div class="container">
+		<div class="page-frame">
 			<h2 class="section-heading">Install</h2>
 			<div class="terminal" role="img" aria-label="Terminal showing install commands">
 				<div class="terminal__bar" aria-hidden="true">
@@ -131,7 +131,7 @@ onMount(() => {
 	</section>
 
 	<section class="contribute" aria-label="Contribute your own set">
-		<div class="container">
+		<div class="page-frame">
 			<h2 class="section-heading">Create Your Own</h2>
 			<p class="contribute__sub">Got a theme in mind? Adding a set takes just three steps.</p>
 			<div class="steps">
@@ -169,7 +169,7 @@ onMount(() => {
 </main>
 
 <footer>
-	<div class="container">
+	<div class="page-frame">
 		<span>Made with <span aria-label="cursor">_</span> by JJ</span>
 		<span class="footer__sep">|</span>
 		<a href="https://github.com/doublej/claude-verbs">GitHub</a>
@@ -195,7 +195,13 @@ onMount(() => {
 	}
 	:global(body.scroll-locked) { overflow: hidden; }
 
-	.container { max-width: var(--max-w); margin: 0 auto; padding: 0 1.5rem; }
+	.page-frame {
+		max-width: var(--max-w);
+		margin: 0 auto;
+		padding: 0 1.5rem;
+		border-left: 0.5px solid var(--border-subtle);
+		border-right: 0.5px solid var(--border-subtle);
+	}
 
 	/* ---- Canvas ---- */
 
@@ -262,13 +268,13 @@ onMount(() => {
 
 	section { padding: 4rem 0; }
 	.section-heading {
-		font-size: 1.5rem;
+		font-family: var(--display);
+		font-size: clamp(2rem, 5vw, 3.5rem);
 		font-weight: 700;
 		color: var(--text);
 		margin-bottom: 2rem;
 		text-align: center;
 	}
-	.section-heading::before { content: '# '; color: var(--text-faint); }
 
 	/* ---- Terminal ---- */
 
@@ -292,16 +298,8 @@ onMount(() => {
 		border-bottom: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
 	}
 
-	.terminal__dot {
-		width: 10px;
-		height: 10px;
-		border-radius: 0;
-		background: var(--border);
-	}
-
-	.terminal__dot--red { background: var(--text-faint); }
-	.terminal__dot--yellow { background: var(--text-faint); }
-	.terminal__dot--green { background: var(--text-faint); }
+	.terminal__dot { width: 10px; height: 10px; border-radius: 0; background: var(--border); }
+	.terminal__dot--red, .terminal__dot--yellow, .terminal__dot--green { background: var(--text-faint); }
 	.terminal__body { padding: 1.25rem; font-size: 0.82rem; line-height: 2; }
 	.terminal__line::before { content: '$ '; color: var(--accent); }
 	.terminal__comment { color: var(--text-faint); }
@@ -321,16 +319,12 @@ onMount(() => {
 	}
 
 	.step {
-		background: color-mix(in srgb, var(--bg-raised) 70%, transparent);
-		border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
-		border-radius: 0;
 		padding: 1.25rem;
 		text-align: center;
-		backdrop-filter: blur(8px);
-		-webkit-backdrop-filter: blur(8px);
 	}
 
 	.step__num {
+		font-family: var(--display);
 		font-size: 1.5rem;
 		font-weight: 700;
 		color: var(--accent);
@@ -369,22 +363,9 @@ onMount(() => {
 		border-color: var(--accent);
 	}
 
-	.contribute__note {
-		text-align: center;
-		color: var(--text-faint);
-		font-size: 0.72rem;
-		max-width: 720px;
-		margin: 1rem auto 0;
-		line-height: 1.6;
-	}
+	.contribute__note { text-align: center; color: var(--text-faint); font-size: 0.72rem; max-width: 720px; margin: 1rem auto 0; line-height: 1.6; }
 
-	footer {
-		position: relative;
-		padding: 2rem 0 4rem;
-		text-align: center;
-		font-size: 0.75rem;
-		color: var(--text-faint);
-	}
+	footer { position: relative; padding: 2rem 0 4rem; text-align: center; font-size: 0.75rem; color: var(--text-faint); }
 
 	footer a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
 	footer a:hover { color: var(--accent); }
@@ -399,5 +380,9 @@ onMount(() => {
 	@media (max-width: 600px) {
 		section { padding: 2.5rem 0; }
 		.steps { grid-template-columns: 1fr; }
+		.page-frame {
+			border-left: none;
+			border-right: none;
+		}
 	}
 </style>

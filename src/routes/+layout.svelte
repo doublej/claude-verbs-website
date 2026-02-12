@@ -21,6 +21,7 @@ $effect(() => {
 <style>
   :global(:root) {
     --mono: 'Space Mono', 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    --display: 'Space Grotesk', system-ui, sans-serif;
     --max-w: 960px;
   }
 
@@ -37,6 +38,7 @@ $effect(() => {
     --accent-dim: rgba(74, 222, 128, 0.15);
     --cyan: #fbbf24;
     --bg-home: #0d1117;
+    --border-subtle: rgba(255, 255, 255, 0.08);
     --disclaimer-bg: #000;
     --disclaimer-text: #888;
   }
@@ -54,6 +56,7 @@ $effect(() => {
     --accent-dim: rgba(22, 163, 74, 0.15);
     --cyan: #ca8a04;
     --bg-home: #f5f5f5;
+    --border-subtle: rgba(0, 0, 0, 0.08);
     --disclaimer-bg: #e5e7eb;
     --disclaimer-text: #6b7280;
   }

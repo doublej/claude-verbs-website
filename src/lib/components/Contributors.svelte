@@ -44,15 +44,11 @@ const { usernames, authors }: { usernames: string[]; authors: Authors } = $props
   }
 
   .contributors__title {
-    font-size: 1rem;
+    font-family: var(--display);
+    font-size: clamp(1.5rem, 3vw, 2rem);
     font-weight: 700;
     color: var(--text);
     margin-bottom: 0.5rem;
-  }
-
-  .contributors__title::before {
-    content: '## ';
-    color: var(--text-faint);
   }
 
   .contributors__sub {

@@ -15,13 +15,13 @@ const { data }: { data: PageData } = $props()
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
   <link
-    href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
     rel="stylesheet"
   />
 </svelte:head>
 
 <header class="hero">
-  <div class="container">
+  <div class="page-frame">
     <h1 class="hero__title">Claude Verbs</h1>
     <p class="hero__tagline">Themed spinner verb sets for Claude Code</p>
     <p class="hero__desc">
@@ -35,15 +35,15 @@ const { data }: { data: PageData } = $props()
 
 <main>
   <section class="gallery" aria-label="Verb set gallery">
-    <div class="container">
-      <h2 class="gallery__heading">Browse Sets</h2>
+    <div class="page-frame">
+      <h2 class="section-heading">Browse Sets</h2>
       <Gallery sets={data.sets} authors={data.authors} preferredLang={data.preferredLang} />
     </div>
   </section>
 
   <section class="install" aria-label="Installation instructions">
-    <div class="container">
-      <h2 class="install__heading">Install</h2>
+    <div class="page-frame">
+      <h2 class="section-heading">Install</h2>
       <div class="terminal" role="img" aria-label="Terminal showing install commands">
         <div class="terminal__bar" aria-hidden="true">
           <span class="terminal__dot terminal__dot--red"></span>
@@ -62,8 +62,8 @@ const { data }: { data: PageData } = $props()
   </section>
 
   <section class="contribute" aria-label="Contribute your own set">
-    <div class="container">
-      <h2 class="contribute__heading">Create Your Own</h2>
+    <div class="page-frame">
+      <h2 class="section-heading">Create Your Own</h2>
       <p class="contribute__sub">Got a theme in mind? Adding a set takes just three steps.</p>
       <div class="steps">
         <div class="step">
@@ -99,14 +99,14 @@ const { data }: { data: PageData } = $props()
   </section>
 
   <section class="contributors-section" aria-label="Contributors">
-    <div class="container">
+    <div class="page-frame">
       <Contributors usernames={data.contributors} authors={data.authors} />
     </div>
   </section>
 </main>
 
 <footer>
-  <div class="container">
+  <div class="page-frame">
     <span>Made with <span aria-label="cursor">_</span> by JJ</span>
     <span class="footer__sep">|</span>
     <a href="https://github.com/doublej/claude-verbs">GitHub</a>
@@ -132,10 +132,12 @@ const { data }: { data: PageData } = $props()
     -webkit-font-smoothing: antialiased;
   }
 
-  .container {
+  .page-frame {
     max-width: var(--max-w);
     margin: 0 auto;
     padding: 0 1.5rem;
+    border-left: 0.5px solid var(--border-subtle);
+    border-right: 0.5px solid var(--border-subtle);
   }
 
   section {
@@ -150,16 +152,13 @@ const { data }: { data: PageData } = $props()
   }
 
   .hero__title {
-    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-family: var(--display);
+    font-size: clamp(4rem, 12vw, 8rem);
     font-weight: 700;
     color: var(--accent);
-    letter-spacing: -0.02em;
-    margin-bottom: 0.5rem;
-  }
-
-  .hero__title::before {
-    content: '> ';
-    color: var(--text-faint);
+    letter-spacing: -0.03em;
+    line-height: 0.9;
+    margin-bottom: 1rem;
   }
 
   .hero__tagline {
@@ -177,22 +176,18 @@ const { data }: { data: PageData } = $props()
     line-height: 1.7;
   }
 
-  /* ---- Gallery ---- */
+  /* ---- Sections ---- */
 
-  .gallery__heading,
-  .install__heading {
-    font-size: 1.5rem;
+  .section-heading {
+    font-family: var(--display);
+    font-size: clamp(2rem, 5vw, 3.5rem);
     font-weight: 700;
     color: var(--text);
     margin-bottom: 2rem;
     text-align: center;
   }
 
-  .gallery__heading::before,
-  .install__heading::before {
-    content: '# ';
-    color: var(--text-faint);
-  }
+  /* ---- Terminal ---- */
 
   .terminal {
     background: color-mix(in srgb, var(--bg-surface) 70%, transparent);
@@ -221,17 +216,9 @@ const { data }: { data: PageData } = $props()
     background: var(--border);
   }
 
-  .terminal__dot--red {
-    background: var(--text-faint);
-  }
-
-  .terminal__dot--yellow {
-    background: var(--text-faint);
-  }
-
-  .terminal__dot--green {
-    background: var(--text-faint);
-  }
+  .terminal__dot--red { background: var(--text-faint); }
+  .terminal__dot--yellow { background: var(--text-faint); }
+  .terminal__dot--green { background: var(--text-faint); }
 
   .terminal__body {
     padding: 1.25rem;
@@ -258,19 +245,6 @@ const { data }: { data: PageData } = $props()
     padding-top: 2rem;
   }
 
-  .contribute__heading {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 1rem;
-    text-align: center;
-  }
-
-  .contribute__heading::before {
-    content: '# ';
-    color: var(--text-faint);
-  }
-
   .contribute__sub {
     text-align: center;
     color: var(--text-muted);
@@ -287,16 +261,12 @@ const { data }: { data: PageData } = $props()
   }
 
   .step {
-    background: color-mix(in srgb, var(--bg-raised) 70%, transparent);
-    border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
-    border-radius: 0;
     padding: 1.25rem;
     text-align: center;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
   }
 
   .step__num {
+    font-family: var(--display);
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--accent);
@@ -380,6 +350,15 @@ const { data }: { data: PageData } = $props()
 
     .hero {
       padding: 3.5rem 0 2.5rem;
+    }
+
+    .hero__title {
+      font-size: clamp(2.5rem, 12vw, 4rem);
+    }
+
+    .page-frame {
+      border-left: none;
+      border-right: none;
     }
 
     .steps {

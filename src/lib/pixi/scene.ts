@@ -15,9 +15,9 @@ import {
 import { createMeshGeometry } from './camera'
 import { FONT_FAMILY, PALETTE } from './constants'
 import { buildDeadPixelLayers } from './effects/dead-pixels'
-import { buildGlareCanvas } from './effects/glare'
+import { type DofFilter, createDofFilter } from './effects/dof'
 import { createLcdFilter } from './effects/lcd'
-import { hexToNum, makeStyle } from './helpers'
+import { countColumns, hexToNum, makeStyle } from './helpers'
 import type { Params } from './params'
 
 export interface SceneRefs {
@@ -50,9 +50,9 @@ export interface SceneRefs {
   lcdFilter: Filter
   bloomFilter: BloomFilter
   adjustmentFilter: AdjustmentFilter
+  dofFilter: DofFilter
   deadPixelSprite: Sprite
   stuckPixelSprite: Sprite
-  glareSprite: Sprite
   breathingWrap: Container
   scrollZoomWrap: Container
   cameraMesh: MeshSimple
@@ -105,7 +105,6 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
     style: makeStyle(PALETTE.suggestion, params),
     label: 'inputText',
   })
-  inputText.x = Math.round(caretText.width)
   const bootOutputText = new Text({
     text: '',
     style: makeStyle(PALETTE.dim, params),
@@ -200,6 +199,9 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
   breathingWrap.addChild(scrollZoomWrap)
   app.stage.addChild(breathingWrap)
 
+  const dofFilter = createDofFilter()
+  breathingWrap.filters = [dofFilter]
+
   // Dead pixels — rendered in display-texture space so they align with LCD grid cells
   const dpLayers = buildDeadPixelLayers(padDW, padDH, params.deadPixelsEnabled)
   const deadPixelTexture = Texture.from({ resource: dpLayers.dark, scaleMode: 'nearest' })
@@ -218,16 +220,7 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
 
   display.addChild(deadPixelSprite, stuckPixelSprite)
 
-  const glareCanvas = buildGlareCanvas(screenW, screenH)
-  const glareTexture = Texture.from({ resource: glareCanvas, scaleMode: 'linear' })
-  const glareSprite = new Sprite({ texture: glareTexture, label: 'glare' })
-  glareSprite.blendMode = 'screen'
-  glareSprite.alpha = params.glareOpacity
-  glareSprite.x = screenW - glareSprite.width * 0.4
-  glareSprite.y = -screenH * 0.1
-
   const overlayContainer = new Container({ label: 'overlays' })
-  overlayContainer.addChild(glareSprite)
   scrollZoomWrap.addChild(overlayContainer)
 
   // Measure char width
@@ -237,6 +230,7 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
   })
   const chW = chMetric.width
   chMetric.destroy()
+  inputText.x = Math.round(countColumns(caretText.text) * chW)
 
   return {
     app,
@@ -268,9 +262,9 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
     lcdFilter,
     bloomFilter,
     adjustmentFilter,
+    dofFilter,
     deadPixelSprite,
     stuckPixelSprite,
-    glareSprite,
     breathingWrap,
     scrollZoomWrap,
     cameraMesh,

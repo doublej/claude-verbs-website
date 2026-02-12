@@ -1,6 +1,7 @@
 import type { VerbSet } from '$lib/data/types'
 import type { Container, Text } from 'pixi.js'
 import { resetDemoState } from './app-helpers'
+import { countColumns } from './helpers'
 import type { LayoutCtx } from './layout'
 import type { Params } from './params'
 import type { SceneRefs } from './scene'
@@ -57,14 +58,16 @@ export function layoutMobile(
   ui.spinnerLine.visible = true
   ui.metaLine.visible = true
 
-  const spinnerW = col3 + ui.verbText.width + ui.ellipsisText.width + chW
+  const verbW = Math.round(countColumns(ui.verbText.text) * chW)
+  const ellipsisW = Math.round(countColumns(ui.ellipsisText.text) * chW)
+  const spinnerW = col3 + verbW + ellipsisW + Math.round(chW)
   const spinnerX = Math.max(0, Math.round((screenW - spinnerW) / 2))
   const spinnerY = Math.round(screenH / 2 - lh)
 
   ui.spinnerLine.x = spinnerX
   ui.spinnerLine.y = spinnerY
   ui.verbText.x = col3
-  ui.ellipsisText.x = ui.verbText.x + ui.verbText.width
+  ui.ellipsisText.x = ui.verbText.x + verbW
 
   ui.metaLine.x = spinnerX + col3
   ui.metaLine.y = spinnerY + 2 * lh

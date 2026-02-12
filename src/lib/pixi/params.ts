@@ -10,7 +10,6 @@ export interface Params {
   colorEllipsis: string
   bgColor: string
   colorHighlight: string
-  glareOpacity: number
   perspective: number
   rotateX: number
   rotateY: number
@@ -75,7 +74,6 @@ export function createParams(): Params {
     colorEllipsis: isLight ? '#737373' : '#a2a2a2',
     bgColor: isLight ? '#f5f5f5' : '#0d1117',
     colorHighlight: isLight ? '#e0d9c2' : '#56533e',
-    glareOpacity: 0,
     perspective: 3000, // CAMERA_DEFAULTS.perspective
     rotateX: 5, // CAMERA_DEFAULTS.rotateX
     rotateY: 8, // CAMERA_DEFAULTS.rotateY

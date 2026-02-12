@@ -2,9 +2,8 @@ import type { VerbSet, VerbSets } from '$lib/data/types'
 import { type Application, Container, Text, Texture } from 'pixi.js'
 import { FONT_FAMILY, LAYOUT, PALETTE } from './constants'
 import { buildDeadPixelLayers } from './effects/dead-pixels'
-import { buildGlareCanvas } from './effects/glare'
 import { buildHeaderRows } from './header'
-import { hexToNum, normalizeVerbs, shuffle } from './helpers'
+import { countColumns, hexToNum, normalizeVerbs, shuffle } from './helpers'
 import { buildIntroRows } from './intro'
 import type { LayoutCtx } from './layout'
 import { type Params, displaySize } from './params'
@@ -153,11 +152,6 @@ export function handleResize(
   s.stuckPixelSprite.texture = Texture.from({ resource: dpLayers.stuck, scaleMode: 'nearest' })
   s.stuckPixelSprite.width = rtW
   s.stuckPixelSprite.height = rtH
-  const gc = buildGlareCanvas(w, h)
-  s.glareSprite.texture.destroy(true)
-  s.glareSprite.texture = Texture.from({ resource: gc, scaleMode: 'nearest' })
-  s.glareSprite.x = w - s.glareSprite.texture.width * 0.4
-  s.glareSprite.y = -h * 0.1
   updateCamera()
 }
 
@@ -178,7 +172,7 @@ function addRows(
         style: { fontFamily: FONT_FAMILY, fontSize: params.fontSize, fill: part.color },
       })
       pt.x = xOff
-      xOff += pt.width
+      xOff += Math.round(countColumns(part.text) * lctx.chW)
       rowContainer.addChild(pt)
     }
     s.scrollContainer.addChild(rowContainer)
@@ -249,6 +243,7 @@ export function syncFontSize(
   lctx.chW = m.width
   lctx.lineHeight = Math.round(params.fontSize * LAYOUT.lineHeightRatio) + params.lineHeightOffset
   m.destroy()
+  s.inputText.x = Math.round(countColumns(s.caretText.text) * lctx.chW)
 }
 
 export function syncResolution(app: Application, s: SceneRefs, params: Params): void {

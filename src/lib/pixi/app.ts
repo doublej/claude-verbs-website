@@ -15,11 +15,12 @@ import { type BootAnim, createBootAnim, destroyBootAnim, runBootAnim } from './b
 import { applyCamera } from './camera'
 import { MOUSE_DEFAULTS, PALETTE } from './constants'
 import { createBreathingState, tickBreathing } from './effects/breathing'
+import { updateDofUniforms } from './effects/dof'
 import { createFlickerState } from './effects/flicker'
 import { type EscSkip, createEscSkip, escKeyDown, escKeyUp, resetEsc, tickEsc } from './esc-skip'
 import type { LineDef } from './events'
 import { createLineBuffer } from './events'
-import { hexToNum, shuffle } from './helpers'
+import { countColumns, hexToNum, shuffle } from './helpers'
 import { createLayoutCtx } from './layout'
 import { applyMobileOverrides, initMobileDemo, isMobile } from './mobile'
 import { createParams, displaySize } from './params'
@@ -95,6 +96,7 @@ export interface AppHandle {
   disableScrollZoom: () => void
   enableScrollZoom: () => void
   restartExperience: () => void
+  setOverlapped: (v: boolean) => void
 }
 
 export async function createApp(
@@ -199,7 +201,7 @@ export async function createApp(
         setPrompt: (t) => {
           s.caretText.text = t
           s.caretText.style.fill = PALETTE.prompt
-          s.inputText.x = Math.round(s.caretText.width)
+          s.inputText.x = Math.round(countColumns(s.caretText.text) * lctx.chW)
         },
         setInput: (t) => {
           s.inputText.text = t
@@ -293,30 +295,41 @@ export async function createApp(
     tickLayout(ts, s, params, machine, lctx, scrollItems, pool)
     tickFlicker(s, machine, params, flicker, lctx)
     if (!mobile) tickBreathing(breathing, s.breathingWrap, now, app.screen.width, app.screen.height)
-    if (
-      escSkip.activated &&
-      (machine.current === State.BOOT || machine.current === State.BOOT_READY)
-    ) {
+    if (escSkip.activated) {
       const p = tickEsc(escSkip)
       options?.onEscSkipProgress?.(p)
       if (p >= 1) {
-        enterState(State.IDLE)
+        resetEsc(escSkip)
         options?.onMarketplace?.()
       }
     }
+
+    const dofTarget = machine.overlapped ? 1 : 0
+    const dofDelta = dofTarget - s.dofFilter._strength
+    if (Math.abs(dofDelta) > 0.001) {
+      s.dofFilter._strength += dofDelta * 0.04
+      s.dofFilter.enabled = s.dofFilter._strength > 0.01
+      updateDofUniforms(s.dofFilter)
+    } else if (s.dofFilter._strength !== dofTarget) {
+      s.dofFilter._strength = dofTarget
+      s.dofFilter.enabled = dofTarget > 0
+      updateDofUniforms(s.dofFilter)
+    }
+
     s.display.renderable = true
     app.renderer.render({ container: s.display, target: s.displayRT })
     s.display.renderable = false
   })
 
   const onKeyDown = (e: KeyboardEvent) => {
-    if (
-      e.key === 'Escape' &&
-      (machine.current === State.BOOT || machine.current === State.BOOT_READY)
-    ) {
+    if (e.key === 'Escape') {
       e.preventDefault()
       const justActivated = escKeyDown(escSkip, e.repeat)
       if (justActivated) options?.onEscSkipActivated?.()
+      if (!escSkip.activated) {
+        const mapped = KEY_MAP[e.key]
+        if (mapped) doDispatch(mapped)
+      }
       return
     }
     const mapped = KEY_MAP[e.key]
@@ -377,7 +390,6 @@ export async function createApp(
   function syncParamsToScene(): void {
     if (destroyed) return
     updateCamera()
-    s.glareSprite.alpha = params.glareOpacity
     s.lcdFilter.enabled = params.lcdEnabled
     s.bloomFilter.enabled = params.bloomEnabled
     s.bloomFilter.strengthX = params.bloomStrength
@@ -401,7 +413,7 @@ export async function createApp(
     if (devtoolsLoaded) return
     devtoolsLoaded = true
     const { initDevtools } = await import('./devtools')
-    initDevtools(params, syncParamsToScene)
+    initDevtools(params, s.dofFilter, syncParamsToScene)
   }
 
   if (location.hostname === 'localhost') toggleDevtools()
@@ -426,6 +438,7 @@ export async function createApp(
       clearTimeout(machine.buggedTimer)
       machine.buggedTimer = null
     }
+    machine.overlapped = false
     scrollZoomCtrl?.enable()
     enterState(State.BOOT)
   }
@@ -455,5 +468,8 @@ export async function createApp(
     disableScrollZoom: () => scrollZoomCtrl?.disable(),
     enableScrollZoom: () => scrollZoomCtrl?.enable(),
     restartExperience,
+    setOverlapped: (v: boolean) => {
+      machine.overlapped = v
+    },
   }
 }

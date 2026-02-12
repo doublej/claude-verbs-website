@@ -1,6 +1,6 @@
 import { SEQUENCE } from './config'
 import { LAYOUT, PALETTE } from './constants'
-import { blankLine, pick, randInt, repeat } from './helpers'
+import { blankLine, countColumns, pick, randInt, repeat } from './helpers'
 import type { Params } from './params'
 
 export interface LineDef {
@@ -102,7 +102,7 @@ function mkBoxedPanel(): Event {
   const w = LAYOUT.panelWidth
   const lines: LineDef[] = [{ t: `\u256d${repeat('\u2500', w)}\u256e`, c: PALETTE.border, col: 1 }]
   for (const p of panel) {
-    const pad = w - p.length
+    const pad = w - countColumns(p)
     lines.push({
       t: `\u2502 ${p}${repeat(' ', Math.max(0, pad - 1))}\u2502`,
       c: PALETTE.border,

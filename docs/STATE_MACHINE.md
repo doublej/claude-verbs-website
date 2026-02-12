@@ -1,4 +1,4 @@
-# PixiJS Home Page: State Machine Architecture
+  cop# PixiJS Home Page: State Machine Architecture
 
 ## Overview
 
@@ -54,16 +54,17 @@ demoTimeoutMs: 60000 // Auto-exit demo after 60 seconds
               │            │ ENTER
               │            ▼
               │     ┌─────────────┐
-              │     │  DEMO (2)   │
-              │     └──────┬──────┘
-              │       ESC  │  DEMO_TIMEOUT (60s)
-              │            ▼
-        ESC   │     ┌─────────────┐
-     ┌────────┴────▶│POST_DEMO (3)│
-     │              └──────┬──────┘
-     │                     │ ENTER (action)
-     │                     ├─ copy command
-     │                     └─ navigate marketplace
+              │  ┌─▶│  DEMO (2)   │
+              │  │  └──────┬──────┘
+              │  │    ESC  │  DEMO_TIMEOUT (60s)
+              │  │         ▼
+        ESC   │  │  ┌─────────────┐
+     ┌────────┴──┼─▶│POST_DEMO (3)│
+     │           │  └──────┬──────┘
+     │           │         │ ENTER (action)
+     │           │         ├─ continue to marketplace
+     │           │         ├─ copy command
+     │           └─────────┴─ navigate more demos → IDLE
      │
      │              ╔═════════════╗
      └──────────────║ BUGGED (4) ║◀──── SHIFT_TAB from any state
@@ -72,6 +73,7 @@ demoTimeoutMs: 60000 // Auto-exit demo after 60 seconds
 
 Notes:
   • Arrow navigation enters BROWSING before demo selection
+  • POST_DEMO "navigate more demos" returns to IDLE for continuous browsing
   • All interactive states can transition to BUGGED via SHIFT_TAB
   • BUGGED uses double-line box to indicate special/easter egg status
 ```
@@ -116,12 +118,13 @@ Notes:
 ### POST_DEMO (3)
 **After demo, showing suggestions**
 
-Displays 2 action suggestions:
-1. `"copy command to get access to spinner verb cli"` → copies `bunx github:doublej/claude-verbs-cli install [name]` to clipboard
-2. `"show marketplace"` → navigates to `/marketplace` page
+Displays 3 action suggestions:
+1. `"continue to marketplace"` → navigates to `/marketplace` page
+2. `"copy command"` → copies `bunx github:doublej/claude-verbs-cli install [name]` to clipboard
+3. `"navigate more demos"` → returns to IDLE state to browse more verb sets
 
 - **ARROW_UP/DOWN** → cycles between suggestions
-- **ENTER** → executes selected action (stays in POST_DEMO state)
+- **ENTER** → executes selected action (marketplace/copy stay in POST_DEMO, browse returns to IDLE)
 - Shows hint: `"↑↓ browse · enter to select"`
 
 ### BUGGED (4)
@@ -150,9 +153,9 @@ Displays 2 action suggestions:
 | **DEMO** | ESC | POST_DEMO | Clear `demoTimer`, reset `postIndex` to 0 |
 | | DEMO_TIMEOUT | POST_DEMO | Auto-transition after 60s |
 | | SHIFT_TAB | BUGGED | Enable flicker effect, store previous state |
-| **POST_DEMO** | ENTER | POST_DEMO | Execute action (copy/navigate), stay in state |
+| **POST_DEMO** | ENTER | POST_DEMO or IDLE | Execute action: marketplace/copy stay in POST_DEMO, browse→IDLE |
 | | ARROW_DOWN | POST_DEMO | Increment `postIndex` (wrap to 0) |
-| | ARROW_UP | POST_DEMO | Decrement `postIndex` (wrap to 1) |
+| | ARROW_UP | POST_DEMO | Decrement `postIndex` (wrap to 2) |
 | | SHIFT_TAB | BUGGED | Enable flicker effect, store previous state |
 | **BUGGED** | ESC | (previous) | Return to `machine.previous` state |
 
@@ -194,16 +197,18 @@ Context-preserving easter egg exit:
 
 ```typescript
 POST_SUGGESTIONS = [
-  { text: 'copy command to get access to spinner verb cli', action: 'copy' },
-  { text: 'show marketplace', action: 'marketplace' }
+  { text: 'continue to marketplace', action: 'marketplace' },
+  { text: 'copy command', action: 'copy' },
+  { text: 'navigate more demos', action: 'browse' }
 ]
 ```
 
 **Action handlers:**
-- `copy`: uses `navigator.clipboard.writeText()` to copy `bunx github:doublej/claude-verbs-cli install [name]`
 - `marketplace`: navigates via `window.location.href = '/marketplace'`
+- `copy`: uses `navigator.clipboard.writeText()` to copy `bunx github:doublej/claude-verbs-cli install [name]`
+- `browse`: returns to IDLE state via `cb.enterState(State.IDLE)` to browse more verb sets
 
-Both actions execute immediately on ENTER but keep state at POST_DEMO (allows multiple copies or retries).
+Marketplace and copy actions keep state at POST_DEMO (allows multiple copies). Browse action transitions back to IDLE.
 
 ---
 

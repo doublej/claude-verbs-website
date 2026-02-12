@@ -1,7 +1,7 @@
 import type { Container, Text } from 'pixi.js'
 import { LAYOUT } from './constants'
 import type { LineDef } from './events'
-import { repeat } from './helpers'
+import { countColumns, repeat } from './helpers'
 import { layoutMobile } from './mobile'
 import type { Params } from './params'
 import { type Machine, State } from './state-machine'
@@ -87,7 +87,7 @@ export function layout(
   const { chW, lineHeight: lh } = lctx
   const col3 = Math.round(LAYOUT.defaultCol * chW)
   ui.verbText.x = col3
-  ui.ellipsisText.x = ui.verbText.x + ui.verbText.width
+  ui.ellipsisText.x = ui.verbText.x + Math.round(countColumns(ui.verbText.text) * chW)
 
   const leftX =
     params.absoluteX !== 0

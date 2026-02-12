@@ -39,6 +39,7 @@ export interface Machine {
   hasSubmitted: boolean
   tabCompleted: boolean
   mobile: boolean
+  overlapped: boolean
 }
 
 export function createMachine(): Machine {
@@ -54,6 +55,7 @@ export function createMachine(): Machine {
     hasSubmitted: false,
     tabCompleted: false,
     mobile: false,
+    overlapped: false,
   }
 }
 
@@ -63,8 +65,9 @@ export interface PostSuggestion {
 }
 
 export const POST_SUGGESTIONS: PostSuggestion[] = [
-  { text: 'copy install command to clipboard', action: 'copy' },
-  { text: 'show marketplace', action: 'marketplace' },
+  { text: 'continue to marketplace', action: 'marketplace' },
+  { text: 'copy command', action: 'copy' },
+  { text: 'navigate more demos', action: 'browse' },
 ]
 
 export type DispatchEvent =
@@ -167,6 +170,7 @@ function dispatchPostDemo(event: DispatchEvent, m: Machine, cb: Callbacks): void
         `bunx github:doublej/claude-verbs-cli install ${m.activeSet.name}`,
       )
     else if (act === 'marketplace') cb.onMarketplace?.()
+    else if (act === 'browse') cb.enterState(State.IDLE)
   } else if (event === 'ARROW_DOWN') {
     m.tabCompleted = false
     m.postIndex = (m.postIndex + 1) % POST_SUGGESTIONS.length

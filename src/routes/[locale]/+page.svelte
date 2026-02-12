@@ -22,6 +22,7 @@ function unlock() {
   revealed = true
   scrollLocked = false
   appHandle?.disableScrollZoom()
+  appHandle?.setOverlapped(true)
   window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })
 }
 
@@ -31,6 +32,7 @@ function lock() {
   scrollLocked = true
   escHintActive = false
   escProgress = 0
+  appHandle?.setOverlapped(false)
   appHandle?.restartExperience()
 }
 

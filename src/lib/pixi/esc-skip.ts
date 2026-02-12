@@ -1,8 +1,9 @@
 import { Container, Graphics, Text } from 'pixi.js'
 import { FONT_FAMILY, PALETTE } from './constants'
+import { countColumns } from './helpers'
 
 const DOUBLE_TAP_MS = 500
-const HOLD_MS = 3000
+const HOLD_MS = 1500
 
 export interface EscSkip {
   activated: boolean
@@ -14,6 +15,8 @@ export interface EscSkip {
   bar: Graphics
   barW: number
   barH: number
+  chW: number
+  totalBlocks: number
 }
 
 export function createEscSkip(
@@ -25,14 +28,21 @@ export function createEscSkip(
   const popup = new Container({ label: 'escSkipPopup' })
   popup.visible = false
 
-  const label = 'HOLD ESC 3 SEC.'
-  const pad = Math.round(chW * 2)
-  const barW = Math.round(label.length * chW)
+  const label = 'HOLD ESC 1.5 SEC.'
+  const pad = Math.round(chW * 3)
+  const barW = Math.round(countColumns(label) * chW)
   const barH = Math.round(fontSize * 0.3)
   const boxW = barW + pad * 2
-  const boxH = Math.round(fontSize * 4)
+  const boxH = Math.round(fontSize * 5)
+  const totalBlocks = Math.floor(barW / chW)
 
-  const bg = new Graphics()
+  const shadowOff = Math.round(chW * 0.5)
+  const shadow = new Graphics({ label: 'escSkipShadow' })
+  shadow.rect(shadowOff, shadowOff, boxW, boxH)
+  shadow.fill({ color: 0x000000, alpha: 0.5 })
+  popup.addChild(shadow)
+
+  const bg = new Graphics({ label: 'escSkipBg' })
   bg.rect(0, 0, boxW, boxH)
   bg.fill({ color: 0x000000, alpha: 0.9 })
   bg.stroke({ color: PALETTE.border, width: 1 })
@@ -40,20 +50,21 @@ export function createEscSkip(
 
   const txt = new Text({
     text: label,
-    style: { fontFamily: FONT_FAMILY, fontSize, fill: PALETTE.active },
+    style: { fontFamily: FONT_FAMILY, fontSize, fill: 0xffffff },
+    label: 'escSkipLabel',
   })
   txt.x = pad
   txt.y = Math.round(boxH * 0.22)
   popup.addChild(txt)
 
-  const track = new Graphics()
+  const track = new Graphics({ label: 'escSkipTrack' })
   track.rect(0, 0, barW, barH)
   track.fill({ color: PALETTE.border })
   track.x = pad
   track.y = Math.round(boxH * 0.62)
   popup.addChild(track)
 
-  const bar = new Graphics()
+  const bar = new Graphics({ label: 'escSkipBar' })
   bar.x = pad
   bar.y = Math.round(boxH * 0.62)
   popup.addChild(bar)
@@ -71,6 +82,8 @@ export function createEscSkip(
     bar,
     barW,
     barH,
+    chW,
+    totalBlocks,
   }
 }
 
@@ -118,8 +131,12 @@ export function resetEsc(esc: EscSkip): void {
 
 function redrawBar(esc: EscSkip): void {
   esc.bar.clear()
-  if (esc.progress > 0) {
-    esc.bar.rect(0, 0, Math.round(esc.barW * esc.progress), esc.barH)
-    esc.bar.fill({ color: PALETTE.prompt })
+  if (esc.progress <= 0) return
+  const gap = 2
+  const filled = Math.floor(esc.totalBlocks * esc.progress)
+  for (let i = 0; i < filled; i++) {
+    const x = i * esc.chW
+    esc.bar.rect(x, 0, esc.chW - gap, esc.barH)
   }
+  esc.bar.fill({ color: PALETTE.prompt })
 }

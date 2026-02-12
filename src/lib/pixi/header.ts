@@ -1,6 +1,6 @@
 import type { VerbSets } from '$lib/data/types'
 import { LAYOUT, PALETTE } from './constants'
-import { hexToNum, repeat } from './helpers'
+import { countColumns, hexToNum, repeat } from './helpers'
 import type { Params } from './params'
 
 export interface HeaderPart {
@@ -23,12 +23,12 @@ export function buildHeaderRows(cols: number, sets: VerbSets, params: Params): H
   const cm = PALETTE.suggestion
 
   function ctr(s: string, w: number): string {
-    const g = Math.max(0, w - s.length)
+    const g = Math.max(0, w - countColumns(s))
     const l = Math.floor(g / 2)
     return repeat(' ', l) + s + repeat(' ', g - l)
   }
   function rpad(s: string, w: number): string {
-    return s + repeat(' ', Math.max(0, w - s.length))
+    return s + repeat(' ', Math.max(0, w - countColumns(s)))
   }
   function row(left: string, right: string, c: number): HeaderRow {
     return {
@@ -43,7 +43,7 @@ export function buildHeaderRows(cols: number, sets: VerbSets, params: Params): H
   }
 
   const title = ' Claude Verbs '
-  const dashes = inner - title.length
+  const dashes = inner - countColumns(title)
   const dl = Math.floor(dashes / 2)
 
   return [

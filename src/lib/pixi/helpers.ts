@@ -42,6 +42,16 @@ export function repeat(ch: string, n: number): string {
   return n > 0 ? ch.repeat(n) : ''
 }
 
+/** Count visual columns so layout stays on one monospace cell grid. */
+export function countColumns(text: string): number {
+  let cols = 0
+  for (const ch of text) {
+    if (ch === '\n' || ch === '\r') continue
+    cols += ch === '\t' ? 2 : 1
+  }
+  return cols
+}
+
 export function makeStyle(color: number, params: Params) {
   return { fontFamily: FONT_FAMILY, fontSize: params.fontSize, fill: color }
 }

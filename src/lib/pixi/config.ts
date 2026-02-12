@@ -13,13 +13,13 @@ export const SEQUENCE = {
     bootReadyCreep: { creepTarget: 3.5, creepDurationMs: 30000 },
     focusStrength: 0.6,
     states: {
-      BOOT: { zoom: 1.6, focusY: 'center' as const, durationMs: 200 },
-      IDLE: { zoom: 1.0, focusY: 'prompt' as const, durationMs: 300 },
-      BROWSING: { zoom: 1.35, focusY: 'prompt' as const, durationMs: 180 },
-      DEMO: { zoom: 0.8, focusY: 'spinner' as const, durationMs: 250 },
-      POST_DEMO: { zoom: 1, focusY: 'prompt' as const, durationMs: 200 },
-      BUGGED: { zoom: 0.65, focusY: 'center' as const, durationMs: 100 },
-      BOOT_READY: { zoom: 1.6, focusY: 'bootHint' as const, durationMs: 200 },
+      BOOT: { zoom: 1.6, focusY: "prompt" as const, durationMs: 2500 },
+      IDLE: { zoom: 1.4, focusY: "prompt" as const, durationMs: 2500 },
+      BROWSING: { zoom: 1.1, focusY: "prompt" as const, durationMs: 2500 },
+      DEMO: { zoom: 1.1, focusY: "prompt" as const, durationMs: 2500 },
+      POST_DEMO: { zoom: 1.1, focusY: "prompt" as const, durationMs: 2500 },
+      BUGGED: { zoom: 1, focusY: "prompt" as const, durationMs: 2500 },
+      BOOT_READY: { zoom: 1, focusY: "prompt" as const, durationMs: 2500 },
     },
   },
   burst: {
@@ -33,4 +33,4 @@ export const SEQUENCE = {
     promo: 40,
   },
   demo: { stateDiagramMs: 30000, promoMs: 45000 },
-}
+};

@@ -80,7 +80,5 @@ export const MOUSE_DEFAULTS = {
 export const EFFECT_DEFAULTS = {
   deadPixelCount: 12,
   deadPixelSize: 3,
-  glareWidth: 0.6,
-  glareHeight: 0.4,
   lcdGrid: 4.0,
 }

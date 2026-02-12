@@ -19,15 +19,15 @@ export function applyMobileOverrides(params: Params): void {
   params.rotateX = 0
   params.rotateY = 0
   params.rotateZ = 0
-  params.zoom = 1
+  params.zoom = 0.5
   params.screenPadding = 0.05
   params.absoluteX = 0
   params.absoluteY = 0
-  params.offsetX = 0
+  params.offsetX = 3
   params.offsetY = -2
   params.deadPixelsEnabled = false
   params.bloomStrength = 1
-  params.displayDownscale = 1
+  params.displayDownscale = 0.5
   params.fontSize = 36
   params.lineHeightOffset = 2
 }

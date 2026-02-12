@@ -12,6 +12,7 @@ const installCmd = $derived(`bunx github:doublej/claude-verbs-cli install ${set.
 
 let expanded = $state(false)
 let copied = $state(false)
+let linkCopied = $state(false)
 let hovered = $state(false)
 let currentVerb = $state('')
 let spinnerChar = $state('|')
@@ -37,6 +38,16 @@ function copyInstallCmd(e: MouseEvent) {
   copied = true
   setTimeout(() => {
     copied = false
+  }, 1500)
+}
+
+function copyDeeplink(e: MouseEvent) {
+  e.stopPropagation()
+  const url = `${window.location.origin}/${set.language}/${set.name}/`
+  navigator.clipboard.writeText(url)
+  linkCopied = true
+  setTimeout(() => {
+    linkCopied = false
   }, 1500)
 }
 
@@ -136,6 +147,19 @@ onMount(() => {
     </span>
     <span>{normalizedVerbs.length} verbs</span>
   </div>
+  <button
+    class="card__deeplink"
+    class:card__deeplink--copied={linkCopied}
+    title="Copy link to this set"
+    aria-label="Copy link to {set.name}"
+    onclick={copyDeeplink}
+  >
+    {#if linkCopied}
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+    {:else}
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+    {/if}
+  </button>
   {#if expanded}
     <div class="card__verbs-panel">
       <div class="card__verbs-panel-label">Verbs</div>
@@ -273,13 +297,11 @@ onMount(() => {
     color: var(--accent);
   }
 
-  .card__copy {
+  .card__copy,
+  .card__deeplink {
     position: absolute;
-    top: 1.25rem;
-    right: 3rem;
     background: none;
     border: 1px solid transparent;
-    padding: 0.2rem;
     cursor: pointer;
     color: var(--text-faint);
     display: flex;
@@ -288,12 +310,17 @@ onMount(() => {
     transition: color 0.2s, border-color 0.2s;
   }
 
-  .card__copy:hover {
+  .card__copy { top: 1.25rem; right: 3rem; padding: 0.2rem; }
+  .card__deeplink { bottom: 0; left: 0; width: 28px; height: 28px; }
+
+  .card__copy:hover,
+  .card__deeplink:hover {
     color: var(--accent);
     border-color: var(--border);
   }
 
-  .card__copy--copied {
+  .card__copy--copied,
+  .card__deeplink--copied {
     color: var(--accent);
   }
 
@@ -306,13 +333,8 @@ onMount(() => {
     transition: color 0.2s, transform 0.2s;
   }
 
-  .card:hover .card__expand-hint {
-    color: var(--accent);
-  }
-
-  .expanded .card__expand-hint {
-    transform: rotate(90deg);
-  }
+  .card:hover .card__expand-hint { color: var(--accent); }
+  .expanded .card__expand-hint { transform: rotate(90deg); }
 
   .card__verbs-panel {
     margin-top: 1rem;

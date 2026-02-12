@@ -48,3 +48,10 @@ export function loadSets(): VerbSets {
   cached = sets
   return sets
 }
+
+export function findSet(name: string): VerbSet | undefined {
+  for (const sets of Object.values(loadSets())) {
+    const match = sets.find((s) => s.name === name)
+    if (match) return match
+  }
+}

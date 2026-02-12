@@ -8,10 +8,7 @@ const SPINNER_CHARS = ['|', '/', '-', '\\']
 const { set, author }: { set: VerbSet; author: Author | undefined } = $props()
 
 const normalizedVerbs = $derived(set.verbs.map((v) => v.replace(/^\s*I(?:[\u2019']m| am)\s+/i, '')))
-const installCmd = $derived(`bunx github:doublej/claude-verbs-cli install ${set.name}`)
 
-let copied = $state(false)
-let verbsCopied = $state(false)
 let linkCopied = $state(false)
 let hovered = $state(false)
 let currentVerb = $state('')
@@ -21,24 +18,6 @@ let charTimer: ReturnType<typeof setInterval> | undefined
 let shuffled: string[] = []
 let verbIdx = 0
 let charIdx = 0
-
-function copyInstallCmd(e: MouseEvent) {
-  e.stopPropagation()
-  navigator.clipboard.writeText(installCmd)
-  copied = true
-  setTimeout(() => {
-    copied = false
-  }, 1500)
-}
-
-function copyVerbs(e: MouseEvent) {
-  e.stopPropagation()
-  navigator.clipboard.writeText(normalizedVerbs.join('\n'))
-  verbsCopied = true
-  setTimeout(() => {
-    verbsCopied = false
-  }, 1500)
-}
 
 function copyDeeplink(e: MouseEvent) {
   e.stopPropagation()
@@ -97,29 +76,16 @@ onMount(() => {
   onmouseleave={onMouseLeave}
 >
   <button
-    class="card__copy-verbs"
-    class:card__copy-verbs--copied={verbsCopied}
-    title="Copy verbs"
-    aria-label="Copy verbs from {set.displayName}"
-    onclick={copyVerbs}
+    class="card__deeplink"
+    class:card__deeplink--copied={linkCopied}
+    title="Copy link to this set"
+    aria-label="Copy link to {set.name}"
+    onclick={copyDeeplink}
   >
-    {#if verbsCopied}
+    {#if linkCopied}
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
     {:else}
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
-    {/if}
-  </button>
-  <button
-    class="card__copy"
-    class:card__copy--copied={copied}
-    title="Copy install command"
-    aria-label="Copy install command: {installCmd}"
-    onclick={copyInstallCmd}
-  >
-    {#if copied}
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-    {:else}
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="0"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
     {/if}
   </button>
   <div class="card__name">{set.displayName}</div>
@@ -153,19 +119,6 @@ onMount(() => {
     </span>
     <span>{set.verbCount} verbs</span>
   </div>
-  <button
-    class="card__deeplink"
-    class:card__deeplink--copied={linkCopied}
-    title="Copy link to this set"
-    aria-label="Copy link to {set.name}"
-    onclick={copyDeeplink}
-  >
-    {#if linkCopied}
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-    {:else}
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
-    {/if}
-  </button>
 </div>
 
 <style>
@@ -271,7 +224,6 @@ onMount(() => {
   .card__author-link:hover { color: var(--accent); }
 
   .card__copy,
-  .card__copy-verbs,
   .card__deeplink {
     position: absolute;
     background: none;
@@ -284,19 +236,16 @@ onMount(() => {
     transition: color 0.2s, border-color 0.2s;
   }
 
-  .card__copy-verbs { top: 1.25rem; right: 3rem; padding: 0.2rem; }
+  .card__deeplink { top: 1.25rem; right: 3rem; padding: 0.2rem; }
   .card__copy { top: 1.25rem; right: 1.25rem; padding: 0.2rem; }
-  .card__deeplink { bottom: 0; left: 0; width: 28px; height: 28px; }
 
   .card__copy:hover,
-  .card__copy-verbs:hover,
   .card__deeplink:hover {
     color: var(--accent);
     border-color: var(--border);
   }
 
   .card__copy--copied,
-  .card__copy-verbs--copied,
   .card__deeplink--copied {
     color: var(--accent);
   }

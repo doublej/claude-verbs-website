@@ -1,9 +1,11 @@
 export interface VerbSet {
   name: string
+  displayName: string
   description: string
   author: string
   github: string
   language: string
+  category: string
   verbCount: number
   verbs: string[]
 }

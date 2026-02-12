@@ -116,7 +116,7 @@ onMount(() => {
     {/if}
   </button>
   <span class="card__expand-hint" aria-hidden="true">&#9654;</span>
-  <div class="card__name">{set.name}</div>
+  <div class="card__name">{set.displayName}</div>
   <div class="card__desc">{set.description}</div>
   <div class="card__preview" class:card__preview--active={hovered} aria-live="polite" aria-label="Verb preview">
     <span class="card__preview-icon" aria-hidden="true">{spinnerChar}</span>

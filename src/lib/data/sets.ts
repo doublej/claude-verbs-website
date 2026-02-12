@@ -3,10 +3,12 @@ import type { VerbSet, VerbSets } from './types'
 
 interface RawSetJson {
   name: string
+  displayName?: string
   description: string
   author: string
   github: string
   language: string
+  category?: string
   config: { spinnerVerbs: { verbs: string[] } }
 }
 
@@ -18,10 +20,12 @@ function toVerbSet(raw: RawSetJson): VerbSet {
   const verbs = raw.config.spinnerVerbs.verbs.map(normalizeVerb)
   return {
     name: raw.name,
+    displayName: raw.displayName ?? raw.name,
     description: raw.description,
     author: raw.author,
     github: raw.github,
     language: raw.language,
+    category: raw.category ?? 'original',
     verbCount: verbs.length,
     verbs,
   }

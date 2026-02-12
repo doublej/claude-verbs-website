@@ -2,12 +2,18 @@
 export const SUPPORTED_LOCALES: Record<string, string> = {
   nl_NL: 'nl',
   en_GB: 'en',
+  en_US: 'en',
+  en_AU: 'en',
+  en_CA: 'en',
   de_DE: 'de',
   fr_FR: 'fr',
   es_ES: 'es',
   it_IT: 'it',
   pt_PT: 'pt',
+  pt_BR: 'pt',
   ja_JP: 'ja',
+  ko_KR: 'ko',
+  hi_IN: 'hi',
 }
 
 export const LOCALE_CODES = new Set(Object.keys(SUPPORTED_LOCALES))

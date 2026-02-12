@@ -49,7 +49,7 @@ onMount(() => {
 </script>
 
 <svelte:head>
-  <title>{set.name} — Claude Verbs</title>
+  <title>{set.displayName} — Claude Verbs</title>
   <meta name="description" content="{set.description} — {normalizedVerbs.length} themed spinner verbs for Claude Code." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
@@ -60,7 +60,7 @@ onMount(() => {
   <div class="container">
     <a class="back" href="/{data.locale}/marketplace">&#8592; all sets</a>
 
-    <h1 class="detail__name">{set.name}</h1>
+    <h1 class="detail__name">{set.displayName}</h1>
     <p class="detail__desc">{set.description}</p>
 
     <div class="detail__meta">

@@ -16,8 +16,12 @@ function normalizeVerb(line: string): string {
   return line.replace(/^\s*I(?:[\u2019']m| am)\s+/i, '')
 }
 
+const PREVIEW_LIMIT = 10
+const isProd = import.meta.env.PROD
+
 function toVerbSet(raw: RawSetJson): VerbSet {
-  const verbs = raw.config.spinnerVerbs.verbs.map(normalizeVerb)
+  const allVerbs = raw.config.spinnerVerbs.verbs.map(normalizeVerb)
+  const verbs = isProd ? allVerbs.slice(0, PREVIEW_LIMIT) : allVerbs
   return {
     name: raw.name,
     displayName: raw.displayName ?? raw.name,
@@ -26,7 +30,7 @@ function toVerbSet(raw: RawSetJson): VerbSet {
     github: raw.github,
     language: raw.language,
     category: raw.category ?? 'original',
-    verbCount: verbs.length,
+    verbCount: allVerbs.length,
     verbs,
   }
 }
@@ -43,7 +47,12 @@ export function loadSets(): VerbSets {
 
   const sets: VerbSets = {}
   for (const [path, raw] of Object.entries(modules)) {
-    if (path.includes('schema.json') || path.includes('index.json') || path.includes('_template.json')) continue
+    if (
+      path.includes('schema.json') ||
+      path.includes('index.json') ||
+      path.includes('_template.json')
+    )
+      continue
     const set = toVerbSet(raw)
     const lang = localeToLang(raw.language)
     if (!sets[lang]) sets[lang] = []

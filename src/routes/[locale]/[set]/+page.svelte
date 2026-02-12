@@ -11,6 +11,7 @@ const set = $derived(data.set)
 const author = $derived(data.author)
 const normalizedVerbs = $derived(set.verbs.map((v) => v.replace(/^\s*I(?:[\u2019']m| am)\s+/i, '')))
 const installCmd = $derived(`bunx github:doublej/claude-verbs-cli install ${set.name}`)
+const hasMore = $derived(set.verbCount > normalizedVerbs.length)
 
 let copied = $state(false)
 let currentVerb = $state('')
@@ -19,7 +20,9 @@ let spinnerChar = $state('|')
 function copyInstallCmd() {
   navigator.clipboard.writeText(installCmd)
   copied = true
-  setTimeout(() => { copied = false }, 1500)
+  setTimeout(() => {
+    copied = false
+  }, 1500)
 }
 
 onMount(() => {
@@ -50,7 +53,7 @@ onMount(() => {
 
 <svelte:head>
   <title>{set.displayName} — Claude Verbs</title>
-  <meta name="description" content="{set.description} — {normalizedVerbs.length} themed spinner verbs for Claude Code." />
+  <meta name="description" content="{set.description} — {set.verbCount} themed spinner verbs for Claude Code." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
@@ -73,7 +76,7 @@ onMount(() => {
           <AuthorPopup {author} />
         {/if}
       </span>
-      <span>{normalizedVerbs.length} verbs</span>
+      <span>{set.verbCount} verbs</span>
     </div>
 
     <div class="preview" aria-live="polite" aria-label="Live verb preview">
@@ -97,12 +100,15 @@ onMount(() => {
     </div>
 
     <div class="verbs">
-      <div class="verbs__label">All verbs</div>
+      <div class="verbs__label">{hasMore ? `Preview (${normalizedVerbs.length} of ${set.verbCount})` : 'All verbs'}</div>
       <div class="verbs__list">
         {#each normalizedVerbs as verb}
           <div class="verbs__item">{verb}</div>
         {/each}
       </div>
+      {#if hasMore}
+        <p class="verbs__more">Install to get all {set.verbCount} verbs</p>
+      {/if}
     </div>
   </div>
 </main>
@@ -262,6 +268,13 @@ onMount(() => {
   }
 
   .verbs__item::before { content: '- '; color: var(--text-faint); }
+
+  .verbs__more {
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: var(--text-faint);
+    font-style: italic;
+  }
 
   @media (max-width: 600px) {
     .verbs__list { grid-template-columns: 1fr; }

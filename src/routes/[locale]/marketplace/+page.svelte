@@ -1,4 +1,5 @@
 <script lang="ts">
+import Contributors from '$lib/components/Contributors.svelte'
 import Gallery from '$lib/components/Gallery.svelte'
 import type { PageData } from './$types'
 
@@ -86,6 +87,12 @@ const { data }: { data: PageData } = $props()
           Read the Contributing Guide
         </a>
       </div>
+    </div>
+  </section>
+
+  <section class="contributors-section" aria-label="Contributors">
+    <div class="container">
+      <Contributors usernames={data.contributors} authors={data.authors} />
     </div>
   </section>
 </main>

@@ -223,9 +223,11 @@ onMount(() => {
   .card__author-link { color: var(--text-faint); text-decoration: none; transition: color 0.2s; }
   .card__author-link:hover { color: var(--accent); }
 
-  .card__copy,
   .card__deeplink {
     position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    padding: 0.2rem;
     background: none;
     border: 1px solid transparent;
     cursor: pointer;
@@ -236,16 +238,11 @@ onMount(() => {
     transition: color 0.2s, border-color 0.2s;
   }
 
-  .card__deeplink { top: 1.25rem; right: 3rem; padding: 0.2rem; }
-  .card__copy { top: 1.25rem; right: 1.25rem; padding: 0.2rem; }
-
-  .card__copy:hover,
   .card__deeplink:hover {
     color: var(--accent);
     border-color: var(--border);
   }
 
-  .card__copy--copied,
   .card__deeplink--copied {
     color: var(--accent);
   }

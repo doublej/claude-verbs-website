@@ -1,27 +1,11 @@
 <script lang="ts">
 import { page } from '$app/stores'
-import { obliterate } from 'orphan-obliterator'
 import ThemeToggle from '$lib/components/ThemeToggle.svelte'
-
-let orphans: ReturnType<typeof obliterate> | null = null
 
 $effect(() => {
   const locale = $page.data.locale as string | undefined
   if (locale) {
     document.documentElement.lang = locale.replace('_', '-')
-  }
-})
-
-$effect(() => {
-  void $page.url.pathname
-  if (orphans) {
-    orphans.update()
-  } else {
-    orphans = obliterate({ selectors: ['h1', 'h2', 'h3', 'p'], observe: true })
-  }
-  return () => {
-    orphans?.destroy()
-    orphans = null
   }
 })
 </script>

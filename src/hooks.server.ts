@@ -1,7 +1,27 @@
 import { LOCALE_CODES, detectLocale } from '$lib/locale'
-import type { Handle } from '@sveltejs/kit'
+import type { Handle, RequestEvent } from '@sveltejs/kit'
 
-const SKIP_PREFIXES = ['/_app/', '/favicon', '/.', '/api/']
+const SKIP_PREFIXES = ['/_app/', '/favicon', '/.', '/api/', '/mobile']
+
+const MOBILE_UA = /Android|iPhone|iPad|iPod|webOS|BlackBerry|Opera Mini|IEMobile/i
+
+const MOBILE_REDIRECT = new Response(null, {
+  status: 302,
+  headers: { location: '/mobile' },
+})
+
+function shouldRedirectMobile(event: RequestEvent): boolean {
+  const ua = event.request.headers.get('user-agent') ?? ''
+  return MOBILE_UA.test(ua)
+}
+
+function handleLocaleRoute(event: RequestEvent, resolve: Parameters<Handle>[0]['resolve']) {
+  const segments = event.url.pathname.split('/')
+  const isHome = segments.length <= 3 && !segments[2]
+  if (isHome && shouldRedirectMobile(event)) return MOBILE_REDIRECT
+  event.locals.locale = segments[1]
+  return resolve(event)
+}
 
 export const handle: Handle = async ({ event, resolve }) => {
   const { pathname } = event.url
@@ -10,14 +30,13 @@ export const handle: Handle = async ({ event, resolve }) => {
     return resolve(event)
   }
 
-  // Check if path already has a valid locale prefix
-  const segments = pathname.split('/')
-  const maybeLocale = segments[1]
-
+  const maybeLocale = pathname.split('/')[1]
   if (maybeLocale && LOCALE_CODES.has(maybeLocale)) {
-    event.locals.locale = maybeLocale
-    return resolve(event)
+    return handleLocaleRoute(event, resolve)
   }
+
+  // Redirect mobile users hitting / straight to /mobile
+  if (pathname === '/' && shouldRedirectMobile(event)) return MOBILE_REDIRECT
 
   // Detect locale from Accept-Language and redirect
   const acceptLang = event.request.headers.get('accept-language') ?? ''

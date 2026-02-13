@@ -1,6 +1,7 @@
 import type { VerbSet } from '$lib/data/types'
 import type { Container, Text } from 'pixi.js'
 import { resetDemoState } from './app-helpers'
+import { type BrightnessBar, adjustBrightness } from './brightness-bar'
 import { PALETTE } from './constants'
 import type { LayoutCtx } from './layout'
 import type { Params } from './params'
@@ -24,6 +25,8 @@ interface MobileContext {
   lctx: LayoutCtx
   scrollItems: (Text | Container)[]
   pool: TextPool
+  brightnessBar: BrightnessBar
+  syncParamsToScene: () => void
   canvas: HTMLCanvasElement
 }
 
@@ -43,9 +46,44 @@ function setMarketplaceHint(s: SceneRefs, lctx: LayoutCtx): void {
   lctx.chromeOffsetY = -lctx.lineHeight
 }
 
-/** Start mobile demo with first locale set and wire up tap-to-cycle. */
+const SWIPE_THRESHOLD = 8
+
+function bindBrightnessSwipe(
+  canvas: HTMLCanvasElement,
+  bar: BrightnessBar,
+  params: Params,
+  sync: () => void,
+): () => void {
+  let startY = 0
+  let accumulated = 0
+
+  const onStart = (e: TouchEvent) => {
+    startY = e.touches[0].clientY
+    accumulated = 0
+  }
+  const onMove = (e: TouchEvent) => {
+    e.preventDefault()
+    const dy = startY - e.touches[0].clientY
+    accumulated += dy
+    startY = e.touches[0].clientY
+    const steps = Math.trunc(accumulated / SWIPE_THRESHOLD)
+    if (steps !== 0) {
+      accumulated -= steps * SWIPE_THRESHOLD
+      params.userBrightness = adjustBrightness(bar, steps)
+      sync()
+    }
+  }
+  canvas.addEventListener('touchstart', onStart, { passive: true })
+  canvas.addEventListener('touchmove', onMove, { passive: false })
+  return () => {
+    canvas.removeEventListener('touchstart', onStart)
+    canvas.removeEventListener('touchmove', onMove)
+  }
+}
+
+/** Start mobile demo with first locale set and brightness swipe. */
 export function initMobileDemo(ctx: MobileContext): () => void {
-  const { machine, localeSets, ts, s, params, lctx, scrollItems, pool, canvas } = ctx
+  const { machine, localeSets, ts, s, params, lctx, scrollItems, pool } = ctx
   const firstSet = localeSets[0] ?? null
   if (firstSet) {
     machine.activeSet = firstSet
@@ -57,14 +95,5 @@ export function initMobileDemo(ctx: MobileContext): () => void {
   setMarketplaceHint(s, lctx)
   ts.layoutDirty = true
 
-  const onTap = () => {
-    if (localeSets.length <= 1) return
-    machine.browseIndex = (machine.browseIndex + 1) % localeSets.length
-    const nextSet = localeSets[machine.browseIndex]
-    machine.activeSet = nextSet
-    resetDemoState(nextSet, ts, s, params, scrollItems, pool)
-    ts.layoutDirty = true
-  }
-  canvas.addEventListener('pointerup', onTap)
-  return onTap
+  return bindBrightnessSwipe(ctx.canvas, ctx.brightnessBar, params, ctx.syncParamsToScene)
 }

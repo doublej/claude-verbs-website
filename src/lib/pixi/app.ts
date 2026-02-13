@@ -399,17 +399,19 @@ export async function createApp(
     document.addEventListener('keyup', onKeyUp)
   }
 
-  s.inputContainer.on('pointertap', () => doDispatch('ENTER'))
-  s.promptText.eventMode = 'static'
-  s.promptText.cursor = 'pointer'
-  s.promptText.on('pointertap', () => {
-    if (machine.current === State.IDLE) doDispatch('ENTER')
-  })
+  if (!demoMode) {
+    s.inputContainer.on('pointertap', () => doDispatch('ENTER'))
+    s.promptText.eventMode = 'static'
+    s.promptText.cursor = 'pointer'
+    s.promptText.on('pointertap', () => {
+      if (machine.current === State.IDLE) doDispatch('ENTER')
+    })
+  }
 
   let headerAdded = false
-  let demoTapHandler: (() => void) | null = null
+  let demoCleanup: (() => void) | null = null
   if (demoMode) {
-    demoTapHandler = initMobileDemo({
+    demoCleanup = initMobileDemo({
       machine,
       localeSets,
       ts,
@@ -418,6 +420,8 @@ export async function createApp(
       lctx,
       scrollItems,
       pool,
+      brightnessBar,
+      syncParamsToScene,
       canvas: app.canvas,
     })
   } else {
@@ -502,7 +506,7 @@ export async function createApp(
         document.removeEventListener('keydown', onKeyDown)
         document.removeEventListener('keyup', onKeyUp)
       }
-      if (demoTapHandler) app.canvas.removeEventListener('pointerup', demoTapHandler)
+      demoCleanup?.()
       if (machine.demoTimer) clearTimeout(machine.demoTimer)
       if (machine.buggedTimer) clearTimeout(machine.buggedTimer)
       pool.flush()

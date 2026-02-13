@@ -5,10 +5,9 @@ const SKIP_PREFIXES = ['/_app/', '/favicon', '/.', '/api/', '/mobile']
 
 const MOBILE_UA = /Android|iPhone|iPad|iPod|webOS|BlackBerry|Opera Mini|IEMobile/i
 
-const MOBILE_REDIRECT = new Response(null, {
-  status: 302,
-  headers: { location: '/mobile' },
-})
+function mobileRedirect() {
+  return new Response(null, { status: 302, headers: { location: '/mobile' } })
+}
 
 function shouldRedirectMobile(event: RequestEvent): boolean {
   const ua = event.request.headers.get('user-agent') ?? ''
@@ -18,7 +17,7 @@ function shouldRedirectMobile(event: RequestEvent): boolean {
 function handleLocaleRoute(event: RequestEvent, resolve: Parameters<Handle>[0]['resolve']) {
   const segments = event.url.pathname.split('/')
   const isHome = segments.length <= 3 && !segments[2]
-  if (isHome && shouldRedirectMobile(event)) return MOBILE_REDIRECT
+  if (isHome && shouldRedirectMobile(event)) return mobileRedirect()
   event.locals.locale = segments[1]
   return resolve(event)
 }
@@ -36,7 +35,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   }
 
   // Redirect mobile users hitting / straight to /mobile
-  if (pathname === '/' && shouldRedirectMobile(event)) return MOBILE_REDIRECT
+  if (pathname === '/' && shouldRedirectMobile(event)) return mobileRedirect()
 
   // Detect locale from Accept-Language and redirect
   const acceptLang = event.request.headers.get('accept-language') ?? ''

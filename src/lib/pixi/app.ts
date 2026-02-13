@@ -411,6 +411,8 @@ export async function createApp(
   let headerAdded = false
   let demoCleanup: (() => void) | null = null
   if (demoMode) {
+    // Shift focus area to the left on mobile to prevent content from being off-screen
+    params.absoluteX = 2
     demoCleanup = initMobileDemo({
       machine,
       localeSets,

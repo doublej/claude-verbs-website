@@ -1,6 +1,17 @@
 import { localeToLang } from '$lib/locale'
 import type { VerbSet, VerbSets } from './types'
 
+interface RawAuthorProject {
+  name: string
+  url: string
+  description: string
+}
+
+interface RawAuthorInfo {
+  description: string
+  projects: RawAuthorProject[]
+}
+
 interface RawSetJson {
   name: string
   displayName?: string
@@ -10,6 +21,7 @@ interface RawSetJson {
   language: string
   category?: string
   config: { spinnerVerbs: { verbs: string[] } }
+  authorInfo?: RawAuthorInfo
 }
 
 function normalizeVerb(line: string): string {

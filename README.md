@@ -43,11 +43,7 @@ Website contribution calls-to-action should send users to:
 - [doublej/claude-verbs](https://github.com/doublej/claude-verbs)
 - [doublej/claude-verbs/CONTRIBUTING.md](https://github.com/doublej/claude-verbs/blob/main/CONTRIBUTING.md)
 
-Contributors should include an author manifest in their PR description with:
-
-- GitHub profile URL
-- Top 3 projects (name, URL, short description)
-- Generic one-sentence description
+Contributors can optionally add an `authorInfo` object to their set JSON to control their profile on the website. If omitted, data is fetched from the GitHub API.
 
 ## Project Structure
 

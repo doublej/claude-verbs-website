@@ -1,0 +1,138 @@
+# Claude Verbs — Verb Set Creation Guide
+
+> This file is for LLMs. Point your AI assistant at https://claudeverbs.com/llm.txt to help create a verb set.
+
+Claude Verbs are themed spinner verb sets for Claude Code — the animated status messages shown while Claude thinks.
+
+## What you're creating
+
+A JSON file containing 15–100 short action phrases (aim for 50) themed around a subject chosen by the user. The set will be submitted as a pull request to the community repository.
+
+## JSON format
+
+```json
+{
+  "$schema": "./schema.json",
+  "name": "lowercase-kebab-case-name",
+  "displayName": "Human-Readable Title",
+  "category": "entertainment",
+  "description": "A short description of the theme",
+  "author": "Author Name",
+  "github": "github-username",
+  "language": "en_US",
+  "config": {
+    "spinnerVerbs": {
+      "mode": "replace",
+      "verbs": [
+        "Verb phrase one",
+        "Verb phrase two"
+      ]
+    }
+  },
+  "authorInfo": {
+    "description": "One-sentence bio about the author.",
+    "projects": [
+      { "name": "project", "url": "https://github.com/user/project", "description": "One sentence." }
+    ]
+  }
+}
+```
+
+## Field reference
+
+| Field | Required | Rules |
+|-------|----------|-------|
+| `name` | Yes | Lowercase kebab-case, must match filename without `.json`. Use a country prefix for localised pop culture (e.g. `uk-peep-show`, `us-the-office`, `jp-gaki-no-tsukai`). No prefix needed for original/universal themes. |
+| `displayName` | Yes | Human-readable title shown in listings. |
+| `category` | Yes | One of: `entertainment`, `music`, `gaming`, `literature`, `science`, `tech`, `sport`, `culture`, `original`. |
+| `description` | Yes | Short phrase describing the theme (e.g. "Portal puzzle adventure spinner verbs"). |
+| `author` | Yes | The contributor's name. |
+| `github` | Yes | GitHub username (for attribution). |
+| `language` | Yes | Locale code in `xx_YY` format (e.g. `en_US`, `nl_NL`, `de_DE`, `fr_FR`, `ja_JP`). |
+| `mode` | Yes | `"replace"` (swap default verbs) or `"append"` (add to defaults). Almost always `"replace"`. |
+| `verbs` | Yes | Array of 15–100 unique strings. Aim for 50. |
+| `authorInfo` | No | Optional object with `description` (one-sentence bio) and `projects` (1–3 projects with `name`, `url`, `description`). Controls how the author appears on claudeverbs.com. If omitted, data is fetched from the GitHub API. |
+
+## Writing good verbs
+
+### Must
+
+- Each verb is a short action phrase (something someone can do).
+- 2–6 words per verb.
+- No duplicates or near-duplicates (including trivial rewordings).
+- No ending punctuation. No emojis.
+- Write verbs in the language matching the `language` field.
+
+### Should
+
+- Mix verb styles: say, do, check, avoid, pretend, panic, contemplate, endure, regret, observe, etc.
+- Keep it punchy and rhythmic — these scroll by fast in a spinner.
+- Aim for "recognisable vibe" without requiring deep lore knowledge.
+- Be funny and creative. Bland or generic verbs make a boring set.
+
+### Must not
+
+- Do not prepend verbs with "I'm", "I am", or similar subject prefixes. Claude Code prepends these automatically.
+- Do not reproduce long verbatim quotes. Keep catchphrase references to 1–3 words and convert them into actions (e.g. "Say the thing" not the quote itself).
+- Do not use bare nouns or standalone quotes as verbs. Every entry must be an action.
+
+## Examples
+
+Good verbs (from a Peep Show set):
+- "Rehearse a casual hello"
+- "Avoid Big Suze's gaze"
+- "Endure Jeremy's latest scheme"
+- "Panic about four naan again"
+- "Rationalize my poor choices"
+
+Good verbs (from a Portal set):
+- "Test the portal gun"
+- "Carry the companion cube"
+- "Dodge endless laser barrage"
+- "Promise cake after testing"
+- "Know there's no cake"
+
+Bad verbs (and why):
+- "Coffee" — bare noun, not an action
+- "I'm thinking about the code" — has "I'm" prefix
+- "That's what she said!" — standalone quote with punctuation
+- "Do something" — too generic, not themed
+- "Recalibrate the quantum flux capacitor matrix" — too long, over 6 words
+
+## Naming conventions
+
+Use a country/region prefix when the theme is tied to a specific culture:
+- `uk-peep-show`, `us-the-office`, `au-kath-and-kim`, `fr-kaamelott`
+- `us-billie-eilish`, `jp-gaki-no-tsukai`, `kr-infinite-challenge`
+
+Skip the prefix for universal or original themes:
+- `idiot`, `multi-lul`
+
+## Step-by-step workflow
+
+1. **Ask the user** for a subject/theme, their preferred language, their name and GitHub username.
+2. **Generate the JSON** following the format and rules above.
+3. **Ask the user** if they want to add `authorInfo` (optional — for their profile on claudeverbs.com).
+4. **Self-check** before showing the result:
+   - Count is 15–100?
+   - Every entry is an action phrase?
+   - No entry exceeds 6 words?
+   - No duplicates or near-duplicates?
+   - JSON is valid?
+   - All required fields present?
+   - `name` is lowercase-kebab-case?
+5. **Save the file** as `sets/<name>.json`.
+6. **Validate** by running `bun run validate.ts` in the repo root.
+
+## Submitting
+
+Verb set PRs go to the community repository only:
+
+- Repository: https://github.com/doublej/claude-verbs
+- Guide: https://github.com/doublej/claude-verbs/blob/main/CONTRIBUTING.md
+
+Do NOT open PRs on `claude-verbs-cli` or `claude-verbs-website`. Those repositories do not accept community pull requests.
+
+## Browse existing sets
+
+Visit https://claudeverbs.com to see published sets for inspiration.

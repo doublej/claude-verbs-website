@@ -61,6 +61,7 @@ export interface SceneRefs {
   displayRT: RenderTexture
   contentW: number
   contentH: number
+  padX: number
   padY: number
   chW: number
 }
@@ -273,6 +274,7 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
     displayRT,
     contentW: dW,
     contentH: dH,
+    padX,
     padY,
     chW,
   }

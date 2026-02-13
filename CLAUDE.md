@@ -35,7 +35,7 @@ src/
 │   ├── data/
 │   │   ├── types.ts              # VerbSet, Author interfaces
 │   │   ├── sets.ts               # loads verb set JSON files
-│   │   ├── sets/**/*.json        # verb set data (41 files)
+│   │   ├── claude-verbs/         # git submodule (doublej/claude-verbs)
 │   │   ├── authors.ts            # build-time GitHub fetch script
 │   │   ├── authors.json          # generated author data
 │   │   └── lang-names.ts         # language code → display name

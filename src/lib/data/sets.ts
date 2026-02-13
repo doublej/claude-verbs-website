@@ -35,7 +35,7 @@ function toVerbSet(raw: RawSetJson): VerbSet {
   }
 }
 
-const modules = import.meta.glob<RawSetJson>('./sets/*.json', {
+const modules = import.meta.glob<RawSetJson>('./claude-verbs/sets/*.json', {
   eager: true,
   import: 'default',
 })

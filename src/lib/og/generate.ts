@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
 import { buildSetOgSvg } from './template'
 
-const IGNORED_SET_FILES = new Set(['schema.json', 'index.json', '_template.json'])
+const IGNORED_SET_FILES = new Set(['schema.json', 'index.json', '_template.json', 'package.json', 'bun.lock'])
 const DEFAULT_DATA_DIR = fileURLToPath(new URL('../data/sets/', import.meta.url))
 const DEFAULT_OUTPUT_DIR = fileURLToPath(new URL('../../../static/og/sets/', import.meta.url))
 const DEFAULT_IMAGE_PATH = fileURLToPath(new URL('../../../static/og/default.png', import.meta.url))

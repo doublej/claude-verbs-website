@@ -50,7 +50,9 @@ export function loadSets(): VerbSets {
     if (
       path.includes('schema.json') ||
       path.includes('index.json') ||
-      path.includes('_template.json')
+      path.includes('_template.json') ||
+      path.includes('package.json') ||
+      path.includes('bun.lock')
     )
       continue
     const set = toVerbSet(raw)

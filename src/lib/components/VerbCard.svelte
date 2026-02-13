@@ -157,18 +157,20 @@ onMount(() => {
     background: var(--bg-raised);
   }
 
-  .card:hover .card__name,
-  .card:hover .card__verb-count {
+  .card:hover .card__copy,
+  .card:hover .card__deeplink {
+    opacity: 1;
+  }
+
+  .card:hover .card__meta {
     opacity: 1;
   }
 
   .card__name {
-    font-size: 1rem;
+    font-size: 0.88rem;
     font-weight: 700;
     color: var(--accent);
     margin-bottom: 0.35rem;
-    opacity: 0;
-    transition: opacity 0.2s;
   }
 
   .card__desc {
@@ -177,10 +179,10 @@ onMount(() => {
     margin-bottom: 0.65rem;
     line-height: 1.5;
     height: calc(2 * 1.5 * 0.78rem);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
     overflow: hidden;
+    position: relative;
+    -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
   }
 
   .card__preview {
@@ -193,6 +195,8 @@ onMount(() => {
     margin-bottom: 0.65rem;
     font-size: 0.72rem;
     min-height: 1.8rem;
+    max-width: 100%;
+    overflow: hidden;
     opacity: 0.4;
     transition: opacity 0.2s, border-color 0.2s;
   }
@@ -218,6 +222,8 @@ onMount(() => {
     color: var(--text-faint);
     white-space: nowrap;
     overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
+    mask-image: linear-gradient(to right, black 80%, transparent 100%);
   }
 
   .card__preview--active .card__preview-verb {
@@ -238,16 +244,13 @@ onMount(() => {
     50% { opacity: 0; }
   }
 
-  .card__verb-count {
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
   .card__meta {
     display: flex;
     gap: 1rem;
     font-size: 0.72rem;
     color: var(--text-faint);
+    opacity: 0;
+    transition: opacity 0.2s;
   }
 
   .card__author {
@@ -276,7 +279,8 @@ onMount(() => {
     align-items: center;
     justify-content: center;
     padding: 0.2rem;
-    transition: color 0.2s, border-color 0.2s;
+    opacity: 0;
+    transition: color 0.2s, border-color 0.2s, opacity 0.2s;
   }
 
   .card__deeplink { top: 1.25rem; right: 3rem; }
@@ -291,5 +295,6 @@ onMount(() => {
   .card__copy--copied,
   .card__deeplink--copied {
     color: var(--accent);
+    opacity: 1;
   }
 </style>

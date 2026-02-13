@@ -29,7 +29,7 @@ import type { LineDef } from './events'
 import { createLineBuffer } from './events'
 import { countColumns, hexToNum, shuffle } from './helpers'
 import { createLayoutCtx } from './layout'
-import { applyMobileOverrides, initMobileDemo, isMobile } from './mobile'
+import { initMobileDemo } from './mobile'
 import { createParams, displaySize } from './params'
 import { buildScene } from './scene'
 import { createScrollZoomController } from './scroll-zoom'
@@ -92,6 +92,7 @@ const KEY_MAP: Record<string, DispatchEvent> = {
 }
 
 interface AppOptions {
+  demoMode?: boolean
   onMarketplace?: () => void
   onEscSkipActivated?: () => void
   onEscSkipProgress?: (progress: number) => void
@@ -113,9 +114,8 @@ export async function createApp(
   options?: AppOptions,
 ): Promise<AppHandle> {
   refreshPalette()
+  const demoMode = options?.demoMode ?? false
   const params = createParams()
-  const mobile = isMobile()
-  if (mobile) applyMobileOverrides(params)
 
   const app = new Application()
   await app.init({
@@ -133,7 +133,6 @@ export async function createApp(
   const focusCrosshair = createFocusCrosshair(s.tuiContainer)
   const pool = createTextPool(params)
   const machine = createMachine()
-  machine.mobile = mobile
   const flicker = createFlickerState()
   const breathing = createBreathingState()
   const lctx = createLayoutCtx(s.chW, params.fontSize, params.lineHeightOffset)
@@ -150,13 +149,10 @@ export async function createApp(
   const escSkip: EscSkip = createEscSkip(params.fontSize, s.chW, s.contentW, s.contentH)
   s.tuiContainer.addChild(escSkip.popup)
 
-  let brightnessBar: BrightnessBar | null = null
-  if (!mobile) {
-    brightnessBar = createBrightnessBar(params.fontSize, s.chW, s.contentH)
-    brightnessBar.container.x = -(s.chW * 2 + brightnessBar.track.width)
-    brightnessBar.container.y = Math.round(s.contentH * 0.2)
-    s.tuiContainer.addChild(brightnessBar.container)
-  }
+  const brightnessBar = createBrightnessBar(params.fontSize, s.chW, s.contentH)
+  brightnessBar.container.x = -(s.chW * 2 + brightnessBar.track.width)
+  brightnessBar.container.y = Math.round(s.contentH * 0.2)
+  s.tuiContainer.addChild(brightnessBar.container)
 
   const doDispatch = (event: DispatchEvent) =>
     dispatch(event, machine, localeSets, idiotSet, {
@@ -249,7 +245,7 @@ export async function createApp(
     } else {
       applyStateEntry(state, machine, updateSuggestion, startDemo)
     }
-    zoomCtrl?.applyJumpcut(state)
+    zoomCtrl.applyJumpcut(state)
     ts.layoutDirty = true
     ts.statusDirty = true
   }
@@ -257,10 +253,15 @@ export async function createApp(
   syncResolution(app, s, params)
   flushCamera()
 
-  const zoomCtrl = mobile
-    ? null
-    : createZoomController(params, updateCamera, syncParamsToScene, s, lctx, app.screen.height)
-  const scrollZoomCtrl = mobile ? null : createScrollZoomController(s.scrollZoomWrap, app.canvas)
+  const zoomCtrl = createZoomController(
+    params,
+    updateCamera,
+    syncParamsToScene,
+    s,
+    lctx,
+    app.screen.height,
+  )
+  const scrollZoomCtrl = createScrollZoomController(s.scrollZoomWrap, app.canvas)
 
   let cameraDirty = true
 
@@ -275,18 +276,16 @@ export async function createApp(
     currentZoom: 1,
   }
 
-  const onMouseMove = mobile
-    ? null
-    : (e: MouseEvent) => {
-        const rect = app.canvas.getBoundingClientRect()
-        mouseState.x = (e.clientX - rect.left) / rect.width
-        mouseState.y = (e.clientY - rect.top) / rect.height
-        mouseState.targetTX = (mouseState.x - 0.5) * -MOUSE_DEFAULTS.translateRange
-        mouseState.targetTY = (mouseState.y - 0.5) * -MOUSE_DEFAULTS.translateRange
-        const dist = Math.hypot(mouseState.x - 0.5, mouseState.y - 0.5)
-        mouseState.targetZoom = 1 - dist * MOUSE_DEFAULTS.zoomFactor
-      }
-  if (onMouseMove) window.addEventListener('mousemove', onMouseMove)
+  const onMouseMove = (e: MouseEvent) => {
+    const rect = app.canvas.getBoundingClientRect()
+    mouseState.x = (e.clientX - rect.left) / rect.width
+    mouseState.y = (e.clientY - rect.top) / rect.height
+    mouseState.targetTX = (mouseState.x - 0.5) * -MOUSE_DEFAULTS.translateRange
+    mouseState.targetTY = (mouseState.y - 0.5) * -MOUSE_DEFAULTS.translateRange
+    const dist = Math.hypot(mouseState.x - 0.5, mouseState.y - 0.5)
+    mouseState.targetZoom = 1 - dist * MOUSE_DEFAULTS.zoomFactor
+  }
+  window.addEventListener('mousemove', onMouseMove)
 
   const onResize = () => {
     syncResolution(app, s, params)
@@ -300,16 +299,14 @@ export async function createApp(
     // Tweens default to `performance.now()`; passing `Date.now()` causes them to jump/finish instantly.
     tweenGroup.update()
 
-    if (!mobile) {
-      const lerpFactor = MOUSE_DEFAULTS.lerpFactor
-      mouseState.currentTX += (mouseState.targetTX - mouseState.currentTX) * lerpFactor
-      mouseState.currentTY += (mouseState.targetTY - mouseState.currentTY) * lerpFactor
-      mouseState.currentZoom += (mouseState.targetZoom - mouseState.currentZoom) * lerpFactor
-      params.mouseTranslateX = mouseState.currentTX
-      params.mouseTranslateY = mouseState.currentTY
-      params.mouseZoom = mouseState.currentZoom
-      cameraDirty = true
-    }
+    const lerpFactor = MOUSE_DEFAULTS.lerpFactor
+    mouseState.currentTX += (mouseState.targetTX - mouseState.currentTX) * lerpFactor
+    mouseState.currentTY += (mouseState.targetTY - mouseState.currentTY) * lerpFactor
+    mouseState.currentZoom += (mouseState.targetZoom - mouseState.currentZoom) * lerpFactor
+    params.mouseTranslateX = mouseState.currentTX
+    params.mouseTranslateY = mouseState.currentTY
+    params.mouseZoom = mouseState.currentZoom
+    cameraDirty = true
     if (cameraDirty) {
       flushCamera()
       cameraDirty = false
@@ -327,7 +324,7 @@ export async function createApp(
       tickDemo(now, ts, s, params, lctx)
     tickLayout(ts, s, params, machine, lctx, scrollItems, pool)
     tickFlicker(s, machine, params, flicker, lctx)
-    if (!mobile) tickBreathing(breathing, s.breathingWrap, now, app.screen.width, app.screen.height)
+    tickBreathing(breathing, s.breathingWrap, now, app.screen.width, app.screen.height)
     if (brightnessBar) tickBrightnessBar(brightnessBar)
     const escTick = tickEsc(escSkip)
     if (escTick.justActivated) {
@@ -397,7 +394,7 @@ export async function createApp(
       if (machine.current === State.ESC_COUNTDOWN) enterState(machine.previous)
     }
   }
-  if (!mobile) {
+  if (!demoMode) {
     document.addEventListener('keydown', onKeyDown)
     document.addEventListener('keyup', onKeyUp)
   }
@@ -410,14 +407,15 @@ export async function createApp(
   })
 
   let headerAdded = false
-  let mobileTapHandler: (() => void) | null = null
-  if (mobile) {
-    mobileTapHandler = initMobileDemo({
+  let demoTapHandler: (() => void) | null = null
+  if (demoMode) {
+    demoTapHandler = initMobileDemo({
       machine,
       localeSets,
       ts,
       s,
       params,
+      lctx,
       scrollItems,
       pool,
       canvas: app.canvas,
@@ -468,7 +466,7 @@ export async function createApp(
   if (location.hostname === 'localhost') toggleDevtools()
 
   function restartExperience(): void {
-    if (mobile) return
+    if (demoMode) return
     destroyBootAnim(bootAnim)
     resetEsc(escSkip)
     machine.current = State.IDLE
@@ -488,7 +486,7 @@ export async function createApp(
       machine.buggedTimer = null
     }
     machine.overlapped = false
-    scrollZoomCtrl?.enable()
+    scrollZoomCtrl.enable()
     enterState(State.INTRO)
   }
 
@@ -497,14 +495,14 @@ export async function createApp(
       destroyed = true
       destroyBootAnim(bootAnim)
       resetEsc(escSkip)
-      scrollZoomCtrl?.cleanup()
+      scrollZoomCtrl.cleanup()
       window.removeEventListener('resize', onResize)
-      if (onMouseMove) window.removeEventListener('mousemove', onMouseMove)
-      if (!mobile) {
+      window.removeEventListener('mousemove', onMouseMove)
+      if (!demoMode) {
         document.removeEventListener('keydown', onKeyDown)
         document.removeEventListener('keyup', onKeyUp)
       }
-      if (mobileTapHandler) app.canvas.removeEventListener('pointerup', mobileTapHandler)
+      if (demoTapHandler) app.canvas.removeEventListener('pointerup', demoTapHandler)
       if (machine.demoTimer) clearTimeout(machine.demoTimer)
       if (machine.buggedTimer) clearTimeout(machine.buggedTimer)
       pool.flush()
@@ -514,8 +512,8 @@ export async function createApp(
       // biome-ignore lint/suspicious/noExplicitAny: cleanup window globals
       ;(window as any).__PIXI_DEVTOOLS__ = undefined
     },
-    disableScrollZoom: () => scrollZoomCtrl?.disable(),
-    enableScrollZoom: () => scrollZoomCtrl?.enable(),
+    disableScrollZoom: () => scrollZoomCtrl.disable(),
+    enableScrollZoom: () => scrollZoomCtrl.enable(),
     restartExperience,
     setOverlapped: (v: boolean) => {
       machine.overlapped = v

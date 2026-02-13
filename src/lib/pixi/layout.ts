@@ -3,7 +3,6 @@ import { SEQUENCE, stateConfig } from './config'
 import { LAYOUT } from './constants'
 import type { LineDef } from './events'
 import { countColumns, repeat } from './helpers'
-import { layoutMobile } from './mobile'
 import type { Params } from './params'
 import type { Machine } from './state-machine'
 import type { TextPool } from './text-pool'
@@ -12,11 +11,12 @@ export interface LayoutCtx {
   chW: number
   lineHeight: number
   prevRuleCols: number
+  chromeOffsetY: number
 }
 
 export function createLayoutCtx(chW: number, fontSize: number, offset: number): LayoutCtx {
   const baseLineHeight = Math.round(fontSize * LAYOUT.lineHeightRatio)
-  return { chW, lineHeight: baseLineHeight + offset, prevRuleCols: 0 }
+  return { chW, lineHeight: baseLineHeight + offset, prevRuleCols: 0, chromeOffsetY: 0 }
 }
 
 export function layoutScrollItems(
@@ -80,11 +80,6 @@ export function layout(
   },
   pool: TextPool,
 ): void {
-  if (machine.mobile) {
-    layoutMobile(screenW, screenH, lctx, ui)
-    return
-  }
-
   const { chW, lineHeight: lh } = lctx
   const col3 = Math.round(LAYOUT.defaultCol * chW)
   ui.verbText.x = col3
@@ -156,7 +151,7 @@ export function layout(
 
   if (cfg.showSpinner) {
     layoutScrollItems(ui.scrollItems, ui.spinnerLine.y, lctx, ui.scrollContainer, pool)
-    layoutChrome(ui, ui.metaLine.y + lh + pad, lh, pad, ch1)
+    layoutChrome(ui, ui.metaLine.y + lh + pad + lctx.chromeOffsetY, lh, pad, ch1)
   } else {
     layoutIdle(ui, lctx, screenH, pad, ch1)
   }

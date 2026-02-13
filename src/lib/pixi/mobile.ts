@@ -1,7 +1,7 @@
 import type { VerbSet } from '$lib/data/types'
 import type { Container, Text } from 'pixi.js'
 import { resetDemoState } from './app-helpers'
-import { countColumns } from './helpers'
+import { PALETTE } from './constants'
 import type { LayoutCtx } from './layout'
 import type { Params } from './params'
 import type { SceneRefs } from './scene'
@@ -15,78 +15,37 @@ export function isMobile(): boolean {
   return typeof window !== 'undefined' && window.innerWidth < MOBILE_BREAKPOINT
 }
 
-/** Override params for a flat, zoomed-in mobile view. */
-export function applyMobileOverrides(params: Params): void {
-  params.rotateX = 0
-  params.rotateY = 0
-  params.rotateZ = 0
-  params.zoom = 1
-  params.screenPadding = 0.05
-  params.absoluteX = 0
-  params.absoluteY = 0
-  params.offsetX = 3
-  params.offsetY = -2
-  params.lcdEnabled = true
-  params.deadPixelsEnabled = false
-  params.bloomStrength = 1
-  params.displayDownscale = 0.5
-  params.fontSize = 36
-  params.lineHeightOffset = 2
-}
-
-/** Minimal layout: centre spinner + meta, hide everything else. */
-export function layoutMobile(
-  screenW: number,
-  screenH: number,
-  lctx: LayoutCtx,
-  ui: {
-    spinnerLine: Container
-    metaLine: Container
-    scrollContainer: Container
-    bottomChrome: Container
-    inputContainer: Container
-    verbText: Text
-    ellipsisText: Text
-  },
-): void {
-  const { chW, lineHeight: lh } = lctx
-  const col3 = Math.round(3 * chW)
-
-  ui.inputContainer.visible = false
-  ui.scrollContainer.visible = false
-  ui.bottomChrome.visible = false
-  ui.spinnerLine.visible = true
-  ui.metaLine.visible = true
-
-  const verbW = Math.round(countColumns(ui.verbText.text) * chW)
-  const ellipsisW = Math.round(countColumns(ui.ellipsisText.text) * chW)
-  const spinnerW = col3 + verbW + ellipsisW + Math.round(chW)
-  const spinnerX = Math.max(0, Math.round((screenW - spinnerW) / 2))
-  const spinnerY = Math.round(screenH / 2 - lh)
-
-  ui.spinnerLine.x = spinnerX
-  ui.spinnerLine.y = spinnerY
-  ui.verbText.x = col3
-  ui.ellipsisText.x = ui.verbText.x + verbW
-
-  ui.metaLine.x = spinnerX + col3
-  ui.metaLine.y = spinnerY + 2 * lh
-}
-
 interface MobileContext {
   machine: Machine
   localeSets: VerbSet[]
   ts: TickerState
   s: SceneRefs
   params: Params
+  lctx: LayoutCtx
   scrollItems: (Text | Container)[]
   pool: TextPool
   canvas: HTMLCanvasElement
 }
 
+function setMarketplaceHint(s: SceneRefs, lctx: LayoutCtx): void {
+  const msg = 'check back on desktop for the marketplace'
+  const border = '\u2500'.repeat(msg.length + 2)
+  s.ruleTop.text = `\u250c${border}\u2510`
+  s.ruleTop.style.fill = PALETTE.dim
+  s.promptText.text = `\u2502 ${msg} \u2502`
+  s.promptText.style.fill = PALETTE.dim
+  s.ruleBottom.text = `\u2514${border}\u2518`
+  s.ruleBottom.style.fill = PALETTE.dim
+  // Lock prevRuleCols so layout never overwrites our custom rule text
+  const ruleCols = Math.max(1, Math.floor(s.contentW / lctx.chW) - 2)
+  lctx.prevRuleCols = ruleCols
+  // Shift chrome 1 line up (closer to spinner)
+  lctx.chromeOffsetY = -lctx.lineHeight
+}
+
 /** Start mobile demo with first locale set and wire up tap-to-cycle. */
 export function initMobileDemo(ctx: MobileContext): () => void {
-  const { machine, localeSets, ts, s, params, scrollItems, pool, canvas } = ctx
+  const { machine, localeSets, ts, s, params, lctx, scrollItems, pool, canvas } = ctx
   const firstSet = localeSets[0] ?? null
   if (firstSet) {
     machine.activeSet = firstSet
@@ -94,6 +53,8 @@ export function initMobileDemo(ctx: MobileContext): () => void {
     machine.current = State.DEMO
     resetDemoState(firstSet, ts, s, params, scrollItems, pool)
   }
+
+  setMarketplaceHint(s, lctx)
   ts.layoutDirty = true
 
   const onTap = () => {

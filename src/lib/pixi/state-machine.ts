@@ -40,7 +40,6 @@ export interface Machine {
   buggedTimer: ReturnType<typeof setTimeout> | null
   hasSubmitted: boolean
   tabCompleted: boolean
-  mobile: boolean
   overlapped: boolean
 }
 
@@ -56,7 +55,6 @@ export function createMachine(): Machine {
     buggedTimer: null,
     hasSubmitted: false,
     tabCompleted: false,
-    mobile: false,
     overlapped: false,
   }
 }

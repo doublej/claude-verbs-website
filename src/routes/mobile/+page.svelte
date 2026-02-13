@@ -9,10 +9,13 @@ const { data }: { data: PageData } = $props()
 let wrap: HTMLDivElement
 
 onMount(() => {
+  document.documentElement.setAttribute('data-theme', 'dark')
+
   const sets = loadSets()
   let handle: Awaited<ReturnType<typeof createApp>> | undefined
 
   createApp(wrap, sets, {
+    demoMode: true,
     onMarketplace: () => {},
     onEscSkipActivated: () => {},
     onEscSkipProgress: () => {},

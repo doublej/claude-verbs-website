@@ -2,14 +2,12 @@
 import Gallery from '$lib/components/Gallery.svelte'
 import { loadSets } from '$lib/data/sets'
 import { type AppHandle, createApp } from '$lib/pixi/app'
-import { isMobile } from '$lib/pixi/mobile'
 import { onMount } from 'svelte'
 import type { PageData } from './$types'
 
 const { data }: { data: PageData } = $props()
 
 let wrap: HTMLDivElement
-let mobile = $state(false)
 let revealed = $state(false)
 let scrollLocked = $state(true)
 let escHintActive = $state(false)
@@ -32,7 +30,7 @@ function unlock() {
 }
 
 function lock() {
-  if (!revealed || mobile) return
+  if (!revealed) return
   revealed = false
   scrollLocked = true
   escHintActive = false
@@ -98,8 +96,7 @@ $effect(() => {
 onMount(() => {
   const skipIntro = window.location.hash === '#browse'
   if (!skipIntro) window.scrollTo(0, 0)
-  mobile = isMobile()
-  if (mobile || skipIntro) {
+  if (skipIntro) {
     scrollLocked = false
     revealed = true
   }
@@ -154,7 +151,7 @@ onMount(() => {
   })
 
   function onScroll() {
-    if (mobile || !revealed) return
+    if (!revealed) return
     if (window.scrollY <= 0) showRestartHint()
     else cancelRestart()
   }
@@ -190,8 +187,8 @@ onMount(() => {
 	/>
 </svelte:head>
 
-<div bind:this={wrap} id="canvas-wrap" class:revealed class:mobile>
-	{#if !revealed && !mobile}
+<div bind:this={wrap} id="canvas-wrap" class:revealed>
+	{#if !revealed}
 		<button class="skip-btn" class:esc-active={escHintActive} onclick={() => appHandle ? appHandle.skipToMarketplace() : unlock()}>
 			{#if escHintActive}
 				<span class="skip-btn__sizer" aria-hidden="true">SKIP INTRO</span>
@@ -204,7 +201,7 @@ onMount(() => {
 	{/if}
 </div>
 
-{#if restartHintActive && !mobile}
+{#if restartHintActive}
 	<div class="restart-hint">
 		<span class="restart-hint__sizer" aria-hidden="true">HOLD ENTER TO RESTART</span>
 		<span class="restart-hint__label">HOLD ENTER TO RESTART</span>
@@ -437,10 +434,6 @@ onMount(() => {
 		margin-top: 100svh;
 	}
 
-	:global(body:has(#canvas-wrap.mobile)) main {
-		margin-top: 0;
-	}
-
 	/* ---- Sections ---- */
 
 	section { padding: 4rem 0; }
@@ -547,12 +540,6 @@ onMount(() => {
 	footer a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
 	footer a:hover { color: var(--accent); }
 	footer .footer__sep { margin: 0 0.5rem; }
-
-	#canvas-wrap.mobile {
-		position: relative;
-		height: 60svh;
-		z-index: 0;
-	}
 
 	@media (max-width: 600px) {
 		section { padding: 2.5rem 0; }

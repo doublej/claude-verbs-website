@@ -1,15 +1,24 @@
 <script lang="ts">
-import { clearDetected, getTheme, getWasDetected, setTheme } from '$lib/theme.svelte'
+import {
+  type Theme,
+  clearDetected,
+  getResolvedTheme,
+  getTheme,
+  getWasDetected,
+  setTheme,
+} from '$lib/theme.svelte'
 import { onMount } from 'svelte'
 
 const theme = $derived(getTheme())
+const resolvedTheme = $derived(getResolvedTheme())
 const detected = $derived(getWasDetected())
 
 let showDetected = $state(false)
 
+const THEME_ORDER: Theme[] = ['light', 'dark', 'system']
+
 onMount(() => {
   if (!detected) return
-  // small delay so the slide-in animation is visible
   requestAnimationFrame(() => {
     showDetected = true
     setTimeout(() => {
@@ -20,17 +29,25 @@ onMount(() => {
 })
 
 function cycleTheme() {
-  setTheme(theme === 'light' ? 'dark' : 'light')
+  const idx = THEME_ORDER.indexOf(theme)
+  const next = THEME_ORDER[(idx + 1) % THEME_ORDER.length]
+  setTheme(next)
 }
 
 function getLabel(): string {
-  return theme === 'light' ? 'Light mode' : 'Dark mode'
+  if (theme === 'system') {
+    return `Theme: System (${resolvedTheme}). Activate to switch to light mode.`
+  }
+  return `Theme: ${theme === 'light' ? 'Light' : 'Dark'}. Activate to switch to ${
+    theme === 'light' ? 'dark' : 'system'
+  } mode.`
 }
 </script>
 
 <div class="theme-toggle-wrapper">
 	<button
 		class="theme-toggle"
+		type="button"
 		onclick={cycleTheme}
 		aria-label={getLabel()}
 		title={getLabel()}
@@ -43,15 +60,22 @@ function getLabel(): string {
 				<line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
 				<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
 			</svg>
-		{:else}
+		{:else if theme === 'dark'}
 			<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 				<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+			</svg>
+		{:else}
+			<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<rect x="3" y="5" width="18" height="13" rx="1" />
+				<line x1="8" y1="21" x2="16" y2="21" />
+				<line x1="12" y1="18" x2="12" y2="21" />
+				<path d="M15.5 9.2A3.6 3.6 0 1 1 10.8 13 2.9 2.9 0 0 0 15.5 9.2z" />
 			</svg>
 		{/if}
 	</button>
 
 	<div class="detected-badge" class:visible={showDetected}>
-		DETECTED
+		AUTO
 	</div>
 </div>
 
@@ -83,6 +107,11 @@ function getLabel(): string {
 	.theme-toggle:hover {
 		background: var(--bg-surface);
 		transform: scale(1.05);
+	}
+
+	.theme-toggle:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: -2px;
 	}
 
 	.theme-toggle:active {

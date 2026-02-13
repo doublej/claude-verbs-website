@@ -40,7 +40,7 @@ export function buildDeadPixelLayers(w: number, h: number, enabled: boolean): De
     const y = snapToGrid(rawY, grid)
 
     if (STUCK_RED_INDICES.has(i)) {
-      stuckCtx.fillStyle = '#ff0000'
+      stuckCtx.fillStyle = PALETTE.stuckPixel
       stuckCtx.fillRect(x, y, grid, grid)
     } else {
       darkCtx.fillStyle = getDeadPixelColor(i)

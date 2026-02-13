@@ -1,10 +1,10 @@
-export const SPINNER_FRAMES = ["·", "✻", "✽", "✶", "✳", "✢"];
-export const SPINNER_TIMELINE = [0, 0, 1, 2, 3, 4, 5, 5];
-export const FONT_FAMILY = '"SF Mono", "Fira Code", "Cascadia Code", monospace';
+export const SPINNER_FRAMES = ['·', '✻', '✽', '✶', '✳', '✢']
+export const SPINNER_TIMELINE = [0, 0, 1, 2, 3, 4, 5, 5]
+export const FONT_FAMILY = '"SF Mono", "Fira Code", "Cascadia Code", monospace'
 
-function isLight(): boolean {
-  if (typeof document === "undefined") return false;
-  return document.documentElement.getAttribute("data-theme") === "light";
+export function isLightTheme(): boolean {
+  if (typeof document === 'undefined') return false
+  return document.documentElement.getAttribute('data-theme') === 'light'
 }
 
 const LIGHT_PALETTE = {
@@ -16,15 +16,16 @@ const LIGHT_PALETTE = {
   ok: 0x22c55e,
   warn: 0xd97706,
   error: 0xdc2626,
-  prompt: 0x7c3aed,
+  prompt: 0x0550ae,
   accent: 0x0969da,
-  suggestion: 0x8b8b8b,
+  suggestion: 0x6e7781,
   active: 0x000000,
-  deadPixel: "#d0d0d0",
-  deadPixelRed: "#e8a0a0",
-  deadPixelBlue: "#a0a0e8",
-  deadPixelGreen: "#a0e8a0",
-} as const;
+  deadPixel: '#d0d0d0',
+  deadPixelRed: '#e8a0a0',
+  deadPixelBlue: '#a0a0e8',
+  deadPixelGreen: '#a0e8a0',
+  stuckPixel: '#d14343',
+} as const
 
 const DARK_PALETTE = {
   border: 0x30363d,
@@ -39,17 +40,18 @@ const DARK_PALETTE = {
   accent: 0x79c0ff,
   suggestion: 0x555555,
   active: 0xffffff,
-  deadPixel: "#0a0c10",
-  deadPixelRed: "#3a0808",
-  deadPixelBlue: "#08083a",
-  deadPixelGreen: "#083a08",
-} as const;
+  deadPixel: '#0a0c10',
+  deadPixelRed: '#3a0808',
+  deadPixelBlue: '#08083a',
+  deadPixelGreen: '#083a08',
+  stuckPixel: '#ff0000',
+} as const
 
 /** Cached palette — call `refreshPalette()` if theme changes at runtime. */
-export let PALETTE = isLight() ? { ...LIGHT_PALETTE } : { ...DARK_PALETTE };
+export let PALETTE = isLightTheme() ? { ...LIGHT_PALETTE } : { ...DARK_PALETTE }
 
 export function refreshPalette(): void {
-  PALETTE = isLight() ? { ...LIGHT_PALETTE } : { ...DARK_PALETTE };
+  PALETTE = isLightTheme() ? { ...LIGHT_PALETTE } : { ...DARK_PALETTE }
 }
 
 export const LAYOUT = {
@@ -58,7 +60,7 @@ export const LAYOUT = {
   panelWidth: 34,
   textPoolCap: 40,
   defaultCol: 3,
-};
+}
 
 export const CAMERA_DEFAULTS = {
   gridDivisions: 32,
@@ -68,16 +70,16 @@ export const CAMERA_DEFAULTS = {
   rotateZ: -4,
   originX: 4.8,
   originY: 5.3,
-};
+}
 
 export const MOUSE_DEFAULTS = {
   translateRange: 1.2,
   zoomFactor: 0.016,
   lerpFactor: 0.02,
-};
+}
 
 export const EFFECT_DEFAULTS = {
   deadPixelCount: 12,
   deadPixelSize: 3,
   lcdGrid: 4.0,
-};
+}

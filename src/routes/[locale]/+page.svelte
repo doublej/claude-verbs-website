@@ -3,7 +3,6 @@ import Gallery from '$lib/components/Gallery.svelte'
 import { loadSets } from '$lib/data/sets'
 import { type AppHandle, createApp } from '$lib/pixi/app'
 import { isMobile } from '$lib/pixi/mobile'
-import { getResolvedTheme } from '$lib/theme.svelte'
 import { onMount } from 'svelte'
 import type { PageData } from './$types'
 

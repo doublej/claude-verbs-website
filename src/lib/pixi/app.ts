@@ -413,8 +413,8 @@ export async function createApp(
   if (demoMode) {
     // Shift focus area to the left on mobile to prevent content from being off-screen
     params.absoluteX = 2
-    // Scale back the scene on mobile to show 2.5x more content
-    params.scale = 0.34
+    // Scale back the scene on mobile to fit better
+    params.scale = 0.85
     demoCleanup = initMobileDemo({
       machine,
       localeSets,

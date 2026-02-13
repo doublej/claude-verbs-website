@@ -13,7 +13,7 @@ import {
   Texture,
 } from 'pixi.js'
 import { createMeshGeometry } from './camera'
-import { FONT_FAMILY, PALETTE } from './constants'
+import { FONT_FAMILY, PALETTE, isLightTheme } from './constants'
 import { buildDeadPixelLayers } from './effects/dead-pixels'
 import { type DofFilter, createDofFilter } from './effects/dof'
 import { createLcdFilter } from './effects/lcd'
@@ -151,7 +151,7 @@ export function buildScene(app: Application, params: Params, dW: number, dH: num
 
   // Display container (rendered to displayRT, gets LCD + bloom + adjustment filters)
   const display = new Container({ label: 'display' })
-  const lcdFilter = createLcdFilter()
+  const lcdFilter = createLcdFilter(isLightTheme())
   lcdFilter.enabled = params.lcdEnabled
 
   const bloomFilter = new BloomFilter({

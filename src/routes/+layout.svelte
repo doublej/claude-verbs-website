@@ -1,11 +1,27 @@
 <script lang="ts">
 import { page } from '$app/stores'
+import { obliterate } from 'orphan-obliterator'
 import ThemeToggle from '$lib/components/ThemeToggle.svelte'
+
+let orphans: ReturnType<typeof obliterate> | null = null
 
 $effect(() => {
   const locale = $page.data.locale as string | undefined
   if (locale) {
     document.documentElement.lang = locale.replace('_', '-')
+  }
+})
+
+$effect(() => {
+  void $page.url.pathname
+  if (orphans) {
+    orphans.update()
+  } else {
+    orphans = obliterate({ selectors: ['h1', 'h2', 'h3', 'p'], observe: true })
+  }
+  return () => {
+    orphans?.destroy()
+    orphans = null
   }
 })
 </script>
@@ -23,6 +39,7 @@ $effect(() => {
     --mono: 'Space Mono', 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
     --display: 'Space Grotesk', system-ui, sans-serif;
     --max-w: 960px;
+    --theme-transition-duration: 0.2s;
   }
 
   :global(html[data-theme='dark']) {
@@ -52,13 +69,27 @@ $effect(() => {
     --text: #24292f;
     --text-muted: #57606a;
     --text-faint: #6e7781;
-    --accent: #16a34a;
-    --accent-dim: rgba(22, 163, 74, 0.15);
-    --cyan: #ca8a04;
-    --bg-home: #f5f5f5;
+    --accent: #0969da;
+    --accent-dim: rgba(9, 105, 218, 0.15);
+    --cyan: #0550ae;
+    --bg-home: #ffffff;
     --border-subtle: rgba(0, 0, 0, 0.08);
     --disclaimer-bg: #e5e7eb;
     --disclaimer-text: #6b7280;
+  }
+
+  :global(html[data-theme-ready='true'] body),
+  :global(html[data-theme-ready='true'] #canvas-wrap),
+  :global(html[data-theme-ready='true'] main),
+  :global(html[data-theme-ready='true'] section),
+  :global(html[data-theme-ready='true'] footer),
+  :global(html[data-theme-ready='true'] .terminal),
+  :global(html[data-theme-ready='true'] .theme-toggle),
+  :global(html[data-theme-ready='true'] .disclaimer-bar) {
+    transition:
+      background-color var(--theme-transition-duration) ease,
+      color var(--theme-transition-duration) ease,
+      border-color var(--theme-transition-duration) ease;
   }
 
   .disclaimer-bar {
@@ -69,6 +100,5 @@ $effect(() => {
     font-size: 0.75rem;
     padding: 12px 12px;
     font-family: system-ui, sans-serif;
-    transition: background-color 0.2s, color 0.2s;
   }
 </style>

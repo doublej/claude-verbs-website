@@ -70,15 +70,19 @@ export const SEQUENCE = {
         bloomStrength: 2,
       },
       INTRO_READY: {
-        focusY: { line: 24, char: 36 } as FocusTarget,
+        focusY: { line: 25, char: 40 } as FocusTarget,
         showMeta: true,
-        durationMs: 0,
+        durationMs: 1000,
       },
-      IDLE: {},
+      IDLE: {
+        showInput: true,
+        showSpinner: false,
+        showMeta: false,
+      },
       BROWSING: {},
       DEMO: { showSpinner: true },
       POST_DEMO: {
-        focusY: { line: 41, char: 66 } as FocusTarget,
+        focusY: { line: 25, char: 46 } as FocusTarget,
         scale: 3,
         showInput: true,
         showSpinner: true,
@@ -89,9 +93,9 @@ export const SEQUENCE = {
       },
       BUGGED: {},
       ESC_COUNTDOWN: {
-        focusY: { line: 10, char: 40 },
-
-        durationMs: 0,
+        //focusY: { line: 10, char: 40 },
+        showSpinner: false,
+        durationMs: 1500,
         scale: 1,
         brightness: 1,
         saturation: 1,

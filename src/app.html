@@ -7,9 +7,22 @@
 		<title>Claude Verbs</title>
 		<script>
 			(function() {
-				const stored = localStorage.getItem('theme');
-				const theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-				document.documentElement.setAttribute('data-theme', theme);
+				const root = document.documentElement;
+				root.setAttribute('data-theme-ready', 'false');
+				let mode = 'system';
+				try {
+					const stored = localStorage.getItem('theme');
+					if (stored === 'light' || stored === 'dark' || stored === 'system') {
+						mode = stored;
+					}
+				} catch {}
+				const prefersDark =
+					typeof window.matchMedia === 'function' &&
+					window.matchMedia('(prefers-color-scheme: dark)').matches;
+				const resolvedTheme = mode === 'system' ? (prefersDark ? 'dark' : 'light') : mode;
+				root.setAttribute('data-theme-mode', mode);
+				root.setAttribute('data-theme', resolvedTheme);
+				root.style.colorScheme = resolvedTheme;
 			})();
 		</script>
 		%sveltekit.head%

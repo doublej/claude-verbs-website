@@ -142,7 +142,7 @@ onMount(() => {
         <AuthorPopup {author} />
       {/if}
     </span>
-    <span>{set.verbCount} verbs</span>
+    <span class="card__verb-count">{set.verbCount} verbs</span>
   </div>
 </div>
 
@@ -157,11 +157,18 @@ onMount(() => {
     background: var(--bg-raised);
   }
 
+  .card:hover .card__name,
+  .card:hover .card__verb-count {
+    opacity: 1;
+  }
+
   .card__name {
     font-size: 1rem;
     font-weight: 700;
     color: var(--accent);
     margin-bottom: 0.35rem;
+    opacity: 0;
+    transition: opacity 0.2s;
   }
 
   .card__desc {
@@ -169,6 +176,10 @@ onMount(() => {
     color: var(--text-muted);
     margin-bottom: 0.65rem;
     line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .card__preview {
@@ -224,6 +235,11 @@ onMount(() => {
   @keyframes blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
+  }
+
+  .card__verb-count {
+    opacity: 0;
+    transition: opacity 0.2s;
   }
 
   .card__meta {

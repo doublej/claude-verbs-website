@@ -176,6 +176,7 @@ onMount(() => {
     color: var(--text-muted);
     margin-bottom: 0.65rem;
     line-height: 1.5;
+    height: calc(2 * 1.5 * 0.78rem);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;

@@ -48,6 +48,7 @@ export interface Params {
   focusTargetY: number
   focusStrength: number
   screenPadding: number
+  userBrightness: number
 }
 
 export function displaySize(viewW: number, viewH: number, downscale: number): [number, number] {
@@ -112,5 +113,6 @@ export function createParams(): Params {
     focusTargetY: 0,
     focusStrength: 0,
     screenPadding: 0.15,
+    userBrightness: 1.0,
   }
 }

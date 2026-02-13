@@ -11,8 +11,16 @@ import {
   updateSuggestionUI,
 } from './app-helpers'
 import { type BootAnim, createBootAnim, destroyBootAnim, runBootAnim } from './boot'
+import {
+  type BrightnessBar,
+  adjustBrightness,
+  createBrightnessBar,
+  startDimAnimation,
+  tickBrightnessBar,
+} from './brightness-bar'
 import { applyCamera } from './camera'
 import { MOUSE_DEFAULTS, PALETTE, refreshPalette } from './constants'
+import { createFocusCrosshair, updateFocusCrosshair } from './debug-focus'
 import { createBreathingState, tickBreathing } from './effects/breathing'
 import { updateDofUniforms } from './effects/dof'
 import { createFlickerState } from './effects/flicker'
@@ -44,7 +52,6 @@ import {
 } from './ticker'
 import { tweenGroup } from './tween-group'
 import { createZoomController } from './zoom'
-import { createFocusCrosshair, updateFocusCrosshair } from './debug-focus'
 
 function resolveLocale(sets: VerbSets, preferredLang?: string): string {
   if (preferredLang && sets[preferredLang]) return preferredLang
@@ -143,6 +150,14 @@ export async function createApp(
   const escSkip: EscSkip = createEscSkip(params.fontSize, s.chW, s.contentW, s.contentH)
   s.tuiContainer.addChild(escSkip.popup)
 
+  let brightnessBar: BrightnessBar | null = null
+  if (!mobile) {
+    brightnessBar = createBrightnessBar(params.fontSize, s.chW, s.contentH)
+    brightnessBar.container.x = -(s.chW * 2 + brightnessBar.track.width)
+    brightnessBar.container.y = Math.round(s.contentH * 0.2)
+    s.tuiContainer.addChild(brightnessBar.container)
+  }
+
   const doDispatch = (event: DispatchEvent) =>
     dispatch(event, machine, localeSets, idiotSet, {
       enterState,
@@ -199,7 +214,14 @@ export async function createApp(
     exitCurrentState(machine)
     machine.previous = machine.current
     machine.current = state
-    if (state === State.POST_DEMO) machine.postIndex = 0
+    if (state === State.POST_DEMO) {
+      machine.postIndex = 0
+      if (brightnessBar)
+        startDimAnimation(brightnessBar, 7, 120, (mult) => {
+          params.userBrightness = mult
+          syncParamsToScene()
+        })
+    }
     if (state === State.BUGGED) {
       flicker.mode = 0
       machine.buggedTimer = setTimeout(() => doDispatch('BUGGED_TIMEOUT'), BUGGED_TIMEOUT_MS)
@@ -306,6 +328,7 @@ export async function createApp(
     tickLayout(ts, s, params, machine, lctx, scrollItems, pool)
     tickFlicker(s, machine, params, flicker, lctx)
     if (!mobile) tickBreathing(breathing, s.breathingWrap, now, app.screen.width, app.screen.height)
+    if (brightnessBar) tickBrightnessBar(brightnessBar)
     const escTick = tickEsc(escSkip)
     if (escTick.justActivated) {
       options?.onEscSkipActivated?.()
@@ -359,6 +382,12 @@ export async function createApp(
     } else if (e.key === 'Tab') {
       e.preventDefault()
       doDispatch('TAB')
+    } else if ((e.key === '+' || e.key === '=') && brightnessBar) {
+      params.userBrightness = adjustBrightness(brightnessBar, 1)
+      syncParamsToScene()
+    } else if ((e.key === '-' || e.key === '_') && brightnessBar) {
+      params.userBrightness = adjustBrightness(brightnessBar, -1)
+      syncParamsToScene()
     } else if (e.key === '`') toggleDevtools()
   }
   const onKeyUp = (e: KeyboardEvent) => {
@@ -412,9 +441,9 @@ export async function createApp(
     updateCamera()
     s.lcdFilter.enabled = params.lcdEnabled
     s.bloomFilter.enabled = params.bloomEnabled
-    s.bloomFilter.strengthX = params.bloomStrength
-    s.bloomFilter.strengthY = params.bloomStrength
-    s.adjustmentFilter.brightness = params.brightness * params.exposure
+    s.bloomFilter.strengthX = params.bloomStrength * params.userBrightness
+    s.bloomFilter.strengthY = params.bloomStrength * params.userBrightness
+    s.adjustmentFilter.brightness = params.brightness * params.exposure * params.userBrightness
     s.adjustmentFilter.saturation = params.saturation
     s.deadPixelSprite.visible = params.deadPixelsEnabled
     s.stuckPixelSprite.visible = params.deadPixelsEnabled

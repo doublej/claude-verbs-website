@@ -5,12 +5,15 @@ import { State, createMachine, dispatch } from './state-machine'
 function mkSet(name: string): VerbSet {
   return {
     name,
+    displayName: name,
     description: `${name} verbs`,
     author: 'test',
     github: 'https://example.com',
     language: 'en',
+    category: 'original',
     verbCount: 2,
     verbs: ['think', 'ship'],
+    createdAt: '2026-02-11T00:00:00+00:00',
   }
 }
 

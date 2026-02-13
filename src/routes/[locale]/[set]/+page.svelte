@@ -120,11 +120,14 @@ onMount(() => {
 
     <div class="verbs">
       <div class="verbs__label">{hasMore ? `Preview (${previewVerbs.length} of ${set.verbCount})` : 'All verbs'}</div>
-      <div class="verbs__list">
-        {#each previewVerbs as verb}
-          <div class="verbs__item">{verb}</div>
+      <ul class="verbs__list">
+        {#each previewVerbs as verb, i}
+          <li class="verbs__item">
+            <span class="verbs__index">{String(i + 1).padStart(2, '0')}</span>
+            <span class="verbs__text">{verb}</span>
+          </li>
         {/each}
-      </div>
+      </ul>
       {#if hasMore}
         <p class="verbs__more">Install to get all {set.verbCount} verbs</p>
       {/if}
@@ -277,33 +280,51 @@ onMount(() => {
 
   /* ---- Verbs ---- */
 
+  .verbs { max-width: 560px; }
+
   .verbs__label {
     font-size: 0.72rem;
     color: var(--text-faint);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
   }
 
   .verbs__list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 0.25rem 1.5rem;
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    line-height: 1.8;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+    font-size: 0.8rem;
   }
 
-  .verbs__item::before { content: '- '; color: var(--text-faint); }
+  .verbs__item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.4rem 0.75rem;
+    color: var(--text-muted);
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
+    transition: background-color 0.15s;
+  }
+
+  .verbs__item:last-child { border-bottom: none; }
+
+  .verbs__item:hover { background: var(--accent-dim); }
+
+  .verbs__index {
+    color: var(--text-faint);
+    font-size: 0.7rem;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .verbs__text { flex: 1; }
 
   .verbs__more {
-    margin-top: 1rem;
+    margin-top: 0.75rem;
     font-size: 0.75rem;
     color: var(--text-faint);
     font-style: italic;
-  }
-
-  @media (max-width: 600px) {
-    .verbs__list { grid-template-columns: 1fr; }
   }
 </style>

@@ -70,6 +70,24 @@ build:
     bun run build
 
 [group('data')]
+set-dates:
+    #!/usr/bin/env zsh
+    cd src/lib/data/claude-verbs
+    echo '{'
+    first=1
+    for f in sets/*.json; do
+        name=$(basename "$f" .json)
+        [[ "$name" == schema || "$name" == index || "$name" == _template ]] && continue
+        ts=$(git log --follow --diff-filter=A --format="%aI" -- "$f" | tail -1)
+        [[ -z "$ts" ]] && continue
+        (( first )) || echo ','
+        printf '  "%s": "%s"' "$name" "$ts"
+        first=0
+    done
+    echo ''
+    echo '}'
+
+[group('data')]
 sync-sets:
     rm -rf src/lib/data/sets/en src/lib/data/sets/nl
     cp -r ../claude-verbs/en ../claude-verbs/nl src/lib/data/sets/

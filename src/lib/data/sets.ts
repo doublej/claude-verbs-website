@@ -1,4 +1,5 @@
 import { localeToLang } from '$lib/locale'
+import setDates from './set-dates.json'
 import type { VerbSet, VerbSets } from './types'
 
 interface RawAuthorProject {
@@ -31,6 +32,8 @@ function normalizeVerb(line: string): string {
 const PREVIEW_LIMIT = 10
 const isProd = import.meta.env.PROD
 
+const dates = setDates as Record<string, string>
+
 function toVerbSet(raw: RawSetJson): VerbSet {
   const allVerbs = raw.config.spinnerVerbs.verbs.map(normalizeVerb)
   const verbs = isProd ? allVerbs.slice(0, PREVIEW_LIMIT) : allVerbs
@@ -44,6 +47,7 @@ function toVerbSet(raw: RawSetJson): VerbSet {
     category: raw.category ?? 'original',
     verbCount: allVerbs.length,
     verbs,
+    createdAt: dates[raw.name] ?? '',
   }
 }
 

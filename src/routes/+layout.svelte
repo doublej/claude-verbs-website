@@ -45,9 +45,9 @@ $effect(() => {
   }
 
   :global(html[data-theme='light']) {
-    --bg: #ffffff;
+    --bg: #fafafa;
     --bg-raised: #f6f8fa;
-    --bg-surface: #ffffff;
+    --bg-surface: #fafafa;
     --border: #d0d7de;
     --border-accent: #22c55e;
     --text: #24292f;
@@ -56,7 +56,7 @@ $effect(() => {
     --accent: #0969da;
     --accent-dim: rgba(9, 105, 218, 0.15);
     --cyan: #0550ae;
-    --bg-home: #ffffff;
+    --bg-home: #fafafa;
     --border-subtle: rgba(0, 0, 0, 0.08);
     --disclaimer-bg: #e5e7eb;
     --disclaimer-text: #6b7280;

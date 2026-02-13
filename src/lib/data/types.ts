@@ -8,6 +8,7 @@ export interface VerbSet {
   category: string
   verbCount: number
   verbs: string[]
+  createdAt: string
 }
 
 export interface Author {

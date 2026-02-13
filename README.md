@@ -47,8 +47,4 @@ Contributors can optionally add an `authorInfo` object to their set JSON to cont
 
 ## Project Structure
 
-```text
-src/
-  app.html             # HTML template
-  routes/+page.svelte  # Home page
-```
+See [CLAUDE.md](CLAUDE.md) for the full project structure.

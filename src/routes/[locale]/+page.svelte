@@ -104,8 +104,11 @@ onMount(() => {
     revealed = true
   }
   const sets = loadSets()
+  let initVersion = 0
+  let tornDown = false
 
   function init() {
+    const version = ++initVersion
     createApp(wrap, sets, {
       onMarketplace: unlock,
       onEscSkipActivated: () => {
@@ -117,6 +120,10 @@ onMount(() => {
       },
       preferredLang: data.preferredLang,
     }).then((handle) => {
+      if (tornDown || version !== initVersion) {
+        handle.cleanup()
+        return
+      }
       appHandle = handle
       if (skipIntro) {
         handle.disableScrollZoom()
@@ -130,6 +137,8 @@ onMount(() => {
   const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
       if (mutation.attributeName === 'data-theme') {
+        const nextTheme = document.documentElement.getAttribute('data-theme')
+        if (mutation.oldValue === nextTheme) continue
         appHandle?.cleanup()
         appHandle = undefined
         init()
@@ -138,7 +147,11 @@ onMount(() => {
     }
   })
 
-  observer.observe(document.documentElement, { attributes: true })
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+    attributeOldValue: true,
+  })
 
   function onScroll() {
     if (mobile || !revealed) return
@@ -151,6 +164,8 @@ onMount(() => {
   document.addEventListener('keyup', onRestartKeyUp)
 
   return () => {
+    tornDown = true
+    initVersion++
     appHandle?.cleanup()
     observer.disconnect()
     window.removeEventListener('scroll', onScroll)

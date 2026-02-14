@@ -5,7 +5,7 @@
     "project_name": "Claude Verbs Website",
     "project_slug": "claude-verbs-website",
     "description": "Platform to exchange claude verb sets",
-    "author": "Jurre-Jan Smit",
+    "author": "doublej",
     "include_tracking": "y",
     "mcp_servers": "none",
     "mcp_scope": "project"

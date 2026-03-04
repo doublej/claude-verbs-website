@@ -63,7 +63,7 @@ const { data }: { data: PageData } = $props()
   :global(html) { scroll-behavior: smooth; }
   :global(body) { font-family: var(--mono); background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
   .page { min-height: 100vh; }
-  .fr { max-width: var(--max-w); margin: 0 auto; padding: 0 1.5rem; }
+  .fr { margin: 0; padding: 0 1.5rem; }
   .hero { padding: 4rem 0 3rem; text-align: center; }
   .badge { display: inline-flex; align-items: center; gap: 0.5rem; font: 600 0.72rem var(--mono); color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); padding: 0.4rem 0.875rem; margin-bottom: 1.5rem; letter-spacing: 0.02em; }
   .badge-i { font-size: 0.85rem; }

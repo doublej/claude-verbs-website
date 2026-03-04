@@ -1,5 +1,11 @@
 import { Easing, Tween } from '@tweenjs/tween.js'
-import { type FocusTarget, SEQUENCE, type TweenableKey, TWEENABLE_KEYS, stateConfig } from './config'
+import {
+  type FocusTarget,
+  SEQUENCE,
+  TWEENABLE_KEYS,
+  type TweenableKey,
+  stateConfig,
+} from './config'
 import type { LayoutCtx } from './layout'
 import type { Params } from './params'
 import type { SceneRefs } from './scene'
@@ -57,7 +63,10 @@ function resolveFocusPosition(
   }
   switch (focus) {
     case 'header':
-      return { x: 0, y: s.scrollContainer.children[0] ? globalY(s.scrollContainer.children[0]) : screenH * 0.3 }
+      return {
+        x: 0,
+        y: s.scrollContainer.children[0] ? globalY(s.scrollContainer.children[0]) : screenH * 0.3,
+      }
     case 'spinner':
       return { x: 0, y: globalY(s.spinnerLine) }
     case 'prompt':
@@ -181,9 +190,16 @@ export function createZoomController(
     })
 
     if (pos.x > 0 || pos.y > 0) {
-      currentFocusTween = createFocusTween(params, pos, cfg.focusStrength, dur, updateCamera, () => {
-        currentFocusTween = null
-      })
+      currentFocusTween = createFocusTween(
+        params,
+        pos,
+        cfg.focusStrength,
+        dur,
+        updateCamera,
+        () => {
+          currentFocusTween = null
+        },
+      )
     }
   }
 

@@ -18,7 +18,11 @@ export function updateFocusCrosshair(g: Graphics, p: Params): void {
   const y = p.focusTargetY
   g.clear()
   g.setStrokeStyle({ width: 2, color: COLOR, alpha: ALPHA })
-  g.moveTo(x - SIZE, y).lineTo(x + SIZE, y).stroke()
-  g.moveTo(x, y - SIZE).lineTo(x, y + SIZE).stroke()
+  g.moveTo(x - SIZE, y)
+    .lineTo(x + SIZE, y)
+    .stroke()
+  g.moveTo(x, y - SIZE)
+    .lineTo(x, y + SIZE)
+    .stroke()
   g.circle(x, y, SIZE * 0.6).stroke()
 }

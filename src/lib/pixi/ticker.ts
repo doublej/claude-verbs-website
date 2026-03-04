@@ -97,7 +97,6 @@ export function tickScroll(
     ts.lastScrollTime = now
     ts.layoutDirty = true
   }
-
 }
 
 const CLOCK_THROTTLE_MS = 100

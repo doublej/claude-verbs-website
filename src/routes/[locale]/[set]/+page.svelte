@@ -3,25 +3,23 @@ import AuthorPopup from '$lib/components/AuthorPopup.svelte'
 import { onMount } from 'svelte'
 import type { PageData } from './$types'
 
-const SPINNER_CHARS = ['|', '/', '-', '\\']
-
+const SPIN = ['|', '/', '-', '\\']
 const { data }: { data: PageData } = $props()
-
 const set = $derived(data.set)
 const author = $derived(data.author)
 const seo = $derived(data.seo)
-const normalizedVerbs = $derived(set.verbs.map((v) => v.replace(/^\s*I(?:[\u2019']m| am)\s+/i, '')))
-const installCmd = $derived(`bunx github:doublej/claude-verbs-cli install ${set.name}`)
-const PREVIEW_LIMIT = 12
-const previewVerbs = $derived(normalizedVerbs.slice(0, PREVIEW_LIMIT))
-const hasMore = $derived(set.verbCount > previewVerbs.length)
+const verbs = $derived(set.verbs.map((v) => v.replace(/^\s*I(?:[\u2019']m| am)\s+/i, '')))
+const cmd = $derived(`bunx github:doublej/claude-verbs-cli install ${set.name}`)
+const LIMIT = 12
+const preview = $derived(verbs.slice(0, LIMIT))
+const more = $derived(set.verbCount > preview.length)
 
 let copied = $state(false)
-let currentVerb = $state('')
-let spinnerChar = $state('|')
+let verb = $state('')
+let spin = $state('|')
 
-function copyInstallCmd() {
-  navigator.clipboard.writeText(installCmd)
+function copy() {
+  navigator.clipboard.writeText(cmd)
   copied = true
   setTimeout(() => {
     copied = false
@@ -29,27 +27,21 @@ function copyInstallCmd() {
 }
 
 onMount(() => {
-  const shuffled = [...normalizedVerbs]
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-  }
-  currentVerb = shuffled[0] ?? 'Thinking...'
-
-  let verbIdx = 0
-  let charIdx = 0
-  const verbTimer = setInterval(() => {
-    verbIdx = (verbIdx + 1) % shuffled.length
-    currentVerb = shuffled[verbIdx]
+  const sh = [...verbs].sort(() => Math.random() - 0.5)
+  verb = sh[0] ?? 'Thinking...'
+  let vi = 0
+  let si = 0
+  const vt = setInterval(() => {
+    vi = (vi + 1) % sh.length
+    verb = sh[vi]
   }, 2200)
-  const charTimer = setInterval(() => {
-    charIdx = (charIdx + 1) % SPINNER_CHARS.length
-    spinnerChar = SPINNER_CHARS[charIdx]
+  const st = setInterval(() => {
+    si = (si + 1) % SPIN.length
+    spin = SPIN[si]
   }, 200)
-
   return () => {
-    clearInterval(verbTimer)
-    clearInterval(charTimer)
+    clearInterval(vt)
+    clearInterval(st)
   }
 })
 </script>
@@ -72,259 +64,82 @@ onMount(() => {
   <meta name="twitter:image" content={seo.twitterImageUrl} />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
-    rel="stylesheet"
-  />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
 </svelte:head>
 
-<main class="detail">
-  <div class="container">
-    <a class="back" href="/{data.locale}#browse">&#8592; all sets</a>
-
-    <h1 class="detail__name">{set.displayName}</h1>
-    <p class="detail__desc">{set.description}</p>
-
-    <div class="detail__meta">
-      <span class="detail__author">
-        {#if author?.avatarUrl}
-          <img class="detail__avatar" src="{author.avatarUrl}&s=40" alt="" loading="lazy" />
-        {/if}
-        <a class="detail__author-link" href="https://github.com/{set.github}" target="_blank" rel="noopener">{set.author}</a>
-        {#if author}
-          <AuthorPopup {author} />
-        {/if}
-      </span>
-      <span>{set.verbCount} verbs</span>
-    </div>
-
-    <div class="preview" aria-live="polite" aria-label="Live verb preview">
-      <span class="preview__icon" aria-hidden="true">{spinnerChar}</span>
-      <span class="preview__verb">{currentVerb}</span>
-      <span class="preview__cursor" aria-hidden="true"></span>
-    </div>
-
-    <div class="install-block">
-      <div class="install-block__label">Install</div>
-      <button class="install-block__cmd" onclick={copyInstallCmd} title="Copy install command">
-        <span class="install-block__prompt">$</span> {installCmd}
-        <span class="install-block__copy">
-          {#if copied}
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-          {:else}
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="0"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-          {/if}
-        </span>
+<main class="page">
+  <div class="fr">
+    <nav class="nav"><a class="back" href="/{data.locale}#browse"><span class="arr">←</span><span>All sets</span></a></nav>
+    <header class="hd">
+      <div class="meta">
+        <div class="auth">
+          {#if author?.avatarUrl}<img class="av" src="{author.avatarUrl}&s=40" alt="" loading="lazy" />{/if}
+          <a class="al" href="https://github.com/{set.github}" target="_blank" rel="noopener">{set.author}</a>
+          {#if author}<AuthorPopup {author} />{/if}
+        </div>
+        <div class="stats"><span class="cnt">{set.verbCount}</span><span class="lbl">verbs</span></div>
+      </div>
+      <h1 class="name">{set.displayName}</h1>
+      <p class="desc">{set.description}</p>
+    </header>
+    <div class="pv" aria-live="polite"><span class="sp">{spin}</span><span class="txt">{verb}</span><span class="cur"></span></div>
+    <section class="inst">
+      <h2 class="ih">Install</h2>
+      <button class="cmd" onclick={copy} title="Copy install command">
+        <span class="pr">$</span><span class="ct">{cmd}</span>
+        <span class="ac">{#if copied}<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>{:else}<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="0"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>{/if}</span>
       </button>
-    </div>
-
-    <div class="verbs">
-      <div class="verbs__label">{hasMore ? `Preview (${previewVerbs.length} of ${set.verbCount})` : 'All verbs'}</div>
-      <ul class="verbs__list">
-        {#each previewVerbs as verb, i}
-          <li class="verbs__item">
-            <span class="verbs__index">{String(i + 1).padStart(2, '0')}</span>
-            <span class="verbs__text">{verb}</span>
-          </li>
-        {/each}
-      </ul>
-      {#if hasMore}
-        <p class="verbs__more">Install to get all {set.verbCount} verbs</p>
-      {/if}
-    </div>
+    </section>
+    <section class="vbs">
+      <h2 class="vh">{more ? `Preview (${preview.length} of ${set.verbCount})` : 'All verbs'}</h2>
+      <ol class="vl">{#each preview as v, i}<li class="vi"><span class="vn">{String(i + 1).padStart(2, '0')}</span><span class="vt">{v}</span></li>{/each}</ol>
+      {#if more}<p class="vm">Install to unlock all {set.verbCount} verbs</p>{/if}
+    </section>
   </div>
 </main>
 
 <style>
-  :global(body) {
-    font-family: var(--mono);
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  .container { max-width: var(--max-w); margin: 0 auto; padding: 0 1.5rem; }
-
-  .detail { padding: 3rem 0 4rem; }
-
-  .back {
-    display: inline-block;
-    color: var(--text-faint);
-    text-decoration: none;
-    font-size: 0.78rem;
-    margin-bottom: 2rem;
-    transition: color 0.2s;
-  }
-  .back:hover { color: var(--accent); }
-
-  .detail__name {
-    font-size: clamp(1.5rem, 4vw, 2.5rem);
-    font-weight: 700;
-    color: var(--accent);
-    margin-bottom: 0.5rem;
-  }
-  .detail__name::before { content: '> '; color: var(--text-faint); }
-
-  .detail__desc {
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    margin-bottom: 1.5rem;
-    max-width: 560px;
-  }
-
-  .detail__meta {
-    display: flex;
-    gap: 1rem;
-    font-size: 0.78rem;
-    color: var(--text-faint);
-    margin-bottom: 2rem;
-  }
-
-  .detail__author {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    position: relative;
-  }
-  .detail__author:hover :global(.author-popup) { display: block; }
-
-  .detail__avatar { width: 20px; height: 20px; border-radius: 0; }
-
-  .detail__author-link {
-    color: var(--text-faint);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .detail__author-link:hover { color: var(--accent); }
-
-  /* ---- Preview ---- */
-
-  .preview {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: color-mix(in srgb, var(--bg) 60%, transparent);
-    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
-    padding: 0.5rem 1rem;
-    margin-bottom: 2rem;
-    font-size: 0.85rem;
-  }
-
-  .preview__icon {
-    color: var(--accent);
-    font-weight: 700;
-    width: 1ch;
-    display: inline-block;
-    text-align: center;
-  }
-
-  .preview__verb { color: var(--text); white-space: nowrap; }
-
-  .preview__cursor {
-    display: inline-block;
-    width: 0.5ch;
-    height: 1em;
-    background: var(--accent);
-    vertical-align: text-bottom;
-    animation: blink 1s step-end infinite;
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
-
-  /* ---- Install ---- */
-
-  .install-block { margin-bottom: 2.5rem; }
-
-  .install-block__label {
-    font-size: 0.72rem;
-    color: var(--text-faint);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 0.5rem;
-  }
-
-  .install-block__cmd {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-    max-width: 560px;
-    background: color-mix(in srgb, var(--bg-surface) 70%, transparent);
-    border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
-    padding: 0.75rem 1rem;
-    font: 0.82rem var(--mono);
-    color: var(--text);
-    cursor: pointer;
-    text-align: left;
-    transition: border-color 0.2s;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-
-  .install-block__cmd:hover { border-color: var(--accent); }
-
-  .install-block__prompt { color: var(--accent); font-weight: 700; }
-
-  .install-block__copy {
-    margin-left: auto;
-    color: var(--text-faint);
-    display: flex;
-    transition: color 0.2s;
-  }
-
-  .install-block__cmd:hover .install-block__copy { color: var(--accent); }
-
-  /* ---- Verbs ---- */
-
-  .verbs { max-width: 560px; }
-
-  .verbs__label {
-    font-size: 0.72rem;
-    color: var(--text-faint);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 0.5rem;
-  }
-
-  .verbs__list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
-    font-size: 0.8rem;
-  }
-
-  .verbs__item {
-    display: flex;
-    align-items: baseline;
-    gap: 0.75rem;
-    padding: 0.4rem 0.75rem;
-    color: var(--text-muted);
-    border-bottom: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
-    transition: background-color 0.15s;
-  }
-
-  .verbs__item:last-child { border-bottom: none; }
-
-  .verbs__item:hover { background: var(--accent-dim); }
-
-  .verbs__index {
-    color: var(--text-faint);
-    font-size: 0.7rem;
-    flex-shrink: 0;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .verbs__text { flex: 1; }
-
-  .verbs__more {
-    margin-top: 0.75rem;
-    font-size: 0.75rem;
-    color: var(--text-faint);
-    font-style: italic;
-  }
+  :global(body) { font-family: var(--mono); background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .page { min-height: 100vh; padding: 0 0 4rem; }
+  .fr { max-width: var(--max-w); margin: 0 auto; padding: 0 1.5rem; }
+  .nav { padding: 2rem 0; }
+  .back { display: inline-flex; align-items: center; gap: 0.5rem; font: 500 0.78rem var(--mono); color: var(--text-faint); text-decoration: none; transition: color 0.15s; }
+  .back:hover { color: var(--text); }
+  .arr { font-size: 1rem; transition: transform 0.15s; }
+  .back:hover .arr { transform: translateX(-2px); }
+  .hd { margin-bottom: 2rem; }
+  .meta { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+  .auth { display: flex; align-items: center; gap: 0.5rem; position: relative; }
+  .auth:hover :global(.author-popup) { display: block; }
+  .av { width: 24px; height: 24px; opacity: 0.9; }
+  .al { font: 400 0.78rem var(--mono); color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+  .al:hover { color: var(--accent); }
+  .stats { display: flex; align-items: baseline; gap: 0.35rem; }
+  .cnt { font: 700 1.5rem var(--display); color: var(--accent); line-height: 1; }
+  .lbl { font: 400 0.72rem var(--mono); color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.05em; }
+  .name { font: 700 clamp(1.5rem, 5vw, 2.5rem) var(--display); color: var(--text); margin-bottom: 0.5rem; line-height: 1.2; }
+  .desc { font: 400 0.85rem var(--mono); color: var(--text-muted); line-height: 1.6; max-width: 560px; }
+  .pv { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--bg-surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 0.875rem 1.25rem; margin-bottom: 2.5rem; font: 400 0.9rem var(--mono); }
+  .sp { color: var(--accent); font-weight: 700; width: 1ch; text-align: center; }
+  .txt { color: var(--text); }
+  .cur { width: 0.5ch; height: 1.1em; background: var(--accent); animation: blink 1s step-end infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  .inst { margin-bottom: 2.5rem; }
+  .ih { font: 600 0.72rem var(--mono); color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+  .cmd { display: flex; align-items: center; gap: 0.75rem; width: 100%; max-width: 600px; background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 1rem 1.25rem; font: 400 0.85rem var(--mono); color: var(--text); cursor: pointer; text-align: left; transition: border-color 0.15s; }
+  .cmd:hover { border-color: var(--accent); }
+  .pr { color: var(--accent); font-weight: 700; flex-shrink: 0; }
+  .ct { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ac { flex-shrink: 0; color: var(--text-faint); display: flex; transition: color 0.15s; }
+  .cmd:hover .ac { color: var(--accent); }
+  .vbs { max-width: 600px; }
+  .vh { font: 600 0.72rem var(--mono); color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+  .vl { list-style: none; margin: 0; padding: 0; border: 1px solid var(--border-subtle); }
+  .vi { display: flex; align-items: baseline; gap: 1rem; padding: 0.625rem 1rem; font: 400 0.82rem var(--mono); color: var(--text-muted); border-bottom: 1px solid var(--border-subtle); transition: background-color 0.1s; }
+  .vi:last-child { border-bottom: none; }
+  .vi:hover { background: var(--bg-raised); }
+  .vn { font: 400 0.7rem var(--mono); color: var(--text-faint); font-variant-numeric: tabular-nums; flex-shrink: 0; width: 2ch; }
+  .vt { flex: 1; }
+  .vm { margin-top: 1rem; font: 400 0.78rem var(--mono); color: var(--text-faint); font-style: italic; }
+  @media (max-width: 640px) { .nav { padding: 1.5rem 0; } .meta { flex-direction: column; align-items: flex-start; gap: 0.75rem; } .pv { display: flex; width: 100%; } .cmd { padding: 0.875rem 1rem; } }
 </style>

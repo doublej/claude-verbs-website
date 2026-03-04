@@ -1,45 +1,40 @@
 /** Timing, zoom, and sequencing configuration for the TUI animation. */
 
 export type FocusTarget =
-  | "center"
-  | "prompt"
-  | "spinner"
-  | "bootHint"
-  | "header"
-  | { line: number; char?: number };
+  | 'center'
+  | 'prompt'
+  | 'spinner'
+  | 'bootHint'
+  | 'header'
+  | { line: number; char?: number }
 
 /** Numeric Params keys that can be tweened per-state transition. */
-export type TweenableKey =
-  | "scale"
-  | "brightness"
-  | "saturation"
-  | "exposure"
-  | "bloomStrength";
+export type TweenableKey = 'scale' | 'brightness' | 'saturation' | 'exposure' | 'bloomStrength'
 
 export const TWEENABLE_KEYS: TweenableKey[] = [
-  "scale",
-  "brightness",
-  "saturation",
-  "exposure",
-  "bloomStrength",
-];
+  'scale',
+  'brightness',
+  'saturation',
+  'exposure',
+  'bloomStrength',
+]
 
 export interface StateConfig {
-  zoom: number;
-  scale: number;
-  brightness: number;
-  saturation: number;
-  exposure: number;
-  bloomStrength: number;
-  focusY: FocusTarget;
-  focusStrength: number;
-  durationMs: number;
-  showInput: boolean;
-  showSpinner: boolean;
-  showMeta: boolean;
+  zoom: number
+  scale: number
+  brightness: number
+  saturation: number
+  exposure: number
+  bloomStrength: number
+  focusY: FocusTarget
+  focusStrength: number
+  durationMs: number
+  showInput: boolean
+  showSpinner: boolean
+  showMeta: boolean
 }
 
-type PartialStateConfig = Partial<StateConfig>;
+type PartialStateConfig = Partial<StateConfig>
 
 export const SEQUENCE = {
   boot: {
@@ -115,33 +110,30 @@ export const SEQUENCE = {
     promo: 40,
   },
   demo: { stateDiagramMs: 20000, promoMs: 30000 },
-};
+}
 
-export type StateKey = keyof typeof SEQUENCE.zoom.states;
+export type StateKey = keyof typeof SEQUENCE.zoom.states
 
 /** Map State enum → config key. Import State lazily to avoid circular deps. */
 const STATE_KEYS: StateKey[] = [
-  "INTRO", // 0
-  "INTRO_READY", // 1
-  "IDLE", // 2
-  "BROWSING", // 3
-  "DEMO", // 4
-  "POST_DEMO", // 5
-  "BUGGED", // 6
-  "ESC_COUNTDOWN", // 7
-];
+  'INTRO', // 0
+  'INTRO_READY', // 1
+  'IDLE', // 2
+  'BROWSING', // 3
+  'DEMO', // 4
+  'POST_DEMO', // 5
+  'BUGGED', // 6
+  'ESC_COUNTDOWN', // 7
+]
 
 /** Resolved configs: each state inherits unset fields from the previous one. */
-const resolvedStates: StateConfig[] = STATE_KEYS.reduce<StateConfig[]>(
-  (acc, key, i) => {
-    const partial = SEQUENCE.zoom.states[key];
-    const prev = i > 0 ? acc[i - 1] : ({} as StateConfig);
-    acc.push({ ...prev, ...partial });
-    return acc;
-  },
-  [],
-);
+const resolvedStates: StateConfig[] = STATE_KEYS.reduce<StateConfig[]>((acc, key, i) => {
+  const partial = SEQUENCE.zoom.states[key]
+  const prev = i > 0 ? acc[i - 1] : ({} as StateConfig)
+  acc.push({ ...prev, ...partial })
+  return acc
+}, [])
 
 export function stateConfig(state: number): StateConfig {
-  return resolvedStates[state];
+  return resolvedStates[state]
 }

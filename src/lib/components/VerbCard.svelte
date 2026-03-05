@@ -1,7 +1,12 @@
 <script lang="ts">
 import type { Author, VerbSet } from '$lib/data/types'
+import type { AppHandle } from '$lib/pixi/app'
 
-const { set, author }: { set: VerbSet; author: Author | undefined } = $props()
+const {
+  set,
+  author,
+  appHandle,
+}: { set: VerbSet; author: Author | undefined; appHandle?: AppHandle } = $props()
 const cmd = $derived(`bunx github:doublej/claude-verbs-cli install ${set.name}`)
 
 let copied = $state(false)
@@ -16,7 +21,7 @@ function copy(e: MouseEvent) {
 }
 </script>
 
-<article class="c">
+<article class="c" onmouseenter={() => appHandle?.previewSet(set)} onmouseleave={() => appHandle?.stopPreview()}>
   <div class="top">
     <span class="nm">{set.displayName}</span>
     <span class="meta">{set.verbCount} verbs · {set.author}</span>
@@ -27,11 +32,11 @@ function copy(e: MouseEvent) {
 </article>
 
 <style>
-  .c { display: flex; align-items: center; gap: 0.75rem; border: 1px solid var(--border); padding: 0.625rem 0.875rem; font-family: var(--mono); background: var(--bg-surface); }
+  .c { display: flex; align-items: center; gap: 0.75rem; border: 1px solid var(--border); padding: 0.625rem 0.875rem; font-family: var(--mono); background: var(--bg-surface); height: 3.5rem; }
   .c:hover { border-color: var(--text); }
-  .top { display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; }
-  .nm { font: 700 0.82rem var(--mono); color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .meta { font: 400 0.65rem var(--mono); color: var(--text-muted); white-space: nowrap; }
-  .btn { flex-shrink: 0; font: 600 0.65rem var(--mono); color: var(--text-muted); background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.5rem; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .top { display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; flex: 1; }
+  .nm { font: 700 0.82rem var(--mono); color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+  .meta { font: 400 0.65rem var(--mono); color: var(--text-muted); white-space: nowrap; text-align: left; }
+  .btn { flex-shrink: 0; font: 600 0.65rem var(--mono); color: var(--text-muted); background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.5rem; cursor: pointer; transition: all 0.15s; white-space: nowrap; min-width: 4.5rem; text-align: center; }
   .btn:hover, .btn.cp { color: var(--text); border-color: var(--text); }
 </style>

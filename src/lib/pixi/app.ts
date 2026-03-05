@@ -106,6 +106,8 @@ export interface AppHandle {
   restartExperience: () => void
   setOverlapped: (v: boolean) => void
   skipToMarketplace: () => void
+  previewSet: (set: VerbSet) => void
+  stopPreview: () => void
 }
 
 export async function createApp(
@@ -530,6 +532,13 @@ export async function createApp(
       resetEsc(escSkip)
       enterState(State.POST_DEMO)
       options?.onMarketplace?.()
+    },
+    previewSet: (set: VerbSet) => {
+      machine.activeSet = set
+      enterState(State.DEMO)
+    },
+    stopPreview: () => {
+      enterState(State.POST_DEMO)
     },
   }
 }

@@ -77,17 +77,17 @@ export function createParams(): Params {
     colorEllipsis: isLight ? '#737373' : '#a2a2a2',
     bgColor: isLight ? '#f5f5f5' : '#0d1117',
     colorHighlight: isLight ? '#e0d9c2' : '#56533e',
-    perspective: 3000, // CAMERA_DEFAULTS.perspective
-    rotateX: 5, // CAMERA_DEFAULTS.rotateX
-    rotateY: 8, // CAMERA_DEFAULTS.rotateY
-    rotateZ: -4, // CAMERA_DEFAULTS.rotateZ
+    perspective: 3000,
+    rotateX: 45,
+    rotateY: -4,
+    rotateZ: 25.5,
     scale: 1,
     translateX: 0,
     translateY: 0,
     mouseTranslateX: 0,
     mouseTranslateY: 0,
-    originX: 4.8, // CAMERA_DEFAULTS.originX
-    originY: 5.3, // CAMERA_DEFAULTS.originY
+    originX: 16.8,
+    originY: 41.3,
     displayDownscale: 0.5,
     imageRendering: 'pixelated',
     fontSize: 48,

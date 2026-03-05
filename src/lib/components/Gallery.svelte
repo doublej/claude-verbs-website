@@ -1,13 +1,15 @@
 <script lang="ts">
 import { langName } from '$lib/data/lang-names'
 import type { Authors, VerbSets } from '$lib/data/types'
+import type { AppHandle } from '$lib/pixi/app'
 import VerbCard from './VerbCard.svelte'
 
 const {
   sets,
   authors,
   preferredLang = '',
-}: { sets: VerbSets; authors: Authors; preferredLang?: string } = $props()
+  appHandle,
+}: { sets: VerbSets; authors: Authors; preferredLang?: string; appHandle?: AppHandle } = $props()
 
 const langs = $derived(
   Object.keys(sets).sort((a, b) => {
@@ -26,7 +28,7 @@ const langs = $derived(
         <div class="lang">{langName(l)}</div>
         <div class="blocks">
           {#each items as s (s.name)}
-            <VerbCard set={s} author={authors[s.github]} />
+            <VerbCard set={s} author={authors[s.github]} {appHandle} />
           {/each}
         </div>
       </div>
@@ -35,14 +37,12 @@ const langs = $derived(
 </div>
 
 <style>
-  .g { display: flex; flex-direction: column; }
-  .row { display: grid; grid-template-columns: 120px 1fr; border-bottom: 1px solid var(--border-subtle); }
-  .row:first-child { border-top: 1px solid var(--border-subtle); }
-  .lang { font: 700 0.75rem var(--mono); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; padding: 1.5rem 1rem 1.5rem 0; position: sticky; left: 0; }
-  .blocks { display: flex; flex-wrap: wrap; gap: 1px; padding: 1rem 0; }
+  .g { display: flex; flex-direction: column; gap: 1.5rem; }
+  .row { display: grid; grid-template-columns: 100px 1fr; gap: 0.75rem; align-items: start; }
+  .lang { font: 700 0.75rem var(--mono); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; padding-top: 0.625rem; }
+  .blocks { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1px; }
   @media (max-width: 640px) {
     .row { grid-template-columns: 1fr; }
-    .lang { padding: 1rem 0 0.25rem; position: static; }
-    .blocks { padding: 0.25rem 0 1rem; }
+    .lang { padding-top: 0; }
   }
 </style>

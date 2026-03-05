@@ -65,11 +65,11 @@ export const LAYOUT = {
 export const CAMERA_DEFAULTS = {
   gridDivisions: 32,
   perspective: 3000,
-  rotateX: 5,
-  rotateY: 8,
-  rotateZ: -4,
-  originX: 4.8,
-  originY: 5.3,
+  rotateX: 45,
+  rotateY: -4,
+  rotateZ: 25.5,
+  originX: 16.8,
+  originY: 41.3,
 }
 
 export const MOUSE_DEFAULTS = {

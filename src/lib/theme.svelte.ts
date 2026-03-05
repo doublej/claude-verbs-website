@@ -88,7 +88,7 @@ function initTheme(): void {
     applyThemeMode(stored)
   } else {
     wasDetected = true
-    applyThemeMode('system')
+    applyThemeMode('dark')
   }
   enableTransitionsAfterFirstPaint()
 }

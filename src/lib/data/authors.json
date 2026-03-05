@@ -2,26 +2,26 @@
   "doublej": {
     "username": "doublej",
     "avatarUrl": "https://avatars.githubusercontent.com/u/548350?v=4",
-    "name": "doublej",
+    "name": "Jurre-Jan Smit",
     "bio": null,
     "repos": [
+      {
+        "name": "siargao-market",
+        "description": null,
+        "stars": 0,
+        "url": "https://github.com/doublej/siargao-market"
+      },
+      {
+        "name": "flights",
+        "description": "Fast, robust Google Flights scraper (API) for Python. (Probably)",
+        "stars": 0,
+        "url": "https://github.com/doublej/flights"
+      },
       {
         "name": "claude-verbs-website",
         "description": null,
         "stars": 0,
         "url": "https://github.com/doublej/claude-verbs-website"
-      },
-      {
-        "name": "claude-verbs",
-        "description": null,
-        "stars": 0,
-        "url": "https://github.com/doublej/claude-verbs"
-      },
-      {
-        "name": "envchain-tools-manager",
-        "description": null,
-        "stars": 0,
-        "url": "https://github.com/doublej/envchain-tools-manager"
       }
     ]
   },
@@ -30,14 +30,7 @@
     "avatarUrl": "https://avatars.githubusercontent.com/u/5793718?v=4",
     "name": "David van Driel",
     "bio": null,
-    "repos": [
-      {
-        "name": "claude-verbs-cli",
-        "description": null,
-        "stars": 0,
-        "url": "https://github.com/davidvandriel/claude-verbs-cli"
-      }
-    ]
+    "repos": []
   },
   "anthropics": {
     "username": "anthropics",
@@ -46,22 +39,22 @@
     "bio": null,
     "repos": [
       {
-        "name": "argo-cd",
-        "description": "Declarative Continuous Deployment for Kubernetes",
-        "stars": 0,
-        "url": "https://github.com/anthropics/argo-cd"
-      },
-      {
-        "name": "claudes-c-compiler",
-        "description": "Claude Opus 4.6 wrote a dependency-free C compiler in Rust, with backends targeting x86 (64- and 32-bit), ARM, and RISC-V, capable of compiling a booting Linux kernel.",
-        "stars": 2113,
-        "url": "https://github.com/anthropics/claudes-c-compiler"
-      },
-      {
-        "name": "nix-eval-jobs",
-        "description": "Parallel nix evaluator with a streamable json output [maintainers @Mic92, @adisbladis]",
+        "name": "agent-sdk-workshop",
+        "description": null,
         "stars": 1,
-        "url": "https://github.com/anthropics/nix-eval-jobs"
+        "url": "https://github.com/anthropics/agent-sdk-workshop"
+      },
+      {
+        "name": "financial-services-plugins",
+        "description": null,
+        "stars": 5365,
+        "url": "https://github.com/anthropics/financial-services-plugins"
+      },
+      {
+        "name": "moka",
+        "description": "A high performance concurrent caching library for Rust",
+        "stars": 4,
+        "url": "https://github.com/anthropics/moka"
       }
     ]
   }
